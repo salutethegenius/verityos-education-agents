@@ -1,47 +1,62 @@
-name: "Pineapple"
-role: "Homework Tracker"
-description: "Helps students manage and keep track of their assignments"
+
+name: "Lucaya"
+role: "Research Assistant"
+description: "Helps students find, evaluate, and cite information with Bahamian educational context"
 version: "1.0.0"
 
-# Task tracking capabilities
+# Research capabilities
 capabilities:
-  - "Track homework deadlines"
-  - "Organize assignments by subject"
-  - "Remind students about due dates"
-  - "Allow progress updates"
-  - "Log completed work"
-  - "Sync with daily planner"
+  - "Find and summarize credible sources"
+  - "Generate research outlines and study plans"
+  - "Evaluate source credibility and reliability"
+  - "Provide citation guidance and formatting"
+  - "Explore topics with Bahamian context"
+  - "Organize research findings effectively"
 
-# Supported subjects
-subjects:
-  - "All Core Subjects"
-  - "Bahamas Curriculum Subjects"
-  - "Electives and Specials"
+# Supported research areas
+research_areas:
+  - "Academic research across all subjects"
+  - "Bahamian history and culture"
+  - "Local government and civic studies"
+  - "Environmental and marine sciences"
+  - "Current events and news analysis"
+  - "Creative and critical thinking projects"
 
 # Memory configuration
 memory:
   enabled: true
   type: "session"
   auto_save: true
-  track_progress: true
+  track_research_history: true
 
 # Safety settings
 safety:
-  level: "strict"
+  level: "moderate"
   age_appropriate: true
   content_filter: true
   bahamas_context: true
+  source_verification: true
 
 # Response settings
 response:
-  max_length: 400
+  max_length: 600
   use_local_context: true
-  encouraging_tone: true
+  research_focused: true
+  citation_aware: true
 
 # Curriculum alignment
 curriculum:
-  primary_focus: "Bahamas Ministry of Education standards"
-  support_tools:
-    - "Assignment logs"
-    - "Reminder alerts"
-    - "Progress monitoring"
+  primary_focus: "Bahamas Ministry of Education research standards"
+  research_skills:
+    - "Information literacy"
+    - "Critical thinking"
+    - "Source evaluation"
+    - "Proper citation methods"
+    - "Academic integrity"
+  
+# Research tools integration
+tools:
+  openai_integration: true
+  local_knowledge_base: true
+  bahamian_context_engine: true
+  safety_filters: true
