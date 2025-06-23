@@ -395,6 +395,106 @@ body {
     border-top: 1px solid #e0e6ed;
 }
 
+/* Student Portal Styles */
+.student-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.student-header h1 {
+    margin: 0;
+    font-size: 1.5em;
+}
+
+.student-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.logout-btn {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.logout-btn:hover {
+    background: rgba(255,255,255,0.3);
+}
+
+.student-notice {
+    text-align: center;
+    padding: 10px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 5px;
+    margin-top: 10px;
+    color: #6c757d;
+}
+
+.help-samples {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.sample-text {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background 0.2s;
+}
+
+.sample-text:hover {
+    background: #e9ecef;
+}
+
+.chat-history-item {
+    padding: 12px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.chat-history-item:hover {
+    background: #f8f9fa;
+}
+
+.chat-history-item.active {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.chat-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.chat-preview {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 4px;
+}
+
+.chat-meta {
+    color: #999;
+    font-size: 0.8em;
+}
+
 /* Student Login Styles */
 .login-container {
     display: flex;

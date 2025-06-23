@@ -32,7 +32,7 @@
 
             <div id="chat-container">
                 <div id="chat-window">
-                    <div class="message bot">Welcome! I'm ready to help you with your studies.</div>
+                    <!-- Messages will be populated here -->
                 </div>
 
                 <div id="input-area">
@@ -46,11 +46,12 @@
             </div>
         </div>
 
-        <!-- Right sidebar for agent controls and help -->
+        <!-- Right sidebar for agent controls -->
         <div id="controls-sidebar">
             <div id="agent-controls">
                 <h3>📚 Learning Assistants</h3>
                 <div class="control-group">
+                    <label>🤖 Assistant</label>
                     <select id="agent-select">
                         <option value="sage">🧙‍♂️ Sage - Tutor</option>
                         <option value="echo">🗣️ Echo - Reading Coach</option>
@@ -83,7 +84,12 @@
             <div id="agent-help">
                 <h3>💡 How to Use</h3>
                 <div id="help-content">
-                    <!-- Help content will be populated by JavaScript -->
+                    <h4>🧙‍♂️ Sage - Math Homework Help</h4>
+                    <div class="help-samples">
+                        <div class="sample-text">• "What is 25 + 47?"</div>
+                        <div class="sample-text">• "Help me solve: 2x + 5 = 15"</div>
+                        <div class="sample-text">• "Check my work: 12 × 8 = 96"</div>
+                    </div>
                 </div>
             </div>
         </div>
