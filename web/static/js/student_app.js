@@ -448,19 +448,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialize
     updateTaskOptions();
-    updateAgentHelp();
-    loadChatHistorySidebar();
     
-    // Initialize help content with click handlers
+    // Wait a bit for dropdowns to be populated before updating help
     setTimeout(() => {
-        document.querySelectorAll('.sample-text').forEach(sample => {
-            sample.addEventListener('click', function() {
-                const text = this.textContent.replace('• "', '').replace('"', '');
-                document.getElementById('message-input').value = text;
-                document.getElementById('message-input').focus();
-            });
-        });
+        updateAgentHelp();
     }, 100);
+    
+    loadChatHistorySidebar();
     
     if (chatSessions.length === 0) {
         startNewChat();
@@ -572,6 +566,8 @@ function updateAgentHelp() {
     const subject = document.getElementById('subject-select').value;
     const task = document.getElementById('task-select').value;
     
+    console.log('[DEBUG] updateAgentHelp called with:', { currentAgent, subject, task });
+    
     // Get specific help content based on agent, subject, and task
     let help = null;
     
@@ -579,16 +575,18 @@ function updateAgentHelp() {
         dynamicHelp[currentAgent][subject] && 
         dynamicHelp[currentAgent][subject][task]) {
         help = dynamicHelp[currentAgent][subject][task];
+        console.log('[DEBUG] Found specific help content');
     } else if (dynamicHelp[currentAgent] && dynamicHelp[currentAgent][subject]) {
         // Fallback to first available task for this subject
         const availableTasks = Object.keys(dynamicHelp[currentAgent][subject]);
         if (availableTasks.length > 0) {
             help = dynamicHelp[currentAgent][subject][availableTasks[0]];
+            console.log('[DEBUG] Using fallback help content for task:', availableTasks[0]);
         }
     } else {
         // Generic fallback
         help = {
-            title: `${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)} - ${subject} ${task}`,
+            title: `${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)} - ${subject.charAt(0).toUpperCase() + subject.slice(1)} ${task.charAt(0).toUpperCase() + task.slice(1)}`,
             samples: [
                 '• "Ask me anything about this subject"',
                 '• "Help me understand this topic"',
@@ -597,25 +595,35 @@ function updateAgentHelp() {
                 '• "Practice questions please"'
             ]
         };
+        console.log('[DEBUG] Using generic fallback help content');
     }
     
-    helpContent.innerHTML = `
-        <h4>${help.title}</h4>
-        <div class="help-samples">
-            ${help.samples.map(sample => `<div class="sample-text">${sample}</div>`).join('')}
-        </div>
-    `;
-    
-    // Add click handlers for sample texts
-    setTimeout(() => {
-        document.querySelectorAll('.sample-text').forEach(sample => {
-            sample.addEventListener('click', function() {
-                const text = this.textContent.replace('• "', '').replace('"', '');
-                document.getElementById('message-input').value = text;
-                document.getElementById('message-input').focus();
+    if (helpContent && help) {
+        helpContent.innerHTML = `
+            <h4>${help.title}</h4>
+            <div class="help-samples">
+                ${help.samples.map(sample => `<div class="sample-text">${sample}</div>`).join('')}
+            </div>
+        `;
+        
+        console.log('[DEBUG] Help content updated successfully');
+        
+        // Add click handlers for sample texts
+        setTimeout(() => {
+            document.querySelectorAll('.sample-text').forEach(sample => {
+                sample.addEventListener('click', function() {
+                    const text = this.textContent.replace('• "', '').replace('"', '');
+                    const messageInput = document.getElementById('message-input');
+                    if (messageInput) {
+                        messageInput.value = text;
+                        messageInput.focus();
+                    }
+                });
             });
-        });
-    }, 50);
+        }, 50);
+    } else {
+        console.error('[ERROR] helpContent element or help data not found');
+    }
 }
 
 function startNewChat() {
@@ -770,6 +778,8 @@ function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value.trim();
     
+    console.log('[DEBUG] sendMessage called with message:', message);
+    
     if (!message || message.length === 0) {
         addMessage('📝 Please enter a message before sending!', 'error');
         messageInput.focus();
@@ -784,8 +794,13 @@ function sendMessage() {
     
     // Prevent button spamming
     const sendButton = document.getElementById('send-button');
-    if (sendButton.disabled) return;
-    sendButton.disabled = true;
+    if (sendButton && sendButton.disabled) {
+        console.log('[DEBUG] Send button already disabled, preventing duplicate send');
+        return;
+    }
+    if (sendButton) {
+        sendButton.disabled = true;
+    }
     
     const subject = document.getElementById('subject-select').value;
     const task = document.getElementById('task-select').value;
@@ -827,7 +842,9 @@ function sendMessage() {
     })
     .finally(() => {
         // Re-enable send button
-        sendButton.disabled = false;
+        if (sendButton) {
+            sendButton.disabled = false;
+        }
         
         // Save session after each message
         saveChatSession();
