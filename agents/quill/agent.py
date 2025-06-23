@@ -30,8 +30,15 @@ class QuillAgent(BaseAgent):
     def process_message(self, message: str, **kwargs) -> str:
         """Process incoming messages - required implementation of abstract method"""
         try:
+            # Extract subject and task from kwargs to avoid duplicate arguments
+            subject = kwargs.get('subject', 'general')
+            task = kwargs.get('task', 'general')
+            
+            # Remove subject and task from kwargs to avoid conflicts
+            filtered_kwargs = {k: v for k, v in kwargs.items() if k not in ['subject', 'task']}
+            
             # For basic messages, treat them as assignment submissions
-            return self.process_assignment(message, "general", "general", **kwargs)
+            return self.process_assignment(message, task, subject, **filtered_kwargs)
         except Exception as e:
             print(f"[ERROR] QuillAgent encountered: {e}")
             return "I apologize, but I'm having trouble processing your message. Could you try rephrasing it? 🤔"
