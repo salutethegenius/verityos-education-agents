@@ -15,3 +15,15 @@ FLASK_DEBUG = "0"
 [[ports]]
 localPort = 3000
 externalPort = 80
+
+[workflows]
+runButton = "Start VerityOS"
+
+[[workflows.workflow]]
+name = "Start VerityOS"
+author = 36910130
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"

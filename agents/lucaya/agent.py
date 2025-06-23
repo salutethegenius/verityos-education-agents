@@ -413,5 +413,6 @@ def run_agent(message: str, payload: Optional[Dict[str, Any]] = None) -> str:
         
         return response
     else:
-        return agent.process_direct_message(message)on_id=session_id, user_type=user_type)
-    return agent.process_research_query(message, subject=subject)
+        # Initialize with default session
+        agent.initialize_session("default-session", "student")
+        return agent.process_message(message)
