@@ -1,0 +1,53 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerityOS Education - Student Login</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <h1>🎓 VerityOS Education</h1>
+            <h2>Student Portal</h2>
+            
+            <form id="student-login-form">
+                <div class="form-group">
+                    <label for="student-id">Student ID:</label>
+                    <input type="text" id="student-id" name="student-id" placeholder="Enter your Student ID (e.g., JS001)" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="student-name">Full Name:</label>
+                    <input type="text" id="student-name" name="student-name" placeholder="Enter your full name" required>
+                </div>
+                
+                <button type="submit" class="login-btn">Login to Learning Portal</button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Need help? Ask your teacher for your Student ID</p>
+                <a href="/">Teacher Portal</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('student-login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const studentId = document.getElementById('student-id').value;
+            const studentName = document.getElementById('student-name').value;
+            
+            // Store student info in session
+            sessionStorage.setItem('student_id', studentId);
+            sessionStorage.setItem('student_name', studentName);
+            
+            // Redirect to student interface
+            window.location.href = `/student?id=${studentId}&name=${encodeURIComponent(studentName)}`;
+        });
+    </script>
+</body>
+</html>

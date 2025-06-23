@@ -23,6 +23,14 @@ logger = logging.getLogger(__name__)
 def index():
     return render_template("agent_interface.html", agent="sage")
 
+@app.route("/student-login")
+def student_login():
+    return render_template("student_login.html")
+
+@app.route("/student")
+def student_interface():
+    return render_template("student_interface.html")
+
 @app.route('/api/<agent_name>', methods=['POST'])
 def agent_endpoint(agent_name):
     try:

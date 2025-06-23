@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerityOS Education - Student Portal</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 VerityOS Education - Student Portal</h1>
+            <div class="student-info">
+                <span id="student-welcome">Welcome, Student!</span>
+                <button onclick="logout()" class="logout-btn">Logout</button>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="agents-sidebar">
+                <h3>📚 Learning Assistants</h3>
+                <div class="agent-list">
+                    <button class="agent-btn active" data-agent="sage">
+                        🧙‍♂️ Sage - Tutor
+                    </button>
+                    <button class="agent-btn" data-agent="echo">
+                        🗣️ Echo - Reading Coach
+                    </button>
+                    <button class="agent-btn" data-agent="lucaya">
+                        🔍 Lucaya - Research
+                    </button>
+                </div>
+                
+                <div class="learning-controls">
+                    <h4>📖 Subject</h4>
+                    <select id="subject-select">
+                        <option value="math">Mathematics</option>
+                        <option value="science">Science</option>
+                        <option value="english">English</option>
+                        <option value="history">History</option>
+                        <option value="bahamas studies">Bahamas Studies</option>
+                    </select>
+                    
+                    <h4>📝 Activity</h4>
+                    <select id="task-select">
+                        <option value="homework">Homework Help</option>
+                        <option value="study">Study Session</option>
+                        <option value="quiz">Practice Quiz</option>
+                        <option value="review">Review</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="chat-area">
+                <div class="chat-messages" id="chat-messages"></div>
+                
+                <div class="chat-input-area">
+                    <div class="input-group">
+                        <input type="text" id="message-input" placeholder="Ask me anything about your studies..." autocomplete="off">
+                        <button id="send-button">Send</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/student_app.js"></script>
+</body>
+</html>
