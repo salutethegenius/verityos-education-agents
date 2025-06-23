@@ -28,22 +28,94 @@
         </div>
 
         <div id="input-area">
-          <select id="agent-select">
-            <option value="sage">Sage (Tutor)</option>
-            <option value="quill" disabled>Quill (Autograder) - Coming Soon</option>
-            <option value="lucaya">Lucaya (Research)</option>
-            <option value="echo">Echo (Comprehension)</option>
-            <option value="nassau">Nassau (Admin)</option>
-            <option value="pineapple">Pineapple (Homework)</option>
-          </select>
+          <textarea id="message-input" placeholder="Type your message here... (Shift+Enter for new line)"></textarea>
+          <button id="send-button">Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right sidebar for agent controls and AI settings -->
+    <div id="controls-sidebar">
+      <div id="agent-controls">
+        <h3>🤖 Agent Selection</h3>
+        <select id="agent-select">
+          <option value="sage">Sage (Tutor)</option>
+          <option value="quill" disabled>Quill (Autograder) - Coming Soon</option>
+          <option value="lucaya">Lucaya (Research)</option>
+          <option value="echo">Echo (Comprehension)</option>
+          <option value="nassau">Nassau (Admin)</option>
+          <option value="pineapple">Pineapple (Homework)</option>
+        </select>
+        
+        <div class="control-group">
+          <label for="subject-select">Subject:</label>
           <select id="subject-select">
             <!-- Options will be populated by JavaScript based on selected agent -->
           </select>
+        </div>
+        
+        <div class="control-group">
+          <label for="task-select">Task:</label>
           <select id="task-select">
             <!-- Options will be populated by JavaScript based on selected agent -->
           </select>
-          <textarea id="message-input" placeholder="Type your message here... (Shift+Enter for new line)"></textarea>
-          <button id="send-button">Send</button>
+        </div>
+      </div>
+
+      <div id="ai-settings">
+        <h3>⚙️ AI Settings</h3>
+        
+        <div class="control-group">
+          <label for="temperature-slider">Creativity Level:</label>
+          <div class="slider-container">
+            <input type="range" id="temperature-slider" min="0" max="10" value="7" step="1">
+            <div class="slider-labels">
+              <span>Focused</span>
+              <span id="temperature-value">7</span>
+              <span>Creative</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label for="response-length">Response Length:</label>
+          <select id="response-length">
+            <option value="short">Brief</option>
+            <option value="medium" selected>Balanced</option>
+            <option value="long">Detailed</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="focus-mode">Focus Mode:</label>
+          <select id="focus-mode">
+            <option value="educational" selected>Educational</option>
+            <option value="conversational">Conversational</option>
+            <option value="problem-solving">Problem Solving</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="explanation-style">Explanation Style:</label>
+          <select id="explanation-style">
+            <option value="simple">Simple</option>
+            <option value="standard" selected>Standard</option>
+            <option value="detailed">Detailed</option>
+          </select>
+        </div>
+
+        <div class="control-group checkbox-group">
+          <label>
+            <input type="checkbox" id="bahamian-context" checked>
+            Use Bahamian Context
+          </label>
+        </div>
+
+        <div class="control-group checkbox-group">
+          <label>
+            <input type="checkbox" id="step-by-step" checked>
+            Show Step-by-Step
+          </label>
         </div>
       </div>
     </div>

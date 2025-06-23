@@ -56,6 +56,16 @@ document.addEventListener('DOMContentLoaded', function() {
             newChatBtn.addEventListener('click', startNewChat);
         }
 
+        // Add temperature slider functionality
+        const temperatureSlider = document.getElementById('temperature-slider');
+        const temperatureValue = document.getElementById('temperature-value');
+        
+        if (temperatureSlider && temperatureValue) {
+            temperatureSlider.addEventListener('input', function() {
+                temperatureValue.textContent = this.value;
+            });
+        }
+
         // Initialize session management
         if (!currentSessionId) {
             currentSessionId = generateSessionId();
@@ -600,6 +610,14 @@ async function sendMessage() {
         messageInput.value = '';
         messageInput.style.height = 'auto'; // Reset height after sending
 
+        // Collect AI settings
+        const temperature = document.getElementById('temperature-slider')?.value || 7;
+        const responseLength = document.getElementById('response-length')?.value || 'medium';
+        const focusMode = document.getElementById('focus-mode')?.value || 'educational';
+        const explanationStyle = document.getElementById('explanation-style')?.value || 'standard';
+        const bahamianContext = document.getElementById('bahamian-context')?.checked || true;
+        const stepByStep = document.getElementById('step-by-step')?.checked || true;
+
         // Send to backend
         fetch(`/api/${agent}`, {
             method: 'POST',
@@ -611,7 +629,15 @@ async function sendMessage() {
                 subject: subject,
                 task: task,
                 session_id: currentSessionId,
-                user_type: 'student'
+                user_type: 'student',
+                ai_settings: {
+                    temperature: parseFloat(temperature) / 10, // Convert to 0-1 range
+                    response_length: responseLength,
+                    focus_mode: focusMode,
+                    explanation_style: explanationStyle,
+                    bahamian_context: bahamianContext,
+                    step_by_step: stepByStep
+                }
             })
         })
         .then(response => {
