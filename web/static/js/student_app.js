@@ -439,17 +439,23 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => updateAgentHelp(), 300);
     });
     
-    // Set up send button with comprehensive debugging
+    // Set up send button with comprehensive debugging and duplicate prevention
     const sendButton = document.getElementById('send-button');
     const messageInput = document.getElementById('message-input');
     
     console.log('[DEBUG] Setting up event listeners:', {
         sendButton: !!sendButton,
-        messageInput: !!messageInput
+        messageInput: !!messageInput,
+        sendButtonListeners: sendButton ? sendButton.onclick : 'N/A'
     });
     
     if (sendButton) {
         console.log('[DEBUG] Adding click listener to send button');
+        
+        // Remove any existing listeners first
+        sendButton.onclick = null;
+        
+        // Add single click handler
         sendButton.addEventListener('click', function(e) {
             console.log('[DEBUG] ===== SEND BUTTON CLICKED =====');
             console.log('[DEBUG] Event details:', {
@@ -457,13 +463,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 target: e.target.tagName,
                 timeStamp: e.timeStamp,
                 isTrusted: e.isTrusted,
-                currentTarget: e.currentTarget === sendButton
+                currentTarget: e.currentTarget === sendButton,
+                buttonDisabled: sendButton.disabled
             });
             e.preventDefault();
+            e.stopPropagation();
+            
+            // Extra check to prevent disabled button clicks
+            if (sendButton.disabled) {
+                console.log('[DEBUG] Button click ignored - button is disabled');
+                return;
+            }
+            
             sendMessage();
-        });
+        }, { once: false });
         
-        // Add additional debugging for button state changes
+        // Add state monitoring
         const observer = new MutationObserver((mutations) => {
             mutations.forEach((mutation) => {
                 if (mutation.type === 'attributes' && mutation.attributeName === 'disabled') {
@@ -478,30 +493,42 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (messageInput) {
-        console.log('[DEBUG] Adding keypress listener to message input');
-        messageInput.addEventListener('keypress', function(e) {
-            console.log('[DEBUG] ===== KEYPRESS EVENT =====');
+        console.log('[DEBUG] Adding input listeners');
+        
+        // Keydown handler for Enter key (more reliable than keypress)
+        messageInput.addEventListener('keydown', function(e) {
+            console.log('[DEBUG] ===== KEYDOWN EVENT =====');
             console.log('[DEBUG] Key details:', {
                 key: e.key,
                 code: e.code,
                 shiftKey: e.shiftKey,
                 ctrlKey: e.ctrlKey,
                 inputValue: `"${this.value}"`,
-                inputLength: this.value.length
+                inputLength: this.value.length,
+                sendButtonDisabled: sendButton ? sendButton.disabled : 'N/A'
             });
             
             if (e.key === 'Enter' && !e.shiftKey) {
-                console.log('[DEBUG] Enter key pressed - triggering send');
+                console.log('[DEBUG] Enter key pressed - preventing default and triggering send');
                 e.preventDefault();
+                e.stopPropagation();
+                
+                // Extra check for button state
+                if (sendButton && sendButton.disabled) {
+                    console.log('[DEBUG] Enter key ignored - send button is disabled');
+                    return;
+                }
+                
                 sendMessage();
             }
         });
         
-        // Add debugging for input changes
+        // Input handler for auto-resize and monitoring
         messageInput.addEventListener('input', function(e) {
             console.log('[DEBUG] Input changed:', {
                 value: `"${this.value}"`,
                 length: this.value.length,
+                hasContent: this.value.trim().length > 0,
                 selectionStart: this.selectionStart,
                 selectionEnd: this.selectionEnd
             });
@@ -511,7 +538,7 @@ document.addEventListener('DOMContentLoaded', function() {
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
         
-        // Add focus/blur debugging
+        // Focus/blur monitoring
         messageInput.addEventListener('focus', function() {
             console.log('[DEBUG] Message input focused');
         });
@@ -944,7 +971,7 @@ async function loadAgentSession(agent) {
 }
 
 function sendMessage() {
-    console.log('[DEBUG] ===== SEND MESSAGE FUNCTION CALLED =====');
+    console.log('[DEBUG] ===== STUDENT SEND MESSAGE FUNCTION CALLED =====');
     console.log('[DEBUG] Call stack:', new Error().stack);
     
     const messageInput = document.getElementById('message-input');
@@ -952,102 +979,99 @@ function sendMessage() {
     
     console.log('[DEBUG] Elements found:', {
         messageInput: !!messageInput,
-        sendButton: !!sendButton
+        sendButton: !!sendButton,
+        messageInputValue: messageInput ? `"${messageInput.value}"` : 'N/A',
+        sendButtonDisabled: sendButton ? sendButton.disabled : 'N/A'
     });
     
     if (!messageInput) {
-        console.error('[ERROR] Message input not found');
+        console.error('[ERROR] Message input not found - CRITICAL ERROR');
         return;
     }
     
-    const rawMessage = messageInput.value;
+    if (!sendButton) {
+        console.error('[ERROR] Send button not found - CRITICAL ERROR');
+        return;
+    }
+    
+    const rawMessage = messageInput.value || '';
     const message = rawMessage.trim();
     
-    console.log('[DEBUG] Message analysis:', {
+    console.log('[DEBUG] Message validation analysis:', {
         rawValue: `"${rawMessage}"`,
         rawLength: rawMessage.length,
         trimmedValue: `"${message}"`,
         trimmedLength: message.length,
-        hasWhitespaceOnly: rawMessage.replace(/\s+/g, '').length === 0,
+        hasContent: message.length > 0,
+        hasNonWhitespace: message.replace(/\s+/g, '').length > 0,
+        hasLettersOrNumbers: /[a-zA-Z0-9]/.test(message),
         messageInput_focused: document.activeElement === messageInput,
-        sendButton_disabled: sendButton ? sendButton.disabled : 'N/A'
+        sendButton_disabled: sendButton.disabled
     });
     
-    // Enhanced validation for empty messages
-    if (!message || message.length === 0 || message === '' || message.replace(/\s+/g, '').length === 0) {
-        console.log('[DEBUG] Empty or whitespace-only message detected - BLOCKING SEND');
-        console.log('[DEBUG] Validation failed:', {
+    // STRICT validation for empty messages - this is the main issue
+    if (!message || message.length === 0 || !message.replace(/\s+/g, '') || !/[a-zA-Z0-9]/.test(message)) {
+        console.log('[DEBUG] ===== EMPTY MESSAGE BLOCKED =====');
+        console.log('[DEBUG] Validation results:', {
             truthyCheck: !!message,
             lengthCheck: message.length > 0,
-            emptyStringCheck: message !== '',
-            whitespaceCheck: message.replace(/\s+/g, '').length > 0
+            whitespaceCheck: !!message.replace(/\s+/g, ''),
+            alphanumericCheck: /[a-zA-Z0-9]/.test(message)
         });
-        // Prevent sending empty messages
+        
+        // Don't show error message for empty, just refocus and exit
         messageInput.focus();
-        return;
-    }
-    
-    // Validate message contains actual content (not just special characters)
-    if (message.replace(/[^a-zA-Z0-9\s]/g, '').trim().length === 0) {
-        console.log('[DEBUG] Message contains no meaningful content');
-        addMessage('Please enter a meaningful question or message.', 'error');
-        messageInput.focus();
+        console.log('[DEBUG] Empty message handling complete - NO SEND');
         return;
     }
     
     // Student-specific limitations
     if (message.length > 300) {
+        console.log('[DEBUG] Message too long, blocking send');
         addMessage('📝 Please keep your questions shorter (under 300 characters) so I can help you better!', 'error');
+        messageInput.focus();
         return;
     }
     
-    // Prevent button spamming and validate button state
-    if (sendButton) {
-        console.log('[DEBUG] Checking send button state before send:', {
-            disabled: sendButton.disabled,
-            textContent: sendButton.textContent,
-            opacity: sendButton.style.opacity
-        });
-        
-        if (sendButton.disabled) {
-            console.log('[DEBUG] Send button already disabled, preventing duplicate send');
-            return;
-        }
-        
-        console.log('[DEBUG] Disabling send button for request');
-        sendButton.disabled = true;
-        sendButton.textContent = 'Sending...';
-        sendButton.style.opacity = '0.6';
-        sendButton.style.cursor = 'not-allowed';
-        
-        console.log('[DEBUG] Send button state after disable:', {
-            disabled: sendButton.disabled,
-            textContent: sendButton.textContent,
-            opacity: sendButton.style.opacity
-        });
+    // BUTTON STATE MANAGEMENT - Critical fix
+    if (sendButton.disabled) {
+        console.log('[DEBUG] Send button already disabled, preventing duplicate send');
+        return;
     }
+    
+    console.log('[DEBUG] ===== PROCESSING VALID MESSAGE =====');
+    console.log('[DEBUG] Message approved for sending:', `"${message}"`);
+    
+    // Disable button IMMEDIATELY to prevent double-clicks
+    sendButton.disabled = true;
+    sendButton.textContent = 'Sending...';
+    sendButton.style.opacity = '0.6';
+    sendButton.style.cursor = 'not-allowed';
     
     const subjectSelect = document.getElementById('subject-select');
     const taskSelect = document.getElementById('task-select');
     
     if (!subjectSelect || !taskSelect) {
         console.error('[ERROR] Subject or task select not found');
-        if (sendButton) {
-            sendButton.disabled = false;
-            sendButton.textContent = 'Send';
-        }
+        // Re-enable button on error
+        sendButton.disabled = false;
+        sendButton.textContent = 'Send';
+        sendButton.style.opacity = '1';
+        sendButton.style.cursor = 'pointer';
         return;
     }
     
     const subject = subjectSelect.value;
     const task = taskSelect.value;
     
-    // Add user message to chat
+    // Add user message to chat immediately
     addMessage(message, 'user');
+    
+    // Clear input immediately after adding to chat
     messageInput.value = '';
     messageInput.style.height = 'auto';
     
-    // Send to agent with student context
+    // Prepare payload
     const payload = {
         message: message,
         subject: subject,
@@ -1058,8 +1082,9 @@ function sendMessage() {
         user_type: 'student'
     };
     
-    console.log('[DEBUG] Sending payload:', payload);
+    console.log('[DEBUG] Sending API request with payload:', payload);
     
+    // Send to backend
     fetch(`/api/${currentAgent}`, {
         method: 'POST',
         headers: {
@@ -1068,49 +1093,41 @@ function sendMessage() {
         body: JSON.stringify(payload)
     })
     .then(response => {
+        console.log('[DEBUG] API response received:', response.status, response.statusText);
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         return response.json();
     })
     .then(data => {
-        console.log('[DEBUG] Received response:', data);
+        console.log('[DEBUG] API data received:', data);
         if (data.response) {
             addMessage(data.response, 'bot');
+        } else if (data.error) {
+            addMessage(`Error: ${data.error}`, 'error');
         } else {
             addMessage('Sorry, I had trouble understanding that. Please try again.', 'error');
         }
     })
     .catch(error => {
-        console.error('[ERROR] Fetch error:', error);
+        console.error('[ERROR] API request failed:', error);
         addMessage('Sorry, I encountered an error. Please try again.', 'error');
     })
     .finally(() => {
-        console.log('[DEBUG] Fetch request completed, re-enabling send button');
+        console.log('[DEBUG] ===== FINAL CLEANUP =====');
         
-        // Re-enable send button with proper state reset
+        // ALWAYS re-enable button in finally block
         if (sendButton) {
-            console.log('[DEBUG] Send button state before re-enable:', {
-                disabled: sendButton.disabled,
-                textContent: sendButton.textContent,
-                opacity: sendButton.style.opacity
-            });
-            
             sendButton.disabled = false;
             sendButton.textContent = 'Send';
             sendButton.style.opacity = '1';
             sendButton.style.cursor = 'pointer';
-            
-            console.log('[DEBUG] Send button state after re-enable:', {
-                disabled: sendButton.disabled,
-                textContent: sendButton.textContent,
-                opacity: sendButton.style.opacity
-            });
+            console.log('[DEBUG] Send button re-enabled successfully');
         }
         
-        // Save session after each message
+        // Save session after each successful message
         saveChatSession();
-        console.log('[DEBUG] ===== SEND MESSAGE FUNCTION COMPLETED =====');
+        console.log('[DEBUG] ===== STUDENT SEND MESSAGE COMPLETED =====');
     });
 }
 
