@@ -51,10 +51,10 @@ document.addEventListener('DOMContentLoaded', function() {
             currentSessionId = generateSessionId();
         }
         currentAgent = 'sage';
-        
+
         // Load chat history sidebar
         loadChatHistorySidebar();
-        
+
         // Load initial session or create new one
         if (chatSessions.length === 0) {
             startNewChat();
@@ -196,10 +196,10 @@ function loadChatHistorySidebar() {
   chatSessions.forEach((chat, index) => {
     const chatItem = document.createElement('div');
     chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
-    
+
     const agentName = chat.agent.charAt(0).toUpperCase() + chat.agent.slice(1);
     const date = new Date(chat.timestamp).toLocaleDateString();
-    
+
     chatItem.innerHTML = `
       <div class="chat-title">${chat.title || 'New Chat'}</div>
       <div class="chat-preview">${chat.lastMessage || 'No messages yet'}</div>
@@ -280,7 +280,7 @@ async function loadSessionHistory(agent) {
         if (data.conversation_history && data.conversation_history.length > 0) {
           // Convert server history to local format and store it
           const localHistory = [];
-          
+
           data.conversation_history.forEach(msg => {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${msg.role === 'user' ? 'user-message' : 'agent-message'}`;
@@ -292,7 +292,7 @@ async function loadSessionHistory(agent) {
             }
 
             chatWindow.appendChild(messageDiv);
-            
+
             // Store in local history for future switches
             localHistory.push({
               content: messageDiv.innerHTML,
@@ -316,7 +316,7 @@ async function loadSessionHistory(agent) {
       welcomeMessage.className = 'message agent-message';
       welcomeMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> Welcome! I'm ready to help you with your studies. How can I assist you today?`;
       chatWindow.appendChild(welcomeMessage);
-      
+
       // Store welcome message in local history
       conversationHistory[agent] = [{
         content: welcomeMessage.innerHTML,
@@ -461,7 +461,7 @@ function updateDropdowns() {
 function addMessage(message, type) {
     const chatWindow = document.getElementById('chat-window');
     const messageDiv = document.createElement('div');
-    
+
     if (type === 'user') {
         messageDiv.className = 'message user-message';
         messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
@@ -473,9 +473,9 @@ function addMessage(message, type) {
         messageDiv.className = 'message error-message';
         messageDiv.innerHTML = `<strong>Error:</strong> ${message}`;
     }
-    
+
     chatWindow.appendChild(messageDiv);
-    
+
     // Update local conversation history
     if (currentAgent) {
         if (!conversationHistory[currentAgent]) {
@@ -486,16 +486,16 @@ function addMessage(message, type) {
             className: messageDiv.className
         });
     }
-    
+
     // Save current chat session
     saveChatSession();
-    
+
     // Update sidebar
     loadChatHistorySidebar();
-    
+
     // Auto-scroll to bottom
     chatWindow.scrollTop = chatWindow.scrollHeight;
-    
+
     console.log(`[DEBUG] Added ${type} message: ${message.substring(0, 50)}...`);
 }
 
@@ -535,7 +535,7 @@ async function sendMessage() {
             console.log('[DEBUG] Empty message, not sending');
             return;
         }
-        
+
         // Update current agent and generate new session if needed
         if (agent !== currentAgent) {
             currentAgent = agent;
@@ -586,3 +586,32 @@ async function sendMessage() {
         addMessage('Sorry, something went wrong. Please refresh the page.', 'error');
     }
 }
+
+function addChatToHistory(agent, sessionId, firstMessage) {
+        try {
+            let history = JSON.parse(localStorage.getItem('chatHistory') || '[]');
+
+            // Check if this session already exists
+            const existingIndex = history.findIndex(chat => 
+                chat.agent === agent && chat.sessionId === sessionId
+            );
+
+            if (existingIndex === -1) {
+                const newChat = {
+                    agent: agent,
+                    sessionId: sessionId,
+                    title: firstMessage.length > 25 ? firstMessage.substring(0, 25) + '...' : firstMessage,
+                    timestamp: new Date().toLocaleString(),
+                    messageCount: 1
+                };
+                history.unshift(newChat);
+
+                // Keep only last 15 chats
+                history = history.slice(0, 15);
+                localStorage.setItem('chatHistory', JSON.stringify(history));
+                updateChatHistorySidebar();
+            }
+        } catch (e) {
+            console.error('Error saving chat history:', e);
+        }
+    }
