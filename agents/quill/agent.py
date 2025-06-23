@@ -37,11 +37,35 @@ class QuillAgent(BaseAgent):
             # Remove subject and task from kwargs to avoid conflicts
             filtered_kwargs = {k: v for k, v in kwargs.items() if k not in ['subject', 'task']}
             
-            # For basic messages, treat them as assignment submissions
+            # Handle greetings and introductions
+            if message.lower().strip() in ['hello', 'hi', 'hey', 'who are you', 'what do you do']:
+                return self.get_introduction()
+            
+            # For assignment submissions, use process_assignment
             return self.process_assignment(message, task, subject, **filtered_kwargs)
         except Exception as e:
             print(f"[ERROR] QuillAgent encountered: {e}")
+            import traceback
+            traceback.print_exc()
             return "I apologize, but I'm having trouble processing your message. Could you try rephrasing it? 🤔"
+    
+    def get_introduction(self) -> str:
+        """Provide an introduction to Quill's capabilities"""
+        return """📝 **Hello! I'm Quill, your AI autograder!** 
+
+I can help you by:
+• **Grading assignments** - Submit your work and I'll evaluate it
+• **Providing detailed feedback** - Get specific suggestions for improvement
+• **Rubric-based scoring** - Fair assessment across multiple criteria
+• **Supporting various subjects** - Math, English, Science, History, and more
+
+Just paste your assignment, essay, or homework answer, and I'll provide:
+- A detailed grade breakdown
+- Constructive feedback
+- Suggestions for improvement
+- Bahamian context when relevant
+
+What would you like me to grade today? 🌴"""
 
     def process_assignment(self, assignment_text: str, assignment_type: str, subject: str, **kwargs) -> str:
         try:

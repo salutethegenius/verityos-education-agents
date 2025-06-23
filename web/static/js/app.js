@@ -2,6 +2,8 @@
 let currentSessionId = null;
 let currentAgent = null;
 let conversationHistory = {};
+let chatSessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
+let currentChatIndex = -1;
 
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
@@ -14,6 +16,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const sendButton = document.getElementById('send-button');
         const messageInput = document.getElementById('message-input');
         const agentSelect = document.getElementById('agent-select');
+        const newChatBtn = document.getElementById('new-chat-btn');
 
         if (sendButton) {
             sendButton.addEventListener('click', sendMessage);
@@ -39,14 +42,25 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+        if (newChatBtn) {
+            newChatBtn.addEventListener('click', startNewChat);
+        }
+
         // Initialize session management
         if (!currentSessionId) {
             currentSessionId = generateSessionId();
         }
         currentAgent = 'sage';
         
-        // Load initial session
-        loadSessionHistory('sage');
+        // Load chat history sidebar
+        loadChatHistorySidebar();
+        
+        // Load initial session or create new one
+        if (chatSessions.length === 0) {
+            startNewChat();
+        } else {
+            loadChatSession(0);
+        }
 
     } catch (error) {
         console.error('[ERROR] Failed to initialize:', error);
@@ -55,6 +69,146 @@ document.addEventListener('DOMContentLoaded', function() {
 
 function generateSessionId() {
   return 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+}
+
+function startNewChat() {
+  // Save current chat if it exists
+  if (currentChatIndex >= 0) {
+    saveChatSession();
+  }
+
+  // Create new chat session
+  const newChat = {
+    id: generateSessionId(),
+    agent: currentAgent || 'sage',
+    title: 'New Chat',
+    lastMessage: '',
+    timestamp: new Date().toISOString(),
+    messages: []
+  };
+
+  chatSessions.unshift(newChat);
+  currentChatIndex = 0;
+  currentSessionId = newChat.id;
+
+  // Clear chat window
+  const chatWindow = document.getElementById('chat-window');
+  chatWindow.innerHTML = '';
+
+  // Show welcome message
+  const welcomeMessage = document.createElement('div');
+  welcomeMessage.className = 'message agent-message';
+  welcomeMessage.innerHTML = `<strong>${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)}:</strong> Welcome! I'm ready to help you with your studies. How can I assist you today?`;
+  chatWindow.appendChild(welcomeMessage);
+
+  // Update sidebar
+  loadChatHistorySidebar();
+
+  console.log('[DEBUG] Started new chat:', newChat.id);
+}
+
+function loadChatSession(index) {
+  if (index < 0 || index >= chatSessions.length) return;
+
+  // Save current chat first
+  if (currentChatIndex >= 0) {
+    saveChatSession();
+  }
+
+  const chat = chatSessions[index];
+  currentChatIndex = index;
+  currentSessionId = chat.id;
+  currentAgent = chat.agent;
+
+  // Update agent selector
+  const agentSelect = document.getElementById('agent-select');
+  if (agentSelect) {
+    agentSelect.value = currentAgent;
+    updateDropdowns();
+  }
+
+  // Load chat messages
+  const chatWindow = document.getElementById('chat-window');
+  chatWindow.innerHTML = '';
+
+  if (chat.messages && chat.messages.length > 0) {
+    chat.messages.forEach(msg => {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = msg.className;
+      messageDiv.innerHTML = msg.content;
+      chatWindow.appendChild(messageDiv);
+    });
+  } else {
+    // Show welcome message for empty chats
+    const welcomeMessage = document.createElement('div');
+    welcomeMessage.className = 'message agent-message';
+    welcomeMessage.innerHTML = `<strong>${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)}:</strong> Welcome! I'm ready to help you with your studies. How can I assist you today?`;
+    chatWindow.appendChild(welcomeMessage);
+  }
+
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+
+  // Update sidebar highlighting
+  loadChatHistorySidebar();
+
+  console.log('[DEBUG] Loaded chat session:', chat.id);
+}
+
+function saveChatSession() {
+  if (currentChatIndex < 0 || currentChatIndex >= chatSessions.length) return;
+
+  const chatWindow = document.getElementById('chat-window');
+  const messages = Array.from(chatWindow.children);
+
+  const chat = chatSessions[currentChatIndex];
+  chat.messages = messages.map(msg => ({
+    content: msg.innerHTML,
+    className: msg.className
+  }));
+
+  // Update title and last message
+  if (messages.length > 1) {
+    const lastUserMessage = messages.reverse().find(msg => 
+      msg.className.includes('user-message')
+    );
+    if (lastUserMessage) {
+      const messageText = lastUserMessage.textContent.replace('You:', '').trim();
+      chat.title = messageText.length > 30 ? 
+        messageText.substring(0, 30) + '...' : messageText;
+      chat.lastMessage = messageText;
+    }
+  }
+
+  chat.timestamp = new Date().toISOString();
+
+  // Save to localStorage
+  localStorage.setItem('chatSessions', JSON.stringify(chatSessions));
+
+  console.log('[DEBUG] Saved chat session:', chat.id);
+}
+
+function loadChatHistorySidebar() {
+  const historyList = document.getElementById('chat-history-list');
+  if (!historyList) return;
+
+  historyList.innerHTML = '';
+
+  chatSessions.forEach((chat, index) => {
+    const chatItem = document.createElement('div');
+    chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
+    
+    const agentName = chat.agent.charAt(0).toUpperCase() + chat.agent.slice(1);
+    const date = new Date(chat.timestamp).toLocaleDateString();
+    
+    chatItem.innerHTML = `
+      <div class="chat-title">${chat.title || 'New Chat'}</div>
+      <div class="chat-preview">${chat.lastMessage || 'No messages yet'}</div>
+      <div class="chat-meta">${agentName} • ${date}</div>
+    `;
+
+    chatItem.addEventListener('click', () => loadChatSession(index));
+    historyList.appendChild(chatItem);
+  });
 }
 
 function switchAgent() {
@@ -332,6 +486,12 @@ function addMessage(message, type) {
             className: messageDiv.className
         });
     }
+    
+    // Save current chat session
+    saveChatSession();
+    
+    // Update sidebar
+    loadChatHistorySidebar();
     
     // Auto-scroll to bottom
     chatWindow.scrollTop = chatWindow.scrollHeight;
