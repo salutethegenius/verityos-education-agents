@@ -26,6 +26,7 @@ class QuillAgent(BaseAgent):
 
     def initialize_session(self, session_id: str, user_type: str = "student", **kwargs) -> None:
         super().initialize_session(session_id, user_type)
+        self.student_level = kwargs.get("grade_level", "middle")  # Set default student level
 
     def process_message(self, message: str, **kwargs) -> str:
         """Process incoming messages - required implementation of abstract method"""
