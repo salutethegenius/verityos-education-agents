@@ -348,7 +348,7 @@ body {
   margin-right: 60px;
 }
 
-/* Mobile-First Responsive Design */
+/* Responsive Design */
 @media (max-width: 1200px) {
   #controls-sidebar {
     width: 280px;
@@ -356,303 +356,41 @@ body {
 }
 
 @media (max-width: 768px) {
-  body {
-    font-size: 16px; /* Prevent zoom on iOS */
-    -webkit-text-size-adjust: 100%;
-    overflow-x: hidden;
-  }
-
   #app-container {
     flex-direction: column;
-    height: 100vh;
-    max-height: 100vh;
   }
 
   #sidebar {
     width: 100%;
-    height: 180px;
+    height: 200px;
     order: 3;
-    min-height: 180px;
-    flex-shrink: 0;
   }
 
   #main-content {
     order: 1;
     flex: 1;
-    padding: 0.75rem;
-    min-height: 0;
   }
 
   #controls-sidebar {
     width: 100%;
-    height: 200px;
+    height: 250px;
     order: 2;
     flex-direction: row;
-    gap: 0.75rem;
+    gap: 1rem;
     overflow-x: auto;
-    padding: 0.75rem;
+  }
+
+  #agent-controls, #ai-settings {
+    min-width: 250px;
     flex-shrink: 0;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  #agent-controls, #ai-settings, #agent-help {
-    min-width: 280px;
-    flex-shrink: 0;
-    padding: 0.75rem;
-  }
-
-  #chat-container {
-    display: flex;
-    flex-direction: column;
-    height: calc(100% - 60px);
-  }
-
-  #chat-window {
-    flex: 1;
-    padding: 0.75rem;
-    margin-bottom: 0.75rem;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-    min-height: 200px;
   }
 
   #input-area {
     flex-direction: column;
-    gap: 0.5rem;
-    flex-shrink: 0;
   }
 
   #message-input {
     min-width: auto;
-    min-height: 44px; /* iOS touch target size */
-    font-size: 16px; /* Prevent zoom on iOS */
-    padding: 12px;
-    border-radius: 8px;
-  }
-
-  #send-button {
-    min-height: 44px; /* iOS touch target size */
-    font-size: 16px;
-    padding: 12px 20px;
-    border-radius: 8px;
-  }
-
-  /* Touch-friendly controls */
-  #new-chat-btn {
-    min-height: 44px;
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .control-group select {
-    min-height: 44px;
-    font-size: 16px;
-    padding: 12px;
-  }
-
-  .sample-text {
-    min-height: 44px;
-    padding: 12px;
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-  }
-
-  .chat-history-item {
-    min-height: 44px;
-    padding: 12px;
-  }
-
-  /* Student header mobile adjustments */
-  .student-header {
-    flex-direction: column;
-    gap: 0.5rem;
-    text-align: center;
-    padding: 1rem;
-  }
-
-  .student-header h1 {
-    font-size: 1.25rem;
-    margin: 0;
-  }
-
-  .student-info {
-    justify-content: center;
-    gap: 1rem;
-  }
-
-  .logout-btn {
-    min-height: 44px;
-    padding: 10px 16px;
-    font-size: 16px;
-  }
-
-  /* Message styling for mobile */
-  .message {
-    padding: 12px;
-    margin: 8px 0;
-    font-size: 16px;
-    line-height: 1.5;
-  }
-
-  .message.user-message {
-    margin-left: 20px;
-  }
-
-  .message.agent-message, .message.error-message {
-    margin-right: 20px;
-  }
-
-  /* Dashboard mobile adjustments */
-  .stats-grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .stat-card {
-    padding: 1rem;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .dashboard-card {
-    padding: 1rem;
-  }
-
-  /* Temperature slider touch improvements */
-  #temperature-slider {
-    height: 8px;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #temperature-slider::-webkit-slider-thumb {
-    width: 24px;
-    height: 24px;
-    -webkit-appearance: none;
-    appearance: none;
-  }
-
-  #temperature-slider::-moz-range-thumb {
-    width: 24px;
-    height: 24px;
-    border: none;
-  }
-}
-
-/* Extra small devices (phones in portrait) */
-@media (max-width: 480px) {
-  body {
-    font-size: 14px;
-  }
-
-  #main-content {
-    padding: 0.5rem;
-  }
-
-  #controls-sidebar {
-    padding: 0.5rem;
-    height: 180px;
-  }
-
-  #agent-controls, #ai-settings, #agent-help {
-    min-width: 250px;
-    padding: 0.5rem;
-  }
-
-  #sidebar {
-    height: 160px;
-  }
-
-  #sidebar-header {
-    padding: 0.75rem;
-  }
-
-  #sidebar-header h3 {
-    font-size: 1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .student-header h1 {
-    font-size: 1.1rem;
-  }
-
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .stat-number {
-    font-size: 1.5rem;
-  }
-
-  .message {
-    padding: 10px;
-    font-size: 14px;
-  }
-
-  .message.user-message {
-    margin-left: 10px;
-  }
-
-  .message.agent-message, .message.error-message {
-    margin-right: 10px;
-  }
-}
-
-/* Landscape phone adjustments */
-@media (max-width: 768px) and (orientation: landscape) {
-  #app-container {
-    flex-direction: row;
-  }
-
-  #sidebar {
-    width: 250px;
-    height: 100vh;
-    order: 1;
-  }
-
-  #main-content {
-    order: 2;
-    flex: 1;
-  }
-
-  #controls-sidebar {
-    width: 280px;
-    height: 100vh;
-    order: 3;
-    flex-direction: column;
-    overflow-y: auto;
-  }
-
-  #agent-controls, #ai-settings, #agent-help {
-    min-width: auto;
-    width: 100%;
-  }
-}
-
-/* Touch device improvements */
-@media (hover: none) and (pointer: coarse) {
-  .sample-text:active,
-  .chat-history-item:active,
-  button:active {
-    background-color: rgba(0, 0, 0, 0.1);
-    transform: scale(0.98);
-    transition: all 0.1s;
-  }
-
-  /* Improve touch targets */
-  .checkbox-group input[type="checkbox"] {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-  }
-
-  /* Better tap highlights */
-  * {
-    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1);
   }
 }
 
