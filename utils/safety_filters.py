@@ -10,6 +10,85 @@ import logging
 logger = logging.getLogger(__name__)
 
 class SafetyFilter:
+    """Comprehensive safety filtering for student inputs and agent outputs"""
+    
+    def __init__(self):
+        self.inappropriate_words = [
+            "violence", "hate", "inappropriate", "harmful", "dangerous"
+        ]
+        
+        self.spam_patterns = [
+            r"(.)\1{10,}",  # 10+ repeated characters (like aaaaaaaaaa)
+            r"^[!@#$%^&*()]{5,}$",  # Only special characters
+        ]
+    
+    def validate_student_input(self, message: str) -> Tuple[bool, str]:
+        """Validate student input for safety and appropriateness"""
+        if not message or not message.strip():
+            return True, ""
+        
+        message_clean = message.strip()
+        
+        # Check for actual spam patterns, but exclude legitimate math
+        if self._is_spam_input(message_clean):
+            return False, "Please avoid repetitive characters."
+        
+        # Check for inappropriate content
+        if self._contains_inappropriate_content(message_clean):
+            return False, "Let's keep our conversation educational and appropriate."
+        
+        return True, ""
+    
+    def _is_spam_input(self, message: str) -> bool:
+        """Check if input is spam, excluding legitimate mathematical expressions"""
+        # Don't flag mathematical expressions
+        if re.search(r'\d+\s*[×*+\-/÷]\s*\d+', message):
+            return False
+        
+        # Don't flag if it contains math-related words
+        math_words = ['multiply', 'times', 'plus', 'minus', 'divide', 'equals', 'calculate']
+        if any(word in message.lower() for word in math_words):
+            return False
+        
+        # Check for actual spam patterns
+        for pattern in self.spam_patterns:
+            if re.search(pattern, message):
+                return True
+        
+        # Check for keyboard mashing (random letters)
+        if len(message) > 8 and re.match(r'^[a-zA-Z]+$', message):
+            # Count unique characters
+            unique_chars = len(set(message.lower()))
+            if unique_chars < len(message) * 0.3:  # Less than 30% unique characters
+                return True
+        
+        return False
+    
+    def _contains_inappropriate_content(self, message: str) -> bool:
+        """Check for inappropriate content"""
+        message_lower = message.lower()
+        return any(word in message_lower for word in self.inappropriate_words)
+    
+    def filter_content(self, content: str, safety_level: str = "moderate", grade_level: str = "middle") -> Tuple[str, List[str]]:
+        """Filter agent output content for safety"""
+        if not content:
+            return content, []
+        
+        issues = []
+        filtered_content = content
+        
+        # Apply content filtering based on safety level
+        if safety_level == "strict":
+            # More restrictive filtering for younger students
+            sensitive_topics = ["violence", "inappropriate", "harmful"]
+            for topic in sensitive_topics:
+                if topic.lower() in filtered_content.lower():
+                    filtered_content = "I'm sorry, but I can't discuss that topic. Let's focus on your studies instead."
+                    issues.append(f"Filtered sensitive topic: {topic}")
+        
+        return filtered_content, issues
+
+class SafetyFilter:
     """Comprehensive safety filtering for educational content"""
     
     def __init__(self):
