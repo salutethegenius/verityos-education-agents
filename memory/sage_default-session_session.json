@@ -2,14 +2,14 @@
   "agent_name": "sage",
   "session_id": "default-session",
   "memory_type": "session",
-  "timestamp": "2025-06-22T23:30:53.002704",
+  "timestamp": "2025-06-23T12:33:53.441958",
   "data": {
     "progress": {
-      "timestamp": "2025-06-22T23:30:53.002681",
-      "intent": "greeting",
+      "timestamp": "2025-06-23T12:33:53.441942",
+      "intent": "explain_concept",
       "subject": null,
       "topic": null,
-      "interaction_count": 11
+      "interaction_count": 13
     },
     "level": "middle",
     "current_subject": null
