@@ -1,3 +1,25 @@
+
+document.addEventListener('DOMContentLoaded', function() {
+  const chatWindow = document.getElementById('chat-window');
+  const messageInput = document.getElementById('message-input');
+  const sendButton = document.getElementById('send-button');
+  const agentSelect = document.getElementById('agent-select');
+
+  // Event listeners
+  sendButton.addEventListener('click', sendMessage);
+  messageInput.addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+      sendMessage();
+    }
+  });
+
+  // Update dropdowns when agent changes
+  agentSelect.addEventListener('change', updateDropdowns);
+
+  // Initialize dropdowns for default agent
+  updateDropdowns();
+});
+
 // Update dropdowns based on selected agent
 function updateDropdowns() {
   const agentSelect = document.getElementById('agent-select');
@@ -62,76 +84,94 @@ function updateDropdowns() {
   }
 }
 
-// Add event listener for agent selection change
-document.addEventListener('DOMContentLoaded', function() {
-  const agentSelect = document.getElementById('agent-select');
-  if (agentSelect) {
-    agentSelect.addEventListener('change', updateDropdowns);
-  }
-});
-
 async function sendMessage() {
   const agent = document.getElementById("agent-select").value;
   const subject = document.getElementById("subject-select").value.trim();
   const task = document.getElementById("task-select").value.trim();
-  const input = document.getElementById("user-input").value.trim();
-  const responseBox = document.getElementById("chat-box");
+  const input = document.getElementById("message-input").value.trim();
+  const chatWindow = document.getElementById("chat-window");
 
-  console.log("[DEBUG] sendMessage fired with:", { agent, input, subject, task });
-
-  if (!responseBox) {
-    console.error("[ERROR] responseBox element not found in DOM.");
-    return;
-  }
+  console.log("[DEBUG] sendMessage fired with:", {
+    agent: agent,
+    input: input,
+    subject: subject,
+    task: task
+  });
 
   if (!input) {
-    responseBox.innerHTML += `<div class="error">⚠️ Please enter a question.</div>`;
+    console.log("[DEBUG] Empty input, not sending");
     return;
   }
 
-  // Clear previous error messages
-  document.getElementById("user-input").value = "";
+  // Add user message to chat
+  const userMessage = document.createElement("div");
+  userMessage.className = "message user-message";
+  userMessage.innerHTML = `<strong>You:</strong> ${input}`;
+  chatWindow.appendChild(userMessage);
 
-  responseBox.innerHTML += `<div class="system">⏳ Thinking...</div>`;
+  // Clear input
+  document.getElementById("message-input").value = "";
+
+  // Add loading indicator
+  const loadingMessage = document.createElement("div");
+  loadingMessage.className = "message agent-message loading";
+  loadingMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> <em>Thinking...</em>`;
+  chatWindow.appendChild(loadingMessage);
+
+  // Scroll to bottom
+  chatWindow.scrollTop = chatWindow.scrollHeight;
 
   try {
-    const res = await fetch(`/api/${agent}`, {
+    const response = await fetch(`/api/${agent}`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ message: input, subject, task })
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: input,
+        subject: subject,
+        task: task
+      }),
     });
 
-    if (!res.ok) {
-      throw new Error(`Server responded with status ${res.status}`);
-    }
+    const data = await response.json();
 
-    const data = await res.json();
+    // Remove loading indicator
+    chatWindow.removeChild(loadingMessage);
 
-    responseBox.innerHTML += `<div class="user">You: ${input}</div>`;
-
+    // Add agent response
+    const agentMessage = document.createElement("div");
+    agentMessage.className = "message agent-message";
+    
     if (data.error) {
-      responseBox.innerHTML += `<div class="error">❌ ${data.error}</div>`;
+      agentMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> <span class="error">Sorry, I encountered an error: ${data.error}</span>`;
     } else {
-      responseBox.innerHTML += `<div class="agent">Agent: ${(data.response || "⚠️ No response").replace(/\n/g, "<br>")}</div>`;
+      // Convert markdown-style formatting to HTML
+      let formattedResponse = data.response
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+      
+      agentMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> ${formattedResponse}`;
     }
-    responseBox.scrollTop = responseBox.scrollHeight;
-  } catch (err) {
-    console.error("[UI ERROR]", err);
-    responseBox.innerHTML += `<div class="error">❌ Error: ${err.message}</div>`;
-  }
-}
+    
+    chatWindow.appendChild(agentMessage);
 
-// Add event listener for Enter key in the input field
-document.addEventListener("DOMContentLoaded", function() {
-  const inputField = document.getElementById("user-input");
-  if (inputField) {
-    inputField.addEventListener("keypress", function(event) {
-      if (event.key === "Enter") {
-        event.preventDefault();
-        sendMessage();
-      }
-    });
-  } else {
-    console.error("[ERROR] user-input element not found when setting up event listener");
+  } catch (error) {
+    console.error("[UI ERROR]", error);
+    
+    // Remove loading indicator
+    if (chatWindow.contains(loadingMessage)) {
+      chatWindow.removeChild(loadingMessage);
+    }
+
+    // Add error message
+    const errorMessage = document.createElement("div");
+    errorMessage.className = "message agent-message error";
+    errorMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> <span class="error">Sorry, I'm having trouble connecting right now. Please try again.</span>`;
+    chatWindow.appendChild(errorMessage);
   }
-});
+
+  // Scroll to bottom
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}

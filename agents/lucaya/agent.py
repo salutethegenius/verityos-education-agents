@@ -47,7 +47,7 @@ class LucayaAgent(BaseAgent):
         # Load research history if available
         if self.memory_enabled:
             saved_data = self.memory_manager.load_memory("lucaya", session_id, "session")
-            if saved_data:
+            if saved_data and isinstance(saved_data, dict):
                 self.research_history = saved_data.get("research_history", [])
                 self.student_level = saved_data.get("level", "middle")
 
