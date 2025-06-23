@@ -9,10 +9,9 @@
   <h1>VerityOS Education Agents</h1>
 
   <div id="chat-container">
-    <div id="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+    <div id="chat-window" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
       <div class="message bot">Welcome to the VerityOS Education Agents! How can I help you today?</div>
     </div>
-    <div id="response-area"></div>
 
     <div id="input-area">
       <select id="agent-select">
@@ -29,8 +28,8 @@
       <select id="task-select">
         <!-- Options will be populated by JavaScript based on selected agent -->
       </select>
-      <input type="text" id="user-input" placeholder="Type your message here..." onkeydown="if(event.key === 'Enter'){sendMessage();}">
-      <button id="send-button" onclick="sendMessage()">Send</button>
+      <input type="text" id="message-input" placeholder="Type your message here...">
+      <button id="send-button">Send</button>
     </div>
   </div>
 
