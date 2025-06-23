@@ -31,6 +31,10 @@ def student_login():
 def student_interface():
     return render_template("student_interface.html")
 
+@app.route("/dashboard")
+def teacher_dashboard():
+    return render_template("teacher_dashboard.html")
+
 @app.route('/api/<agent_name>', methods=['POST'])
 def agent_endpoint(agent_name):
     try:

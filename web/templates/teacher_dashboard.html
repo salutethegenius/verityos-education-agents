@@ -1,0 +1,275 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VerityOS Education - Teacher Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 20px 0;
+        }
+        
+        .dashboard-card {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .dashboard-card h3 {
+            margin-top: 0;
+            color: #495057;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        
+        .student-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .student-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #28a745;
+        }
+        
+        .student-item.inactive {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+        
+        .student-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #28a745;
+        }
+        
+        .status-indicator.inactive {
+            background: #dc3545;
+        }
+        
+        .activity-feed {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .activity-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #007bff;
+        }
+        
+        .activity-time {
+            font-size: 0.8em;
+            color: #6c757d;
+        }
+        
+        .quick-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 20px 0;
+        }
+        
+        .action-btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary { background: #007bff; color: white; }
+        .btn-success { background: #28a745; color: white; }
+        .btn-warning { background: #ffc107; color: #212529; }
+        .btn-info { background: #17a2b8; color: white; }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 4px solid #007bff;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #007bff;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+        
+        .refresh-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #007bff;
+            color: white;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: transform 0.3s ease;
+        }
+        
+        .refresh-btn:hover {
+            transform: scale(1.1);
+        }
+        
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app-container">
+        <div id="main-content" style="width: 100%; padding: 20px;">
+            <div class="dashboard-header">
+                <h1>🏫 Teacher Dashboard - VerityOS Education</h1>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <p>Monitor student activity, manage classes, and track progress</p>
+                    <div>
+                        <span id="last-updated">Last updated: --:--</span>
+                        <a href="/" style="margin-left: 20px;">← Back to Agent Interface</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="total-students">0</div>
+                    <div class="stat-label">Total Students</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="active-students">0</div>
+                    <div class="stat-label">Active Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="total-sessions">0</div>
+                    <div class="stat-label">Sessions Today</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="avg-questions">0</div>
+                    <div class="stat-label">Avg Questions</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions">
+                <button class="action-btn btn-primary" onclick="takeAttendance()">📋 Take Attendance</button>
+                <button class="action-btn btn-success" onclick="createStudent()">👤 Add Student</button>
+                <button class="action-btn btn-warning" onclick="generateReport()">📊 Generate Report</button>
+                <button class="action-btn btn-info" onclick="viewSchedule()">📅 View Schedule</button>
+                <button class="action-btn btn-primary" onclick="refreshDashboard()">🔄 Refresh</button>
+            </div>
+
+            <!-- Main Dashboard Grid -->
+            <div class="dashboard-grid">
+                <!-- Student List -->
+                <div class="dashboard-card">
+                    <h3>👥 Student Roster</h3>
+                    <div class="student-list" id="student-list">
+                        <div style="text-align: center; padding: 20px; color: #6c757d;">
+                            Loading students...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="dashboard-card">
+                    <h3>📈 Recent Activity</h3>
+                    <div class="activity-feed" id="activity-feed">
+                        <div style="text-align: center; padding: 20px; color: #6c757d;">
+                            Loading activity...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Schedule -->
+                <div class="dashboard-card">
+                    <h3>📅 Today's Schedule</h3>
+                    <div id="schedule-display">
+                        <div style="text-align: center; padding: 20px; color: #6c757d;">
+                            Loading schedule...
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Class Overview -->
+                <div class="dashboard-card">
+                    <h3>📊 Class Overview</h3>
+                    <div id="class-overview">
+                        <div style="text-align: center; padding: 20px; color: #6c757d;">
+                            Loading overview...
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Student Monitor -->
+            <div class="dashboard-card" style="margin-top: 20px;">
+                <h3>🔍 Student Monitor</h3>
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <input type="text" id="student-search" placeholder="Search student name or ID..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                    <button class="action-btn btn-info" onclick="searchStudent()">Search</button>
+                </div>
+                <div id="student-details" style="min-height: 200px;">
+                    <div style="text-align: center; padding: 40px; color: #6c757d;">
+                        Search for a student to view detailed information
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Refresh Button -->
+    <button class="refresh-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
+        🔄
+    </button>
+
+    <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
