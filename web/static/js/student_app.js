@@ -425,12 +425,18 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('subject-select').addEventListener('change', function() {
         console.log('[DEBUG] Subject changed to:', this.value);
         updateTaskOptions();
-        setTimeout(() => updateAgentHelp(), 50);
+        // Multiple attempts to ensure help content updates
+        updateAgentHelp();
+        setTimeout(() => updateAgentHelp(), 100);
+        setTimeout(() => updateAgentHelp(), 300);
     });
     
     document.getElementById('task-select').addEventListener('change', function() {
         console.log('[DEBUG] Task changed to:', this.value);
-        setTimeout(() => updateAgentHelp(), 50);
+        // Multiple attempts to ensure help content updates
+        updateAgentHelp();
+        setTimeout(() => updateAgentHelp(), 100);
+        setTimeout(() => updateAgentHelp(), 300);
     });
     
     // Set up send button with better error handling
@@ -595,6 +601,12 @@ function updateTaskOptions() {
             subjectSelect.appendChild(option);
         });
     }
+    
+    // Force help content update after task options are updated
+    setTimeout(() => {
+        updateAgentHelp();
+        console.log('[DEBUG] Help content updated after task options change');
+    }, 100);
 }
 
 function updateAgentHelp() {
@@ -664,18 +676,41 @@ function updateAgentHelp() {
     help.samples.forEach(sample => {
         const sampleElement = document.createElement('div');
         sampleElement.className = 'sample-text';
+        sampleElement.style.cursor = 'pointer';
+        sampleElement.style.padding = '5px';
+        sampleElement.style.margin = '2px 0';
+        sampleElement.style.borderRadius = '3px';
+        sampleElement.style.backgroundColor = '#f8f9fa';
+        sampleElement.style.border = '1px solid #e9ecef';
         sampleElement.textContent = sample;
         
-        // Add click handler immediately
-        sampleElement.addEventListener('click', function() {
-            let text = this.textContent.replace(/^• "/, '').replace(/"$/, '');
-            // Clean up any remaining quotes
+        // Add hover effect
+        sampleElement.addEventListener('mouseenter', function() {
+            this.style.backgroundColor = '#e9ecef';
+        });
+        
+        sampleElement.addEventListener('mouseleave', function() {
+            this.style.backgroundColor = '#f8f9fa';
+        });
+        
+        // Add click handler with better text cleaning
+        sampleElement.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            let text = this.textContent;
+            // Remove bullet point and quotes
+            text = text.replace(/^• "?/, '').replace(/"?$/, '');
+            // Remove any remaining quotes at start/end
             text = text.replace(/^"/, '').replace(/"$/, '');
             
             const messageInput = document.getElementById('message-input');
             if (messageInput) {
                 messageInput.value = text;
                 messageInput.focus();
+                // Auto-resize textarea
+                messageInput.style.height = 'auto';
+                messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
                 console.log('[DEBUG] Sample text clicked, input set to:', text);
             }
         });
@@ -686,6 +721,15 @@ function updateAgentHelp() {
     helpContent.appendChild(samplesContainer);
     
     console.log('[DEBUG] Help content updated successfully with', help.samples.length, 'samples');
+    console.log('[DEBUG] Help content title:', help.title);
+    
+    // Verify the content was actually added to DOM
+    const verifyContent = document.getElementById('help-content');
+    if (verifyContent && verifyContent.children.length > 0) {
+        console.log('[DEBUG] Help content DOM verification: SUCCESS');
+    } else {
+        console.error('[ERROR] Help content DOM verification: FAILED');
+    }
 }
 
 function getAgentEmoji(agent) {
@@ -859,17 +903,9 @@ function sendMessage() {
     console.log('[DEBUG] sendMessage called with message:', message);
     
     // Enhanced validation for empty messages
-    if (!message || message.length === 0 || message === '') {
-        console.log('[DEBUG] Empty message detected, showing error');
-        addMessage('📝 Please enter a message before sending!', 'error');
-        messageInput.focus();
-        return;
-    }
-    
-    // Additional check for whitespace-only messages
-    if (message.replace(/\s/g, '').length === 0) {
-        console.log('[DEBUG] Whitespace-only message detected');
-        addMessage('📝 Please enter a message before sending!', 'error');
+    if (!message || message.length === 0 || message === '' || message.replace(/\s/g, '').length === 0) {
+        console.log('[DEBUG] Empty or whitespace-only message detected');
+        // Don't show error message for empty input, just return silently
         messageInput.focus();
         return;
     }
@@ -880,7 +916,7 @@ function sendMessage() {
         return;
     }
     
-    // Prevent button spamming
+    // Prevent button spamming and validate button state
     if (sendButton) {
         if (sendButton.disabled) {
             console.log('[DEBUG] Send button already disabled, preventing duplicate send');
@@ -888,6 +924,7 @@ function sendMessage() {
         }
         sendButton.disabled = true;
         sendButton.textContent = 'Sending...';
+        sendButton.style.opacity = '0.6';
     }
     
     const subjectSelect = document.getElementById('subject-select');
@@ -949,10 +986,11 @@ function sendMessage() {
         addMessage('Sorry, I encountered an error. Please try again.', 'error');
     })
     .finally(() => {
-        // Re-enable send button
+        // Re-enable send button with proper state reset
         if (sendButton) {
             sendButton.disabled = false;
             sendButton.textContent = 'Send';
+            sendButton.style.opacity = '1';
         }
         
         // Save session after each message
