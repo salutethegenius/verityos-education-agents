@@ -13,9 +13,12 @@ async function sendMessage() {
   }
 
   if (!input) {
-    responseBox.textContent = "⚠️ Please enter a question.";
+    responseBox.innerHTML += `<div class="error">⚠️ Please enter a question.</div>`;
     return;
   }
+  
+  // Clear previous error messages
+  document.getElementById("user-input").value = "";
 
   responseBox.innerHTML += `<div class="system">⏳ Thinking...</div>`;
 
@@ -33,7 +36,12 @@ async function sendMessage() {
     const data = await res.json();
 
     responseBox.innerHTML += `<div class="user">You: ${input}</div>`;
-    responseBox.innerHTML += `<div class="agent">Agent: ${(data.response || "⚠️ No response").replace(/\n/g, "<br>")}</div>`;
+    
+    if (data.error) {
+      responseBox.innerHTML += `<div class="error">❌ ${data.error}</div>`;
+    } else {
+      responseBox.innerHTML += `<div class="agent">Agent: ${(data.response || "⚠️ No response").replace(/\n/g, "<br>")}</div>`;
+    }
     responseBox.scrollTop = responseBox.scrollHeight;
   } catch (err) {
     console.error("[UI ERROR]", err);

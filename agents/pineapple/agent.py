@@ -2,6 +2,8 @@
 
 import datetime
 
+import datetime
+
 class PineappleAgent:
     def __init__(self):
         self.class_schedule = {
@@ -33,6 +35,28 @@ class PineappleAgent:
 
     def list_students(self):
         return "\n".join(self.student_list)
+    
+    def process_message(self, message):
+        """Process incoming message and return appropriate response"""
+        message_lower = message.lower()
+        
+        if "schedule" in message_lower or "today" in message_lower:
+            return f"📅 Today's Schedule:\n{self.get_today_schedule()}"
+        elif "attendance" in message_lower:
+            if "mark" in message_lower:
+                # Simple attendance marking - in real app you'd parse student name
+                return "To mark attendance, please specify: 'Mark [Student Name] as [present/absent]'"
+            else:
+                return f"📊 Today's Attendance:\n{self.get_attendance_for_day()}"
+        elif "students" in message_lower or "list" in message_lower:
+            return f"👥 Student List:\n{self.list_students()}"
+        else:
+            return "🍍 Hi! I'm Pineapple, your homework tracker! I can help with:\n• Today's schedule\n• Attendance tracking\n• Student lists\n\nWhat would you like to know?"
+
+def run_agent(message, data=None):
+    """Entry point for Pineapple agent"""
+    agent = PineappleAgent()
+    return agent.process_message(message)
 
     def add_student(self, name):
         if name not in self.student_list:
