@@ -1,9 +1,18 @@
 
+// Session management
+let currentSessionId = null;
+let currentAgent = null;
+let conversationHistory = {};
+
 document.addEventListener('DOMContentLoaded', function() {
   const chatWindow = document.getElementById('chat-window');
   const messageInput = document.getElementById('message-input');
   const sendButton = document.getElementById('send-button');
   const agentSelect = document.getElementById('agent-select');
+
+  // Generate unique session ID
+  currentSessionId = generateSessionId();
+  currentAgent = agentSelect.value;
 
   // Event listeners
   sendButton.addEventListener('click', sendMessage);
@@ -13,12 +22,120 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // Update dropdowns when agent changes
-  agentSelect.addEventListener('change', updateDropdowns);
+  // Update dropdowns and load session when agent changes
+  agentSelect.addEventListener('change', function() {
+    updateDropdowns();
+    switchAgent();
+  });
 
-  // Initialize dropdowns for default agent
+  // Initialize dropdowns and load session for default agent
   updateDropdowns();
+  loadSessionHistory(currentAgent);
 });
+
+function generateSessionId() {
+  return 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+}
+
+function switchAgent() {
+  const agentSelect = document.getElementById('agent-select');
+  const newAgent = agentSelect.value;
+  
+  if (newAgent !== currentAgent) {
+    // Save current conversation for old agent
+    if (currentAgent) {
+      saveConversationState(currentAgent);
+    }
+    
+    // Switch to new agent
+    currentAgent = newAgent;
+    
+    // Load conversation history for new agent
+    loadSessionHistory(newAgent);
+    
+    console.log(`[SESSION] Switched to agent: ${newAgent}, session: ${currentSessionId}`);
+  }
+}
+
+function saveConversationState(agent) {
+  const chatWindow = document.getElementById('chat-window');
+  const messages = Array.from(chatWindow.children);
+  
+  conversationHistory[agent] = messages.map(msg => ({
+    content: msg.innerHTML,
+    className: msg.className
+  }));
+  
+  console.log(`[SESSION] Saved conversation state for ${agent}: ${conversationHistory[agent].length} messages`);
+}
+
+async function loadSessionHistory(agent) {
+  const chatWindow = document.getElementById('chat-window');
+  
+  // Clear current chat
+  chatWindow.innerHTML = '';
+  
+  // Check if we have local conversation history
+  if (conversationHistory[agent] && conversationHistory[agent].length > 0) {
+    // Restore from local storage
+    conversationHistory[agent].forEach(msg => {
+      const messageDiv = document.createElement('div');
+      messageDiv.className = msg.className;
+      messageDiv.innerHTML = msg.content;
+      chatWindow.appendChild(messageDiv);
+    });
+    
+    console.log(`[SESSION] Loaded ${conversationHistory[agent].length} messages from local history for ${agent}`);
+  } else {
+    // Load from server memory if available
+    try {
+      const response = await fetch(`/api/${agent}/session`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          action: 'load_session',
+          session_id: currentSessionId
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.conversation_history && data.conversation_history.length > 0) {
+          // Restore conversation from server memory
+          data.conversation_history.forEach(msg => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${msg.role === 'user' ? 'user-message' : 'agent-message'}`;
+            
+            if (msg.role === 'user') {
+              messageDiv.innerHTML = `<strong>You:</strong> ${msg.content}`;
+            } else {
+              messageDiv.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> ${msg.content}`;
+            }
+            
+            chatWindow.appendChild(messageDiv);
+          });
+          
+          console.log(`[SESSION] Loaded ${data.conversation_history.length} messages from server memory for ${agent}`);
+        }
+      }
+    } catch (error) {
+      console.log(`[SESSION] No previous session found for ${agent}, starting fresh`);
+    }
+    
+    // Show welcome message if no history
+    if (chatWindow.children.length === 0) {
+      const welcomeMessage = document.createElement('div');
+      welcomeMessage.className = 'message agent-message';
+      welcomeMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> Welcome! I'm ready to help you with your studies. How can I assist you today?`;
+      chatWindow.appendChild(welcomeMessage);
+    }
+  }
+  
+  // Scroll to bottom
+  chatWindow.scrollTop = chatWindow.scrollHeight;
+}
 
 // Update dropdowns based on selected agent
 function updateDropdowns() {
@@ -160,7 +277,8 @@ async function sendMessage() {
     agent: agent,
     input: input,
     subject: subject,
-    task: task
+    task: task,
+    session_id: currentSessionId
   });
 
   if (!input) {
@@ -195,7 +313,9 @@ async function sendMessage() {
       body: JSON.stringify({
         message: input,
         subject: subject,
-        task: task
+        task: task,
+        session_id: currentSessionId,
+        user_type: "student"
       }),
     });
 
@@ -221,6 +341,9 @@ async function sendMessage() {
     }
     
     chatWindow.appendChild(agentMessage);
+
+    // Save conversation state after successful message
+    saveConversationState(agent);
 
   } catch (error) {
     console.error("[UI ERROR]", error);

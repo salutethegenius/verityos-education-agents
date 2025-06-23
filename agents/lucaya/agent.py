@@ -380,11 +380,38 @@ Always maintain educational focus and Bahamian perspective."""
         return self.process_research_query(message, subject="General")
 
 def run_agent(message: str, payload: Optional[Dict[str, Any]] = None) -> str:
-    """Main entry point for Lucaya agent"""
+    """Main entry point for Lucaya agent with session management"""
     agent = LucayaAgent()
-    session_id = payload.get("session_id", "default-session") if payload else "default-session"
-    user_type = payload.get("user_type", "student") if payload else "student"
-    subject = payload.get("subject", "General") if payload else "General"
     
-    agent.initialize_session(session_id=session_id, user_type=user_type)
+    if payload:
+        session_id = payload.get("session_id", "default-session")
+        user_type = payload.get("user_type", "student")
+        subject = payload.get("subject", "General")
+        task = payload.get("task", "research")
+        
+        # Initialize session
+        agent.initialize_session(session_id, user_type)
+        
+        # Add user message to context
+        agent.add_to_context(message, "user")
+        
+        # Process research query
+        response = agent.process_research_query(message, subject=subject)
+        
+        # Add agent response to context
+        agent.add_to_context(response, "assistant")
+        
+        # Save conversation to memory
+        if agent.memory_enabled:
+            conversation_history = agent.context
+            session_data = {
+                "research_history": agent.research_history,
+                "level": agent.student_level,
+                "conversation_history": conversation_history
+            }
+            agent.memory_manager.save_memory("lucaya", session_id, session_data, "session")
+        
+        return response
+    else:
+        return agent.process_direct_message(message)on_id=session_id, user_type=user_type)
     return agent.process_research_query(message, subject=subject)

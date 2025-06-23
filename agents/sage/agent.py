@@ -153,7 +153,7 @@ class SageAgent(BaseAgent):
         subject = kwargs.get("subject", self.current_subject or "general")
         # Get conversation context
         context_summary = self.get_context_summary()
-        
+
         # Get Bahamian cultural context
         cultural_greeting = self.bahamas_context.get_cultural_greeting()
         local_expression = self.bahamas_context.get_local_expression()
@@ -703,9 +703,40 @@ Bahamas context: The Bahamas has 700+ islands, Nassau is the capital, currency i
 
 
 # Flask integration: callable entrypoint for SageAgent
-def run_agent(message: str, payload: dict = None) -> str:
+def run_agent(message: str, payload: Optional[Dict[str, Any]] = None) -> str:
+    """Main entry point for Sage agent with session management"""
     agent = SageAgent()
-    agent.initialize_session(session_id="default-session")
-    payload = payload or {}
-    payload.pop("message", None)
-    return agent.process_message(message, **payload)
+
+    # Initialize session if provided
+    if payload:
+        session_id = payload.get("session_id", "default-session")
+        user_type = payload.get("user_type", "student")
+        subject = payload.get("subject", "General")
+        task = payload.get("task", "homework")
+
+        # Initialize session
+        agent.initialize_session(session_id, user_type)
+
+        # Add user message to context
+        agent.add_to_context(message, "user")
+
+        # Process message
+        response = agent.process_message(message, subject=subject, task=task)
+
+        # Add agent response to context
+        agent.add_to_context(response, "assistant")
+
+        # Save conversation to memory
+        if agent.memory_enabled:
+            conversation_history = agent.context
+            session_data = {
+                "progress": agent.session_progress,
+                "level": agent.student_level,
+                "current_subject": agent.current_subject,
+                "conversation_history": conversation_history
+            }
+            agent.memory_manager.save_memory("sage", session_id, session_data, "session")
+
+        return response
+    else:
+        return agent.process_direct_message(message)

@@ -40,6 +40,8 @@ def agent_endpoint(agent_name):
         message = data.get('message', '')
         subject = data.get('subject', 'general')
         task = data.get('task', 'homework')
+        session_id = data.get('session_id', 'default-session')
+        user_type = data.get('user_type', 'student')
 
         # Handle empty or whitespace-only messages
         if not message or not message.strip():
@@ -55,28 +57,36 @@ def agent_endpoint(agent_name):
         if agent_name not in valid_agents:
             return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
 
-        # Log the incoming request
-        app.logger.info(f"Incoming request for agent {agent_name}: {{'message': '{message}', 'subject': '{subject}', 'task': '{task}'}}")
+        # Log the incoming request with session info
+        app.logger.info(f"Incoming request for agent {agent_name}: {{'message': '{message}', 'subject': '{subject}', 'task': '{task}', 'session_id': '{session_id}'}}")
 
-        # Route to appropriate agent
+        # Prepare payload with session information
+        payload = {
+            "subject": subject, 
+            "task": task, 
+            "session_id": session_id, 
+            "user_type": user_type
+        }
+
+        # Route to appropriate agent with session data
         if agent_name == 'sage':
             from agents.sage.agent import run_agent
-            response = run_agent(message, {"subject": subject, "task": task})
+            response = run_agent(message, payload)
         elif agent_name == 'quill':
             from agents.quill.agent import run_agent
-            response = run_agent(message, {"subject": subject, "task": task})
+            response = run_agent(message, payload)
         elif agent_name == 'lucaya':
             from agents.lucaya.agent import run_agent
-            response = run_agent(message, {"subject": subject, "task": task})
+            response = run_agent(message, payload)
         elif agent_name == 'nassau':
             from agents.nassau.agent import run_agent
-            response = run_agent(message, {"subject": subject, "task": task})
+            response = run_agent(message, payload)
         elif agent_name == 'echo':
             from agents.echo.agent import run_agent
-            response = run_agent(message, {"subject": subject, "task": task})
+            response = run_agent(message, payload)
         elif agent_name == 'pineapple':
             from agents.pineapple.agent import run_agent
-            response = run_agent(message, {"subject": subject, "task": task})
+            response = run_agent(message, payload)
 
         # Ensure response is valid
         if response is None:
@@ -86,6 +96,45 @@ def agent_endpoint(agent_name):
 
     except Exception as e:
         app.logger.error(f"Error processing request for {agent_name}: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+@app.route('/api/<agent_name>/session', methods=['POST'])
+def session_endpoint(agent_name):
+    """Handle session-related operations like loading conversation history"""
+    try:
+        data = request.get_json(force=True)
+        action = data.get('action')
+        session_id = data.get('session_id', 'default-session')
+
+        valid_agents = ['sage', 'quill', 'lucaya', 'nassau', 'echo', 'pineapple']
+        if agent_name not in valid_agents:
+            return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
+
+        if action == 'load_session':
+            # Load conversation history from memory
+            from core.memory_manager import MemoryManager
+            memory_manager = MemoryManager()
+            
+            session_data = memory_manager.load_memory(agent_name, session_id, "session")
+            
+            if session_data and 'conversation_history' in session_data:
+                return jsonify({
+                    "conversation_history": session_data['conversation_history'],
+                    "session_id": session_id,
+                    "agent": agent_name
+                })
+            else:
+                return jsonify({
+                    "conversation_history": [],
+                    "session_id": session_id,
+                    "agent": agent_name,
+                    "message": "No previous session found"
+                })
+
+        return jsonify({"error": "Unknown action"}), 400
+
+    except Exception as e:
+        app.logger.error(f"Error in session endpoint for {agent_name}: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == "__main__":
