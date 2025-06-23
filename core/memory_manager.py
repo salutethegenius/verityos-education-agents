@@ -2,9 +2,7 @@
 Memory Manager for VerityOS Education Agents
 Handles persistent memory across sessions
 """
-```
 
-```
 import json
 import os
 from typing import Dict, List, Optional, Any
