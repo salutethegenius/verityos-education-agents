@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('[DEBUG] DOM loaded, initializing...');
 
     try {
+        // Mobile-specific initializations
+        setupMobileEnhancements();
         updateDropdowns();
 
         // Add event listeners with error handling
@@ -763,3 +765,150 @@ function addChatToHistory(agent, sessionId, firstMessage) {
             console.error('Error saving chat history:', e);
         }
     }
+
+// Mobile-specific enhancements
+function setupMobileEnhancements() {
+    // Prevent zoom on double-tap for iOS
+    let lastTouchEnd = 0;
+    document.addEventListener('touchend', function (event) {
+        const now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+
+    // Add viewport meta tag if not present
+    if (!document.querySelector('meta[name="viewport"]')) {
+        const viewport = document.createElement('meta');
+        viewport.name = 'viewport';
+        viewport.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+        document.head.appendChild(viewport);
+    }
+
+    // Handle orientation changes
+    window.addEventListener('orientationchange', function() {
+        setTimeout(function() {
+            window.scrollTo(0, 0);
+        }, 100);
+    });
+
+    // Improve touch scrolling
+    const scrollElements = document.querySelectorAll('#chat-window, #controls-sidebar, #chat-history-list');
+    scrollElements.forEach(element => {
+        if (element) {
+            element.style.webkitOverflowScrolling = 'touch';
+        }
+    });
+
+    // Add touch feedback to sample texts
+    document.addEventListener('click', function(e) {
+        if (e.target.classList.contains('sample-text')) {
+            e.target.style.backgroundColor = '#e9ecef';
+            setTimeout(() => {
+                e.target.style.backgroundColor = '';
+            }, 150);
+            
+            // Auto-fill the message input
+            const messageInput = document.getElementById('message-input');
+            if (messageInput) {
+                messageInput.value = e.target.textContent.replace('•', '').trim();
+                messageInput.focus();
+                // Trigger input event to resize textarea
+                messageInput.dispatchEvent(new Event('input'));
+            }
+        }
+    });
+
+    // Improve textarea behavior on mobile
+    const messageInput = document.getElementById('message-input');
+    if (messageInput) {
+        // Prevent zoom on focus for iOS
+        messageInput.addEventListener('focus', function() {
+            if (window.innerWidth < 768) {
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
+            }
+        });
+
+        messageInput.addEventListener('blur', function() {
+            if (window.innerWidth < 768) {
+                const viewport = document.querySelector('meta[name="viewport"]');
+                if (viewport) {
+                    viewport.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes');
+                }
+            }
+        });
+
+        // Better mobile typing experience
+        messageInput.addEventListener('input', function() {
+            // Auto-resize textarea
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+    }
+
+    // Add pull-to-refresh simulation for chat window
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow && 'ontouchstart' in window) {
+        let startY = 0;
+        let pullDistance = 0;
+        const pullThreshold = 80;
+
+        chatWindow.addEventListener('touchstart', function(e) {
+            if (chatWindow.scrollTop === 0) {
+                startY = e.touches[0].pageY;
+            }
+        });
+
+        chatWindow.addEventListener('touchmove', function(e) {
+            if (chatWindow.scrollTop === 0 && startY) {
+                pullDistance = e.touches[0].pageY - startY;
+                if (pullDistance > 0 && pullDistance < pullThreshold) {
+                    e.preventDefault();
+                    chatWindow.style.transform = `translateY(${pullDistance / 3}px)`;
+                    chatWindow.style.opacity = 1 - (pullDistance / pullThreshold) * 0.3;
+                }
+            }
+        });
+
+        chatWindow.addEventListener('touchend', function(e) {
+            if (pullDistance > pullThreshold) {
+                // Refresh action - could reload chat or show some feedback
+                console.log('[MOBILE] Pull refresh triggered');
+            }
+            chatWindow.style.transform = '';
+            chatWindow.style.opacity = '';
+            startY = 0;
+            pullDistance = 0;
+        });
+    }
+
+    // Keyboard handling for mobile
+    if (window.innerWidth <= 768) {
+        let initialViewportHeight = window.innerHeight;
+        
+        window.addEventListener('resize', function() {
+            const currentHeight = window.innerHeight;
+            const heightDiff = initialViewportHeight - currentHeight;
+            
+            // If keyboard is likely open (height reduced significantly)
+            if (heightDiff > 150) {
+                document.body.style.height = currentHeight + 'px';
+                // Scroll to input if it's focused
+                const activeElement = document.activeElement;
+                if (activeElement && activeElement.id === 'message-input') {
+                    setTimeout(() => {
+                        activeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+                }
+            } else {
+                document.body.style.height = '';
+            }
+        });
+    }
+
+    console.log('[DEBUG] Mobile enhancements initialized');
+}
