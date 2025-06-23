@@ -1,3 +1,4 @@
+
 // Student portal JavaScript
 let currentAgent = 'sage';
 let currentSessionId = generateSessionId();
@@ -22,159 +23,172 @@ sessionStorage.setItem('student_id', studentId);
 sessionStorage.setItem('student_name', studentName);
 
 // Dynamic help content based on agent and subject
-const helpContent = {
-    'sage': {
-        'math': {
-            title: '🧙‍♂️ Sage - Math Help',
+const HELP_CONTENT = {
+    sage: {
+        math: {
+            title: "🧙‍♂️ Sage - Math Tutor",
             samples: [
-                'What is 25 + 47?',
-                'Help me solve: 2x + 5 = 15',
-                'Check my work: 12 × 8 = 96',
-                'I need help with fractions'
+                "What is 25 + 47?",
+                "Help me solve: 2x + 5 = 15",
+                "Check my work: 12 × 8 = 96"
             ]
         },
-        'science': {
-            title: '🧙‍♂️ Sage - Science Help',
+        science: {
+            title: "🧙‍♂️ Sage - Science Tutor",
             samples: [
-                'What is photosynthesis?',
-                'Explain coral reefs in the Bahamas',
-                'How does climate change affect islands?',
-                'What animals live in mangroves?'
+                "What is photosynthesis?",
+                "Explain how coral reefs work",
+                "Why do hurricanes form in our region?"
             ]
         },
-        'history': {
-            title: '🧙‍♂️ Sage - History Help',
+        history: {
+            title: "🧙‍♂️ Sage - History Tutor",
             samples: [
-                'When did Bahamas gain independence?',
-                'Who were the Lucayans?',
-                'Tell me about Junkanoo festival',
-                'What is our capital city?'
-            ]
-        },
-        'english': {
-            title: '🧙‍♂️ Sage - English Help',
-            samples: [
-                'Help me write an essay',
-                'Check my grammar',
-                'Explain this poem',
-                'Help with my book report'
-            ]
-        },
-        'bahamas studies': {
-            title: '🧙‍♂️ Sage - Bahamas Studies',
-            samples: [
-                'Research about Out Islands',
-                'Our cultural traditions',
-                'Local government structure',
-                'Environmental challenges'
+                "When did The Bahamas gain independence?",
+                "Who were the Lucayans?",
+                "Tell me about Junkanoo festival"
             ]
         }
     },
-    'echo': {
-        'english': {
-            title: '🗣️ Echo - Reading Help',
+    echo: {
+        english: {
+            title: "🗣️ Echo - Reading Coach",
             samples: [
-                'Help me understand this text',
-                'Improve my reading comprehension',
-                'What does this word mean?',
-                'Summarize this paragraph'
+                "Help me understand this passage",
+                "What does this word mean?",
+                "Quiz me on this reading"
             ]
         }
     },
-    'lucaya': {
+    lucaya: {
         'academic research': {
-            title: '🔍 Lucaya - Research Help',
+            title: "🔍 Lucaya - Research Assistant",
             samples: [
-                'Find sources about coral reefs',
-                'Help me create an outline',
-                'How do I cite this source?',
-                'Evaluate this website'
+                "Help me find sources about Bahamian history",
+                "Create an outline for my essay",
+                "Evaluate this website"
             ]
         }
     }
 };
 
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('[STUDENT DEBUG] DOM loaded, setting up portal...');
+function generateSessionId() {
+    return `student-${studentId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+}
 
-    // Set welcome message
-    document.getElementById('student-welcome').textContent = `Welcome, ${studentName}!`;
+function updateHelpContent() {
+    const agentSelect = document.getElementById('agent-select');
+    const subjectSelect = document.getElementById('subject-select');
+    const helpContent = document.getElementById('help-content');
+    
+    if (!agentSelect || !subjectSelect || !helpContent) return;
+    
+    const agent = agentSelect.value;
+    const subject = subjectSelect.value;
+    
+    const content = HELP_CONTENT[agent]?.[subject] || HELP_CONTENT[agent]?.math || {
+        title: "💡 Learning Assistant",
+        samples: ["Ask me anything about your studies!"]
+    };
+    
+    helpContent.innerHTML = `
+        <h4>${content.title}</h4>
+        <div class="help-samples">
+            ${content.samples.map(sample => 
+                `<div class="sample-text" onclick="fillSampleText('${sample}')">${sample}</div>`
+            ).join('')}
+        </div>
+    `;
+}
 
-    // Set up all event listeners
-    setupEventListeners();
-
-    // Update help content
-    updateHelpContent();
-
-    // Load or create initial chat
-    loadChatHistorySidebar();
-    if (chatSessions.length === 0) {
-        startNewChat();
-    } else {
-        loadChatSession(0);
+function fillSampleText(text) {
+    const messageInput = document.getElementById('message-input');
+    if (messageInput) {
+        messageInput.value = text;
+        messageInput.focus();
     }
+}
 
-    console.log('[STUDENT DEBUG] Portal initialization complete');
-});
+function updateTaskOptions() {
+    const agentSelect = document.getElementById('agent-select');
+    const taskSelect = document.getElementById('task-select');
+    
+    if (!agentSelect || !taskSelect) return;
+    
+    const agent = agentSelect.value;
+    
+    const agentTasks = {
+        'sage': [
+            { value: 'homework', text: 'Homework Help' },
+            { value: 'study', text: 'Study Session' },
+            { value: 'quiz', text: 'Practice Quiz' },
+            { value: 'review', text: 'Review' }
+        ],
+        'echo': [
+            { value: 'study', text: 'Reading Practice' },
+            { value: 'homework', text: 'Reading Homework' },
+            { value: 'quiz', text: 'Comprehension Quiz' }
+        ],
+        'lucaya': [
+            { value: 'find sources', text: 'Find Sources' },
+            { value: 'create outline', text: 'Create Outline' },
+            { value: 'topic exploration', text: 'Topic Exploration' }
+        ]
+    };
+    
+    const tasks = agentTasks[agent] || agentTasks['sage'];
+    taskSelect.innerHTML = '';
+    
+    tasks.forEach(task => {
+        const option = document.createElement('option');
+        option.value = task.value;
+        option.textContent = task.text;
+        taskSelect.appendChild(option);
+    });
+}
 
 function setupEventListeners() {
-    console.log('[STUDENT DEBUG] Setting up event listeners...');
-
     // Send button
     const sendButton = document.getElementById('send-button');
-    const messageInput = document.getElementById('message-input');
-
     if (sendButton) {
-        sendButton.addEventListener('click', function(e) {
-            console.log('[STUDENT DEBUG] Send button clicked');
-            e.preventDefault();
-            sendMessage();
-        });
+        sendButton.addEventListener('click', sendMessage);
     }
 
+    // Message input
+    const messageInput = document.getElementById('message-input');
     if (messageInput) {
-        // Enter key to send
-        messageInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                console.log('[STUDENT DEBUG] Enter key pressed');
-                e.preventDefault();
+        messageInput.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
                 sendMessage();
             }
         });
 
-        // Auto-resize textarea
+        // Auto-expand textarea
         messageInput.addEventListener('input', function() {
             this.style.height = 'auto';
             this.style.height = Math.min(this.scrollHeight, 120) + 'px';
         });
     }
 
-    // Agent selector
+    // Agent selection
     const agentSelect = document.getElementById('agent-select');
     if (agentSelect) {
         agentSelect.addEventListener('change', function() {
-            console.log('[STUDENT DEBUG] Agent changed to:', this.value);
-            switchAgent(this.value);
+            const newAgent = this.value;
+            if (newAgent !== currentAgent) {
+                currentAgent = newAgent;
+                updateTaskOptions();
+                updateHelpContent();
+                startNewChat();
+            }
         });
     }
 
-    // Subject and task selectors
+    // Subject selection
     const subjectSelect = document.getElementById('subject-select');
-    const taskSelect = document.getElementById('task-select');
-
     if (subjectSelect) {
-        subjectSelect.addEventListener('change', function() {
-            console.log('[STUDENT DEBUG] Subject changed to:', this.value);
-            updateTaskOptions();
-            updateHelpContent();
-        });
-    }
-
-    if (taskSelect) {
-        taskSelect.addEventListener('change', function() {
-            console.log('[STUDENT DEBUG] Task changed to:', this.value);
-            updateHelpContent();
-        });
+        subjectSelect.addEventListener('change', updateHelpContent);
     }
 
     // New chat button
@@ -182,269 +196,26 @@ function setupEventListeners() {
     if (newChatBtn) {
         newChatBtn.addEventListener('click', startNewChat);
     }
-
-    console.log('[STUDENT DEBUG] Event listeners setup complete');
-}
-
-function generateSessionId() {
-    return `student-${studentId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-}
-
-function switchAgent(agentName) {
-    console.log('[STUDENT DEBUG] Switching to agent:', agentName);
-
-    // Save current chat
-    if (currentChatIndex >= 0) {
-        saveChatSession();
-    }
-
-    currentAgent = agentName;
-    updateTaskOptions();
-    updateHelpContent();
-    startNewChat();
-}
-
-function updateTaskOptions() {
-    console.log('[STUDENT DEBUG] Updating task options for agent:', currentAgent);
-
-    const taskSelect = document.getElementById('task-select');
-    const subjectSelect = document.getElementById('subject-select');
-
-    if (!taskSelect || !subjectSelect) return;
-
-    // Clear current options
-    taskSelect.innerHTML = '';
-
-    if (currentAgent === 'lucaya') {
-        // Research tasks
-        const researchTasks = [
-            { value: 'find sources', text: 'Find Sources' },
-            { value: 'create outline', text: 'Create Outline' },
-            { value: 'evaluate sources', text: 'Evaluate Sources' },
-            { value: 'citation help', text: 'Citation Help' }
-        ];
-
-        researchTasks.forEach(task => {
-            const option = document.createElement('option');
-            option.value = task.value;
-            option.textContent = task.text;
-            taskSelect.appendChild(option);
-        });
-
-        // Update subjects for research
-        subjectSelect.innerHTML = '';
-        const option = document.createElement('option');
-        option.value = 'academic research';
-        option.textContent = 'Academic Research';
-        subjectSelect.appendChild(option);
-
-    } else {
-        // Regular learning tasks
-        const regularTasks = [
-            { value: 'homework', text: 'Homework Help' },
-            { value: 'study', text: 'Study Session' },
-            { value: 'quiz', text: 'Practice Quiz' },
-            { value: 'review', text: 'Review' }
-        ];
-
-        regularTasks.forEach(task => {
-            const option = document.createElement('option');
-            option.value = task.value;
-            option.textContent = task.text;
-            taskSelect.appendChild(option);
-        });
-
-        // Standard subjects
-        if (currentAgent !== 'lucaya') {
-            subjectSelect.innerHTML = '';
-            const subjects = [
-                { value: 'math', text: 'Mathematics' },
-                { value: 'science', text: 'Science' },
-                { value: 'english', text: 'English' },
-                { value: 'history', text: 'History' },
-                { value: 'bahamas studies', text: 'Bahamas Studies' }
-            ];
-
-            subjects.forEach(subject => {
-                const option = document.createElement('option');
-                option.value = subject.value;
-                option.textContent = subject.text;
-                subjectSelect.appendChild(option);
-            });
-        }
-    }
-}
-
-function updateHelpContent() {
-    console.log('[STUDENT DEBUG] Updating help content');
-
-    const helpContentDiv = document.getElementById('help-content');
-    const subjectSelect = document.getElementById('subject-select');
-
-    if (!helpContentDiv || !subjectSelect) return;
-
-    const subject = subjectSelect.value || 'math';
-    let content = helpContent[currentAgent]?.[subject];
-
-    if (!content) {
-        content = helpContent[currentAgent]?.['math'] || {
-            title: `${currentAgent} - Help`,
-            samples: ['Ask me anything!', 'How can I help you?', 'What would you like to learn?']
-        };
-    }
-
-    helpContentDiv.innerHTML = `
-        <h4>${content.title}</h4>
-        <div class="help-samples">
-            ${content.samples.map(sample => 
-                `<div class="sample-text" onclick="insertSample('${sample.replace(/'/g, "\\'")}')">${sample}</div>`
-            ).join('')}
-        </div>
-    `;
-}
-
-function insertSample(text) {
-    console.log('[STUDENT DEBUG] Inserting sample text:', text);
-    const messageInput = document.getElementById('message-input');
-    if (messageInput) {
-        messageInput.value = text;
-        messageInput.focus();
-        // Auto-resize
-        messageInput.style.height = 'auto';
-        messageInput.style.height = Math.min(messageInput.scrollHeight, 120) + 'px';
-    }
-}
-
-function startNewChat() {
-    console.log('[STUDENT DEBUG] Starting new chat');
-
-    // Save current chat
-    if (currentChatIndex >= 0) {
-        saveChatSession();
-    }
-
-    // Create new chat session
-    const newChat = {
-        id: generateSessionId(),
-        agent: currentAgent,
-        title: 'New Chat',
-        lastMessage: '',
-        timestamp: new Date().toISOString(),
-        messages: []
-    };
-
-    chatSessions.unshift(newChat);
-    currentChatIndex = 0;
-    currentSessionId = newChat.id;
-
-    // Clear chat window
-    const chatWindow = document.getElementById('chat-window');
-    chatWindow.innerHTML = '';
-
-    // Show welcome message
-    const greetings = {
-        'sage': `Hello ${studentName}! I'm Sage, your tutor. What would you like to learn today?`,
-        'echo': `Hi ${studentName}! I'm Echo, your reading coach. Ready to improve your comprehension?`,
-        'lucaya': `Welcome ${studentName}! I'm Lucaya, your research assistant. What topic shall we explore?`
-    };
-
-    addMessage(greetings[currentAgent], 'bot');
-    loadChatHistorySidebar();
-}
-
-function loadChatSession(index) {
-    if (index < 0 || index >= chatSessions.length) return;
-
-    // Save current chat
-    if (currentChatIndex >= 0) {
-        saveChatSession();
-    }
-
-    const session = chatSessions[index];
-    currentChatIndex = index;
-    currentSessionId = session.id;
-    currentAgent = session.agent;
-
-    // Update UI
-    document.getElementById('agent-select').value = currentAgent;
-    updateTaskOptions();
-    updateHelpContent();
-
-    // Load messages
-    const chatWindow = document.getElementById('chat-window');
-    chatWindow.innerHTML = '';
-
-    session.messages.forEach(msg => {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = msg.className;
-        messageDiv.innerHTML = msg.content;
-        chatWindow.appendChild(messageDiv);
-    });
-
-    loadChatHistorySidebar();
-    chatWindow.scrollTop = chatWindow.scrollHeight;
-}
-
-function saveChatSession() {
-    if (currentChatIndex >= 0 && currentChatIndex < chatSessions.length) {
-        const chatWindow = document.getElementById('chat-window');
-        const messages = Array.from(chatWindow.children);
-
-        chatSessions[currentChatIndex].messages = messages.map(msg => ({
-            content: msg.innerHTML,
-            className: msg.className
-        }));
-
-        // Update title from last user message
-        const lastUserMessage = messages.reverse().find(msg => msg.className.includes('user'));
-        if (lastUserMessage) {
-            const text = lastUserMessage.textContent || lastUserMessage.innerText;
-            const cleanText = text.replace('You:', '').trim();
-            chatSessions[currentChatIndex].title = cleanText.substring(0, 30) + (cleanText.length > 30 ? '...' : '');
-            chatSessions[currentChatIndex].lastMessage = cleanText.substring(0, 50) + (cleanText.length > 50 ? '...' : '');
-        }
-
-        chatSessions[currentChatIndex].timestamp = new Date().toISOString();
-        localStorage.setItem('studentChatSessions', JSON.stringify(chatSessions));
-    }
-}
-
-function loadChatHistorySidebar() {
-    const historyList = document.getElementById('chat-history-list');
-    if (!historyList) return;
-
-    historyList.innerHTML = '';
-
-    chatSessions.forEach((session, index) => {
-        const historyItem = document.createElement('div');
-        historyItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
-        historyItem.onclick = () => loadChatSession(index);
-
-        historyItem.innerHTML = `
-            <div class="chat-title">${session.title}</div>
-            <div class="chat-preview">${session.lastMessage || 'New conversation'}</div>
-            <div class="chat-meta">${session.agent} • ${new Date(session.timestamp).toLocaleDateString()}</div>
-        `;
-
-        historyList.appendChild(historyItem);
-    });
 }
 
 async function sendMessage() {
-    console.log('[STUDENT DEBUG] ===== SEND MESSAGE CALLED =====');
-
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
+    const agentSelect = document.getElementById('agent-select');
     const subjectSelect = document.getElementById('subject-select');
     const taskSelect = document.getElementById('task-select');
 
-    if (!messageInput || !sendButton || !subjectSelect || !taskSelect) {
+    if (!messageInput || !sendButton || !agentSelect || !subjectSelect || !taskSelect) {
         console.error('[STUDENT ERROR] Missing required elements');
         return;
     }
 
     const message = messageInput.value.trim();
-    console.log('[STUDENT DEBUG] Message to send:', `"${message}"`);
+    const agent = agentSelect.value;
+    const subject = subjectSelect.value;
+    const task = taskSelect.value;
+
+    console.log('[STUDENT DEBUG] sendMessage called:', { agent, message, subject, task });
 
     // Validate message
     if (!message || message.length === 0) {
@@ -453,15 +224,9 @@ async function sendMessage() {
         return;
     }
 
-    if (message.length > 300) {
-        console.log('[STUDENT DEBUG] Message too long');
-        addMessage('📝 Please keep your questions shorter (under 300 characters)!', 'error');
-        return;
-    }
-
-    // Prevent double-sending
+    // Prevent double-clicking
     if (sendButton.disabled) {
-        console.log('[STUDENT DEBUG] Button already disabled');
+        console.log('[STUDENT DEBUG] Send button disabled, preventing duplicate');
         return;
     }
 
@@ -470,30 +235,26 @@ async function sendMessage() {
     sendButton.textContent = 'Sending...';
     sendButton.style.opacity = '0.6';
 
+    // Add user message to chat
+    addMessage(message, 'user');
+    messageInput.value = '';
+    messageInput.style.height = 'auto';
+
     try {
-        // Add user message
-        addMessage(message, 'user');
-        messageInput.value = '';
-        messageInput.style.height = 'auto';
-
-        const payload = {
-            message: message,
-            subject: subjectSelect.value,
-            task: taskSelect.value,
-            session_id: currentSessionId,
-            student_id: studentId,
-            student_name: studentName,
-            user_type: 'student'
-        };
-
-        console.log('[STUDENT DEBUG] Sending payload:', payload);
-
-        const response = await fetch(`/api/${currentAgent}`, {
+        const response = await fetch(`/api/${agent}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({
+                message: message,
+                subject: subject,
+                task: task,
+                session_id: currentSessionId,
+                user_type: 'student',
+                student_id: studentId,
+                student_name: studentName
+            })
         });
 
         console.log('[STUDENT DEBUG] API response:', response.status);
@@ -525,38 +286,230 @@ async function sendMessage() {
         // Save session
         saveChatSession();
 
-        console.log('[STUDENT DEBUG] ===== SEND MESSAGE COMPLETE =====');
+        console.log('[STUDENT DEBUG] Message send complete');
     }
 }
 
-function addMessage(text, type) {
-    console.log('[STUDENT DEBUG] Adding message:', type, text.substring(0, 50) + '...');
-
+function addMessage(message, type) {
     const chatWindow = document.getElementById('chat-window');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${type}`;
+    if (!chatWindow) return;
 
-    // Format message text
-    const formattedText = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-                             .replace(/\n/g, '<br>');
+    const messageDiv = document.createElement('div');
+    
+    let formattedMessage = formatMessageContent(message);
 
     if (type === 'user') {
-        messageDiv.innerHTML = `<strong>You:</strong> ${formattedText}`;
+        messageDiv.className = 'message user-message';
+        messageDiv.innerHTML = `<strong>You:</strong> ${formattedMessage}`;
     } else if (type === 'bot') {
+        messageDiv.className = 'message agent-message';
         const agentName = currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1);
-        messageDiv.innerHTML = `<strong>${agentName}:</strong> ${formattedText}`;
+        messageDiv.innerHTML = `<strong>${agentName}:</strong> ${formattedMessage}`;
     } else if (type === 'error') {
-        messageDiv.innerHTML = `<strong>Error:</strong> ${formattedText}`;
+        messageDiv.className = 'message error-message';
+        messageDiv.innerHTML = `<strong>Error:</strong> ${formattedMessage}`;
     }
 
     chatWindow.appendChild(messageDiv);
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+
+    // Smooth scroll to bottom
+    setTimeout(() => {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }, 100);
+
+    console.log(`[STUDENT DEBUG] Added ${type} message`);
+}
+
+function formatMessageContent(message) {
+    if (!message) return '';
+    
+    return message
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>')
+        .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>(?:\s*<li>.*<\/li>)*)/gs, '<ul>$1</ul>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+}
+
+function startNewChat() {
+    // Save current chat
+    if (currentChatIndex >= 0) {
+        saveChatSession();
+    }
+
+    // Create new chat
+    const newChat = {
+        id: generateSessionId(),
+        agent: currentAgent,
+        title: 'New Chat',
+        lastMessage: '',
+        timestamp: new Date().toISOString(),
+        messages: []
+    };
+
+    chatSessions.unshift(newChat);
+    currentChatIndex = 0;
+    currentSessionId = newChat.id;
+
+    // Clear chat window
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow) {
+        chatWindow.innerHTML = '';
+        
+        // Add welcome message
+        const welcomeMessage = document.createElement('div');
+        welcomeMessage.className = 'message agent-message';
+        const agentName = currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1);
+        welcomeMessage.innerHTML = `<strong>${agentName}:</strong> Hello ${studentName}! I'm ready to help you with your studies. What would you like to work on today?`;
+        chatWindow.appendChild(welcomeMessage);
+    }
+
+    // Update sidebar
+    loadChatHistorySidebar();
+    
+    console.log('[STUDENT DEBUG] Started new chat:', newChat.id);
+}
+
+function loadChatSession(index) {
+    if (index < 0 || index >= chatSessions.length) return;
+
+    // Save current chat first
+    if (currentChatIndex >= 0) {
+        saveChatSession();
+    }
+
+    const chat = chatSessions[index];
+    currentChatIndex = index;
+    currentSessionId = chat.id;
+    currentAgent = chat.agent;
+
+    // Update UI
+    const agentSelect = document.getElementById('agent-select');
+    if (agentSelect) {
+        agentSelect.value = currentAgent;
+        updateTaskOptions();
+        updateHelpContent();
+    }
+
+    // Load messages
+    const chatWindow = document.getElementById('chat-window');
+    if (chatWindow) {
+        chatWindow.innerHTML = '';
+
+        if (chat.messages && chat.messages.length > 0) {
+            chat.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = msg.className;
+                messageDiv.innerHTML = msg.content;
+                chatWindow.appendChild(messageDiv);
+            });
+        } else {
+            // Show welcome message
+            const welcomeMessage = document.createElement('div');
+            welcomeMessage.className = 'message agent-message';
+            const agentName = currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1);
+            welcomeMessage.innerHTML = `<strong>${agentName}:</strong> Hello ${studentName}! I'm ready to help you with your studies. What would you like to work on today?`;
+            chatWindow.appendChild(welcomeMessage);
+        }
+
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    // Update sidebar
+    loadChatHistorySidebar();
+    
+    console.log('[STUDENT DEBUG] Loaded chat session:', chat.id);
+}
+
+function saveChatSession() {
+    if (currentChatIndex < 0 || currentChatIndex >= chatSessions.length) return;
+
+    const chatWindow = document.getElementById('chat-window');
+    if (!chatWindow) return;
+
+    const messages = Array.from(chatWindow.children);
+    const chat = chatSessions[currentChatIndex];
+
+    chat.messages = messages.map(msg => ({
+        content: msg.innerHTML,
+        className: msg.className
+    }));
+
+    // Update title and last message
+    if (messages.length > 1) {
+        const lastUserMessage = messages.reverse().find(msg => 
+            msg.className.includes('user-message')
+        );
+        if (lastUserMessage) {
+            const messageText = lastUserMessage.textContent.replace('You:', '').trim();
+            chat.title = messageText.length > 30 ? 
+                messageText.substring(0, 30) + '...' : messageText;
+            chat.lastMessage = messageText;
+        }
+    }
+
+    chat.timestamp = new Date().toISOString();
+
+    // Save to localStorage
+    localStorage.setItem('studentChatSessions', JSON.stringify(chatSessions));
+    
+    console.log('[STUDENT DEBUG] Saved chat session:', chat.id);
+}
+
+function loadChatHistorySidebar() {
+    const historyList = document.getElementById('chat-history-list');
+    if (!historyList) return;
+
+    historyList.innerHTML = '';
+
+    chatSessions.forEach((chat, index) => {
+        const chatItem = document.createElement('div');
+        chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
+
+        const agentName = chat.agent.charAt(0).toUpperCase() + chat.agent.slice(1);
+        const date = new Date(chat.timestamp).toLocaleDateString();
+
+        chatItem.innerHTML = `
+            <div class="chat-title">${chat.title || 'New Chat'}</div>
+            <div class="chat-preview">${chat.lastMessage || 'No messages yet'}</div>
+            <div class="chat-meta">${agentName} • ${date}</div>
+        `;
+
+        chatItem.addEventListener('click', () => loadChatSession(index));
+        historyList.appendChild(chatItem);
+    });
 }
 
 function logout() {
-    console.log('[STUDENT DEBUG] Logging out');
-    saveChatSession();
     sessionStorage.clear();
     localStorage.removeItem('studentChatSessions');
     window.location.href = '/student-login';
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('[STUDENT DEBUG] DOM loaded, setting up portal...');
+
+    // Set welcome message
+    const welcomeElement = document.getElementById('student-welcome');
+    if (welcomeElement) {
+        welcomeElement.textContent = `Welcome, ${studentName}!`;
+    }
+
+    // Set up all event listeners
+    setupEventListeners();
+
+    // Update help content
+    updateTaskOptions();
+    updateHelpContent();
+
+    // Load or create initial chat
+    loadChatHistorySidebar();
+    if (chatSessions.length === 0) {
+        startNewChat();
+    } else {
+        loadChatSession(0);
+    }
+
+    console.log('[STUDENT DEBUG] Student portal setup complete');
+});

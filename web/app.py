@@ -16,7 +16,14 @@ CORS(app)
 safety_filter = SafetyFilter()
 
 # Set up logging
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(),
+        logging.FileHandler('app.log', mode='a')
+    ]
+)
 logger = logging.getLogger(__name__)
 
 @app.route("/")
@@ -25,7 +32,11 @@ def index():
 
 @app.route("/student-login")
 def student_login():
-    return render_template("student_login.html")
+    try:
+        return render_template("student_login.html")
+    except Exception as e:
+        app.logger.error(f"Error rendering student login: {e}")
+        return "Student login temporarily unavailable", 500
 
 @app.route("/student")
 def student_interface():
@@ -56,17 +67,17 @@ def agent_endpoint(agent_name):
         user_type = data.get('user_type', 'student')
 
         # Handle empty or whitespace-only messages
-        if not message or not message.strip() or message.replace(' ', '').replace('\t', '').replace('\n', '') == '':
+        if not message or not message.strip():
             return jsonify({"response": "Please enter a message to get help! 📝"}), 200
-        else:
-            # Clean up the message - handle encoding issues
-            message = str(message).strip()
-            # Remove any problematic characters that might cause issues
-            message = message.replace('\x00', '').replace('\ufffd', '')
-            
-            # Additional validation for meaningful content
-            if message.replace(' ', '').replace('\t', '').replace('\n', '') == '' or len(message.replace(' ', '')) < 1:
-                return jsonify({"response": "Please enter a meaningful message to get help! 📝"}), 200
+        
+        # Clean up the message - handle encoding issues
+        message = str(message).strip()
+        # Remove any problematic characters that might cause issues
+        message = message.replace('\x00', '').replace('\ufffd', '')
+        
+        # Additional validation for meaningful content
+        if len(message.replace(' ', '').replace('\t', '').replace('\n', '')) < 2:
+            return jsonify({"response": "Please enter a meaningful message to get help! 📝"}), 200
 
         # Validate agent name
         valid_agents = ['sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple']
