@@ -82,6 +82,17 @@ document.addEventListener('DOMContentLoaded', function() {
     updateAgentHelp();
     loadChatHistorySidebar();
     
+    // Initialize help content with click handlers
+    setTimeout(() => {
+        document.querySelectorAll('.sample-text').forEach(sample => {
+            sample.addEventListener('click', function() {
+                const text = this.textContent.replace('• "', '').replace('"', '');
+                document.getElementById('message-input').value = text;
+                document.getElementById('message-input').focus();
+            });
+        });
+    }, 100);
+    
     if (chatSessions.length === 0) {
         startNewChat();
     } else {
@@ -121,6 +132,17 @@ function updateAgentHelp() {
             ${help.samples.map(sample => `<div class="sample-text">${sample}</div>`).join('')}
         </div>
     `;
+    
+    // Add click handlers for sample texts
+    setTimeout(() => {
+        document.querySelectorAll('.sample-text').forEach(sample => {
+            sample.addEventListener('click', function() {
+                const text = this.textContent.replace('• "', '').replace('"', '');
+                document.getElementById('message-input').value = text;
+                document.getElementById('message-input').focus();
+            });
+        });
+    }, 50);
 }
 
 function startNewChat() {
@@ -275,7 +297,10 @@ function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const message = messageInput.value.trim();
     
-    if (!message) return;
+    if (!message || message.length === 0) {
+        messageInput.focus();
+        return;
+    }
     
     // Student-specific limitations
     if (message.length > 300) {
@@ -328,7 +353,7 @@ function sendMessage() {
     })
     .finally(() => {
         // Re-enable send button
-        sendBuffer.disabled = false;
+        sendButton.disabled = false;
         
         // Save session after each message
         saveChatSession();

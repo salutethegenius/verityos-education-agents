@@ -17,7 +17,7 @@ localPort = 3000
 externalPort = 80
 
 [workflows]
-runButton = "Start VerityOS"
+runButton = "Start VerityOS Student"
 
 [[workflows.workflow]]
 name = "Start VerityOS"
@@ -27,3 +27,12 @@ mode = "sequential"
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"
+
+[[workflows.workflow]]
+name = "Start VerityOS Student"
+author = 36910130
+mode = "sequential"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=5000"
