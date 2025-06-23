@@ -4,15 +4,15 @@
   "memory_type": {
     "research_history": [
       {
-        "timestamp": "2025-06-23T14:57:17.608954",
-        "query": "Bahamas in 2025",
-        "intent": "general_research",
-        "subject": "academic research"
+        "timestamp": "2025-06-23T15:11:05.118686",
+        "query": "How old is he?",
+        "intent": "fact_finding",
+        "subject": "bahamian history"
       }
     ],
     "level": "middle",
-    "last_updated": "2025-06-23T14:57:17.608967"
+    "last_updated": "2025-06-23T15:11:05.118698"
   },
-  "timestamp": "2025-06-23T14:57:17.608982",
+  "timestamp": "2025-06-23T15:11:05.118711",
   "data": "session"
 }
