@@ -23,52 +23,70 @@ logger = logging.getLogger(__name__)
 def index():
     return render_template("agent_interface.html", agent="sage")
 
-@app.route("/api/<agent>", methods=["POST"])
-def api_agent(agent):
-    data = request.json or {}
-    message = data.get("message", "").strip()
-    
-    logger.info(f"Incoming request for agent {agent}: {data}")
-
-    # Validate input
-    if not message:
-        return jsonify({"error": "Message cannot be empty"}), 400
-    
-    # Apply safety filter to input
-    is_safe, safety_message = safety_filter.validate_student_input(message)
-    if not is_safe:
-        return jsonify({"error": safety_message}), 400
-
-    run_map = {
-        "sage": run_sage,
-        "quill": run_quill,
-        "echo": run_echo,
-        "lucaya": run_lucaya,
-        "nassau": run_nassau,
-        "pineapple": run_pineapple
-    }
-
-    if agent not in run_map:
-        return jsonify({"error": f"Unknown agent: {agent}"}), 400
-
+@app.route('/api/<agent_name>', methods=['POST'])
+def agent_endpoint(agent_name):
     try:
-        # Get response from agent
-        response = run_map[agent](message, data)
-        
-        # Apply safety filter to output
-        if response:
-            filtered_response, _ = safety_filter.filter_content(
-                response, 
-                safety_level="moderate",
-                grade_level="middle"
-            )
-            return jsonify({"response": filtered_response})
+        # Get JSON data with better error handling
+        try:
+            data = request.get_json(force=True)
+        except Exception as json_error:
+            app.logger.error(f"JSON parsing error: {json_error}")
+            return jsonify({"error": "Invalid JSON format"}), 400
+
+        if not data:
+            return jsonify({"error": "No JSON data provided"}), 400
+
+        # Validate and sanitize input
+        message = data.get('message', '')
+        subject = data.get('subject', 'general')
+        task = data.get('task', 'homework')
+
+        # Handle empty or whitespace-only messages
+        if not message or not message.strip():
+            message = ""
         else:
-            return jsonify({"error": "Agent returned empty response"}), 500
-            
+            # Clean up the message - handle encoding issues
+            message = str(message).strip()
+            # Remove any problematic characters that might cause issues
+            message = message.replace('\x00', '').replace('\ufffd', '')
+
+        # Validate agent name
+        valid_agents = ['sage', 'quill', 'lucaya', 'nassau', 'echo', 'pineapple']
+        if agent_name not in valid_agents:
+            return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
+
+        # Log the incoming request
+        app.logger.info(f"Incoming request for agent {agent_name}: {{'message': '{message}', 'subject': '{subject}', 'task': '{task}'}}")
+
+        # Route to appropriate agent
+        if agent_name == 'sage':
+            from agents.sage.agent import run_agent
+            response = run_agent(message, {"subject": subject, "task": task})
+        elif agent_name == 'quill':
+            from agents.quill.agent import run_agent
+            response = run_agent(message, {"subject": subject, "task": task})
+        elif agent_name == 'lucaya':
+            from agents.lucaya.agent import run_agent
+            response = run_agent(message, {"subject": subject, "task": task})
+        elif agent_name == 'nassau':
+            from agents.nassau.agent import run_agent
+            response = run_agent(message, {"subject": subject, "task": task})
+        elif agent_name == 'echo':
+            from agents.echo.agent import run_agent
+            response = run_agent(message, {"subject": subject, "task": task})
+        elif agent_name == 'pineapple':
+            from agents.pineapple.agent import run_agent
+            response = run_agent(message, {"subject": subject, "task": task})
+
+        # Ensure response is valid
+        if response is None:
+            response = "I'm having trouble processing that request. Please try again."
+
+        return jsonify({"response": response})
+
     except Exception as e:
-        logger.error(f"Error in agent {agent}: {str(e)}")
-        return jsonify({"error": "An error occurred while processing your request"}), 500
+        app.logger.error(f"Error processing request for {agent_name}: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=3000)
