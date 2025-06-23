@@ -68,12 +68,13 @@ function switchAgent() {
     }
 
     // Switch to new agent
+    const previousAgent = currentAgent;
     currentAgent = newAgent;
 
     // Load conversation history for new agent
     loadSessionHistory(newAgent);
 
-    console.log(`[SESSION] Switched to agent: ${newAgent}, session: ${currentSessionId}`);
+    console.log(`[SESSION] Switched from ${previousAgent} to agent: ${newAgent}, session: ${currentSessionId}`);
   }
 }
 
@@ -95,7 +96,7 @@ async function loadSessionHistory(agent) {
   // Clear current chat
   chatWindow.innerHTML = '';
 
-  // Check if we have local conversation history
+  // Check if we have local conversation history first
   if (conversationHistory[agent] && conversationHistory[agent].length > 0) {
     // Restore from local storage
     conversationHistory[agent].forEach(msg => {
@@ -107,7 +108,7 @@ async function loadSessionHistory(agent) {
 
     console.log(`[SESSION] Loaded ${conversationHistory[agent].length} messages from local history for ${agent}`);
   } else {
-    // Load from server memory if available
+    // Only load from server if no local history exists
     try {
       const response = await fetch(`/api/${agent}/session`, {
         method: 'POST',
@@ -123,7 +124,9 @@ async function loadSessionHistory(agent) {
       if (response.ok) {
         const data = await response.json();
         if (data.conversation_history && data.conversation_history.length > 0) {
-          // Restore conversation from server memory
+          // Convert server history to local format and store it
+          const localHistory = [];
+          
           data.conversation_history.forEach(msg => {
             const messageDiv = document.createElement('div');
             messageDiv.className = `message ${msg.role === 'user' ? 'user-message' : 'agent-message'}`;
@@ -135,7 +138,16 @@ async function loadSessionHistory(agent) {
             }
 
             chatWindow.appendChild(messageDiv);
+            
+            // Store in local history for future switches
+            localHistory.push({
+              content: messageDiv.innerHTML,
+              className: messageDiv.className
+            });
           });
+
+          // Save to local conversation history
+          conversationHistory[agent] = localHistory;
 
           console.log(`[SESSION] Loaded ${data.conversation_history.length} messages from server memory for ${agent}`);
         }
@@ -150,6 +162,12 @@ async function loadSessionHistory(agent) {
       welcomeMessage.className = 'message agent-message';
       welcomeMessage.innerHTML = `<strong>${agent.charAt(0).toUpperCase() + agent.slice(1)}:</strong> Welcome! I'm ready to help you with your studies. How can I assist you today?`;
       chatWindow.appendChild(welcomeMessage);
+      
+      // Store welcome message in local history
+      conversationHistory[agent] = [{
+        content: welcomeMessage.innerHTML,
+        className: welcomeMessage.className
+      }];
     }
   }
 
@@ -303,6 +321,17 @@ function addMessage(message, type) {
     }
     
     chatWindow.appendChild(messageDiv);
+    
+    // Update local conversation history
+    if (currentAgent) {
+        if (!conversationHistory[currentAgent]) {
+            conversationHistory[currentAgent] = [];
+        }
+        conversationHistory[currentAgent].push({
+            content: messageDiv.innerHTML,
+            className: messageDiv.className
+        });
+    }
     
     // Auto-scroll to bottom
     chatWindow.scrollTop = chatWindow.scrollHeight;
