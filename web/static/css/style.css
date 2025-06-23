@@ -59,6 +59,7 @@ body {
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.2s;
+  color: white;
 }
 
 .chat-history-item:hover {
@@ -66,27 +67,31 @@ body {
 }
 
 .chat-history-item.active {
-  background: #3498db;
+  background: #2980b9;
+  color: white;
 }
 
 .chat-title {
   font-weight: bold;
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
+  color: inherit;
 }
 
 .chat-preview {
   font-size: 0.8rem;
-  opacity: 0.8;
+  opacity: 0.9;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  color: inherit;
 }
 
 .chat-meta {
   font-size: 0.7rem;
-  opacity: 0.6;
+  opacity: 0.8;
   margin-top: 0.25rem;
+  color: #bdc3c7;
 }
 
 /* Controls Sidebar Styles */
