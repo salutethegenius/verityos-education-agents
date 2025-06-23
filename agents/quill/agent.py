@@ -206,5 +206,32 @@ What would you like me to grade today? 🌴"""
 # API compatibility function
 def run_agent(message: str, payload: dict = None) -> str:
     agent = QuillAgent()
-    agent.initialize_session(session_id="default-session")
-    return agent.process_message(message, **(payload or {}))
+    
+    if payload:
+        session_id = payload.get("session_id", "default-session")
+        user_type = payload.get("user_type", "student")
+        agent.initialize_session(session_id, user_type)
+        
+        # Add user message to context
+        agent.add_to_context(message, "user")
+        
+        # Process the message
+        response = agent.process_message(message, **payload)
+        
+        # Add agent response to context
+        agent.add_to_context(response, "assistant")
+        
+        # Save conversation to memory
+        if agent.memory_enabled:
+            conversation_history = agent.context
+            session_data = {
+                "grading_history": [],
+                "level": agent.student_level,
+                "conversation_history": conversation_history
+            }
+            agent.memory_manager.save_memory("quill", session_id, session_data, "session")
+        
+        return response
+    else:
+        agent.initialize_session(session_id="default-session")
+        return agent.process_message(message, **(payload or {}))
