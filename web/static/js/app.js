@@ -609,21 +609,31 @@ async function sendMessage() {
             return;
         }
 
-        const message = messageInput.value.trim();
+        const rawMessage = messageInput.value;
+        const message = rawMessage.trim();
         const agent = agentSelect.value;
         const subject = subjectSelect.value;
         const task = taskSelect.value;
 
+        console.log('[DEBUG] ===== ADMIN SEND MESSAGE CALLED =====');
         console.log('[DEBUG] sendMessage fired with:', {
             agent: agent,
             input: message,
+            rawInput: `"${rawMessage}"`,
             subject: subject,
-            task: task
+            task: task,
+            messageLength: message.length,
+            rawLength: rawMessage.length
         });
 
         // Don't send empty messages or messages with only whitespace
         if (!message || message.trim().length === 0 || message.replace(/\s+/g, '').length === 0) {
             console.log('[DEBUG] Empty or whitespace-only message, not sending');
+            console.log('[DEBUG] Message validation failed:', {
+                truthyCheck: !!message,
+                trimLengthCheck: message.trim().length > 0,
+                whitespaceCheck: message.replace(/\s+/g, '').length > 0
+            });
             messageInput.focus(); // Refocus the input
             return;
         }
