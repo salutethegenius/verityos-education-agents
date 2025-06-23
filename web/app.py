@@ -45,7 +45,7 @@ def agent_endpoint(agent_name):
 
         # Handle empty or whitespace-only messages
         if not message or not message.strip():
-            message = ""
+            return jsonify({"response": "Please enter a message to get help! 📝"}), 200
         else:
             # Clean up the message - handle encoding issues
             message = str(message).strip()
