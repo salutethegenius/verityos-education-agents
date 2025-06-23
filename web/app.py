@@ -36,3 +36,6 @@ def api_agent(agent):
             return jsonify({"error": str(e)}), 500
 
     return jsonify({"response": f"Unknown agent: {agent}"}), 400
+
+if __name__ == "__main__":
+    app.run(debug=False, host="0.0.0.0", port=3000)

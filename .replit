@@ -1,0 +1,17 @@
+language = "python3"
+run = "PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"
+modules = ["python-3.11"]
+
+[deployment]
+run = ["sh", "-c", "flask run --host=0.0.0.0 --port=3000"]
+
+[nix]
+channel = "stable-24_05"
+packages = ["glibcLocales", "libyaml"]
+
+[env]
+FLASK_DEBUG = "0"
+
+[[ports]]
+localPort = 3000
+externalPort = 80
