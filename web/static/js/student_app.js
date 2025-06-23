@@ -410,49 +410,70 @@ const dynamicHelp = {
 };
 
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('[DEBUG] DOM loaded, initializing student portal...');
+    
     // Display student welcome message
     document.getElementById('student-welcome').textContent = `Welcome, ${studentName}!`;
     
     // Set up agent switching
     document.getElementById('agent-select').addEventListener('change', function() {
+        console.log('[DEBUG] Agent selector changed to:', this.value);
         switchAgent(this.value);
     });
     
     // Set up help content updates when subject or task changes
     document.getElementById('subject-select').addEventListener('change', function() {
+        console.log('[DEBUG] Subject changed to:', this.value);
         updateTaskOptions();
         updateAgentHelp();
     });
     
     document.getElementById('task-select').addEventListener('change', function() {
+        console.log('[DEBUG] Task changed to:', this.value);
         updateAgentHelp();
     });
     
-    // Set up send button
-    document.getElementById('send-button').addEventListener('click', sendMessage);
-    document.getElementById('message-input').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter' && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-        }
-    });
+    // Set up send button with better error handling
+    const sendButton = document.getElementById('send-button');
+    const messageInput = document.getElementById('message-input');
     
-    // Auto-expand textarea
-    document.getElementById('message-input').addEventListener('input', function() {
-        this.style.height = 'auto';
-        this.style.height = Math.min(this.scrollHeight, 120) + 'px';
-    });
+    if (sendButton) {
+        sendButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            console.log('[DEBUG] Send button clicked');
+            sendMessage();
+        });
+    }
+    
+    if (messageInput) {
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                console.log('[DEBUG] Enter key pressed');
+                sendMessage();
+            }
+        });
+        
+        // Auto-expand textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+    }
     
     // Set up new chat button
     document.getElementById('new-chat-btn').addEventListener('click', startNewChat);
     
-    // Initialize
+    // Initialize everything step by step
+    console.log('[DEBUG] Initializing task options...');
     updateTaskOptions();
     
-    // Wait a bit for dropdowns to be populated before updating help
+    console.log('[DEBUG] Initializing help content...');
+    // Force update help content immediately
     setTimeout(() => {
         updateAgentHelp();
-    }, 100);
+        console.log('[DEBUG] Initial help content update completed');
+    }, 200);
     
     loadChatHistorySidebar();
     
@@ -468,6 +489,8 @@ function generateSessionId() {
 }
 
 function switchAgent(agentName) {
+    console.log('[DEBUG] Switching agent to:', agentName);
+    
     // Save current chat session before switching
     if (currentChatIndex >= 0) {
         saveChatSession();
@@ -478,8 +501,11 @@ function switchAgent(agentName) {
     // Update task options for the new agent
     updateTaskOptions();
     
-    // Update help content
-    updateAgentHelp();
+    // Wait for dropdowns to update, then update help content
+    setTimeout(() => {
+        updateAgentHelp();
+        console.log('[DEBUG] Agent switched and help updated');
+    }, 100);
     
     // Start a new chat for the new agent
     startNewChat();
@@ -562,9 +588,24 @@ function updateTaskOptions() {
 }
 
 function updateAgentHelp() {
+    console.log('[DEBUG] updateAgentHelp called');
+    
     const helpContent = document.getElementById('help-content');
-    const subject = document.getElementById('subject-select').value;
-    const task = document.getElementById('task-select').value;
+    const subjectSelect = document.getElementById('subject-select');
+    const taskSelect = document.getElementById('task-select');
+    
+    if (!helpContent) {
+        console.error('[ERROR] help-content element not found');
+        return;
+    }
+    
+    if (!subjectSelect || !taskSelect) {
+        console.error('[ERROR] Subject or task select elements not found');
+        return;
+    }
+    
+    const subject = subjectSelect.value;
+    const task = taskSelect.value;
     
     console.log('[DEBUG] updateAgentHelp called with:', { currentAgent, subject, task });
     
@@ -583,10 +624,12 @@ function updateAgentHelp() {
             help = dynamicHelp[currentAgent][subject][availableTasks[0]];
             console.log('[DEBUG] Using fallback help content for task:', availableTasks[0]);
         }
-    } else {
-        // Generic fallback
+    }
+    
+    // If still no help found, use generic fallback
+    if (!help) {
         help = {
-            title: `${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)} - ${subject.charAt(0).toUpperCase() + subject.slice(1)} ${task.charAt(0).toUpperCase() + task.slice(1)}`,
+            title: `${getAgentEmoji(currentAgent)} ${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)} - ${subject.charAt(0).toUpperCase() + subject.slice(1)} ${task.charAt(0).toUpperCase() + task.slice(1)}`,
             samples: [
                 '• "Ask me anything about this subject"',
                 '• "Help me understand this topic"',
@@ -598,32 +641,47 @@ function updateAgentHelp() {
         console.log('[DEBUG] Using generic fallback help content');
     }
     
-    if (helpContent && help) {
-        helpContent.innerHTML = `
-            <h4>${help.title}</h4>
-            <div class="help-samples">
-                ${help.samples.map(sample => `<div class="sample-text">${sample}</div>`).join('')}
-            </div>
-        `;
+    // Update the help content
+    helpContent.innerHTML = `
+        <h4>${help.title}</h4>
+        <div class="help-samples">
+            ${help.samples.map(sample => `<div class="sample-text">${sample}</div>`).join('')}
+        </div>
+    `;
+    
+    console.log('[DEBUG] Help content updated successfully');
+    
+    // Add click handlers for sample texts after a short delay
+    setTimeout(() => {
+        const sampleTexts = document.querySelectorAll('.sample-text');
+        console.log('[DEBUG] Adding click handlers to', sampleTexts.length, 'sample texts');
         
-        console.log('[DEBUG] Help content updated successfully');
-        
-        // Add click handlers for sample texts
-        setTimeout(() => {
-            document.querySelectorAll('.sample-text').forEach(sample => {
-                sample.addEventListener('click', function() {
-                    const text = this.textContent.replace('• "', '').replace('"', '');
-                    const messageInput = document.getElementById('message-input');
-                    if (messageInput) {
-                        messageInput.value = text;
-                        messageInput.focus();
-                    }
-                });
+        sampleTexts.forEach(sample => {
+            sample.addEventListener('click', function() {
+                let text = this.textContent.replace('• "', '').replace('"', '');
+                // Remove any extra quotes that might be at the end
+                if (text.endsWith('"')) {
+                    text = text.slice(0, -1);
+                }
+                
+                const messageInput = document.getElementById('message-input');
+                if (messageInput) {
+                    messageInput.value = text;
+                    messageInput.focus();
+                    console.log('[DEBUG] Sample text clicked, input set to:', text);
+                }
             });
-        }, 50);
-    } else {
-        console.error('[ERROR] helpContent element or help data not found');
-    }
+        });
+    }, 100);
+}
+
+function getAgentEmoji(agent) {
+    const emojis = {
+        'sage': '🧙‍♂️',
+        'echo': '🗣️',
+        'lucaya': '🔍'
+    };
+    return emojis[agent] || '🤖';
 }
 
 function startNewChat() {
@@ -776,6 +834,13 @@ async function loadAgentSession(agent) {
 
 function sendMessage() {
     const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+    
+    if (!messageInput) {
+        console.error('[ERROR] Message input not found');
+        return;
+    }
+    
     const message = messageInput.value.trim();
     
     console.log('[DEBUG] sendMessage called with message:', message);
@@ -793,17 +858,29 @@ function sendMessage() {
     }
     
     // Prevent button spamming
-    const sendButton = document.getElementById('send-button');
-    if (sendButton && sendButton.disabled) {
-        console.log('[DEBUG] Send button already disabled, preventing duplicate send');
-        return;
-    }
     if (sendButton) {
+        if (sendButton.disabled) {
+            console.log('[DEBUG] Send button already disabled, preventing duplicate send');
+            return;
+        }
         sendButton.disabled = true;
+        sendButton.textContent = 'Sending...';
     }
     
-    const subject = document.getElementById('subject-select').value;
-    const task = document.getElementById('task-select').value;
+    const subjectSelect = document.getElementById('subject-select');
+    const taskSelect = document.getElementById('task-select');
+    
+    if (!subjectSelect || !taskSelect) {
+        console.error('[ERROR] Subject or task select not found');
+        if (sendButton) {
+            sendButton.disabled = false;
+            sendButton.textContent = 'Send';
+        }
+        return;
+    }
+    
+    const subject = subjectSelect.value;
+    const task = taskSelect.value;
     
     // Add user message to chat
     addMessage(message, 'user');
@@ -821,6 +898,8 @@ function sendMessage() {
         user_type: 'student'
     };
     
+    console.log('[DEBUG] Sending payload:', payload);
+    
     fetch(`/api/${currentAgent}`, {
         method: 'POST',
         headers: {
@@ -828,8 +907,14 @@ function sendMessage() {
         },
         body: JSON.stringify(payload)
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
+        console.log('[DEBUG] Received response:', data);
         if (data.response) {
             addMessage(data.response, 'bot');
         } else {
@@ -837,13 +922,14 @@ function sendMessage() {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('[ERROR] Fetch error:', error);
         addMessage('Sorry, I encountered an error. Please try again.', 'error');
     })
     .finally(() => {
         // Re-enable send button
         if (sendButton) {
             sendButton.disabled = false;
+            sendButton.textContent = 'Send';
         }
         
         // Save session after each message
