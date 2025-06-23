@@ -104,6 +104,38 @@ def agent_endpoint(agent_name):
         app.logger.error(f"Error processing request for {agent_name}: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
 
+@app.route('/api/validate-student', methods=['POST'])
+def validate_student():
+    """Validate student login credentials"""
+    try:
+        data = request.get_json()
+        student_id = data.get('student_id', '').strip()
+        password = data.get('password', '').strip()
+        
+        if not student_id or not password:
+            return jsonify({"success": False, "message": "Missing credentials"}), 400
+        
+        # Import and use Coral agent to validate credentials
+        from agents.coral.agent import CoralAgent
+        coral = CoralAgent()
+        
+        # Check if student exists and password matches
+        for key, student in coral.student_accounts.items():
+            if (student['student_id'].upper() == student_id.upper() and 
+                student['password'] == password and 
+                student['active']):
+                return jsonify({
+                    "success": True,
+                    "student_name": student['name'],
+                    "grade": student['grade']
+                })
+        
+        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        
+    except Exception as e:
+        app.logger.error(f"Student validation error: {str(e)}")
+        return jsonify({"success": False, "message": "Server error"}), 500
+
 @app.route('/api/<agent_name>/session', methods=['POST'])
 def session_endpoint(agent_name):
     """Handle session-related operations like loading conversation history"""

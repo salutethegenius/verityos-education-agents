@@ -35,6 +35,7 @@ class CoralAgent:
                 "name": "Jasmine Rolle",
                 "grade": "Grade 8",
                 "student_id": "JS001",
+                "password": "jrolle",
                 "created_date": "2025-01-15",
                 "active": True,
                 "sessions": []
@@ -43,6 +44,7 @@ class CoralAgent:
                 "name": "Kofi Smith", 
                 "grade": "Grade 8",
                 "student_id": "KS002",
+                "password": "ksmith",
                 "created_date": "2025-01-15",
                 "active": True,
                 "sessions": []
@@ -51,6 +53,7 @@ class CoralAgent:
                 "name": "Tiana Clarke",
                 "grade": "Grade 8", 
                 "student_id": "TC003",
+                "password": "tclarke",
                 "created_date": "2025-01-15",
                 "active": True,
                 "sessions": []
@@ -58,7 +61,8 @@ class CoralAgent:
             "malik_johnson": {
                 "name": "Malik Johnson",
                 "grade": "Grade 8",
-                "student_id": "MJ004", 
+                "student_id": "MJ004",
+                "password": "mjohnson", 
                 "created_date": "2025-01-15",
                 "active": True,
                 "sessions": []
@@ -67,6 +71,7 @@ class CoralAgent:
                 "name": "Zaria Knowles",
                 "grade": "Grade 8",
                 "student_id": "ZK005",
+                "password": "zknowles",
                 "created_date": "2025-01-15", 
                 "active": True,
                 "sessions": []
@@ -83,14 +88,18 @@ class CoralAgent:
 
     def create_student_account(self, name: str, grade: str = "Grade 8") -> str:
         """Create a new student account"""
-        # Generate student ID
+        # Generate student ID and password
         name_parts = name.lower().split()
         if len(name_parts) >= 2:
             student_key = f"{name_parts[0]}_{name_parts[1]}"
             student_id = f"{name_parts[0][0].upper()}{name_parts[1][0].upper()}{len(self.student_accounts) + 1:03d}"
+            # Generate password: first letter of first name + last name (e.g., Kenneth Moncur = kmoncur)
+            password = f"{name_parts[0][0]}{name_parts[1]}"
         else:
             student_key = name.lower().replace(" ", "_")
             student_id = f"{name[0].upper()}X{len(self.student_accounts) + 1:03d}"
+            # For single names, use first 6 characters + "123"
+            password = f"{name.lower()[:6]}123"
 
         if student_key in self.student_accounts:
             return f"Student account for {name} already exists."
@@ -100,13 +109,14 @@ class CoralAgent:
             "name": name,
             "grade": grade,
             "student_id": student_id,
+            "password": password,
             "created_date": datetime.date.today().isoformat(),
             "active": True,
             "sessions": []
         }
         
         self._save_student_accounts()
-        return f"✅ Student account created for {name} (ID: {student_id})"
+        return f"✅ **Student Account Created**\n\n**Name:** {name}\n**Student ID:** {student_id}\n**Password:** {password}\n**Grade:** {grade}\n\n📝 *Give these credentials to the student for login access.*"
 
     def search_students(self, query: str) -> str:
         """Search for students by name or ID"""
@@ -235,6 +245,20 @@ class CoralAgent:
             result += f"{i}. {status} {student['name']} (ID: {student['student_id']}) - {student['grade']}\n"
         return result
 
+    def get_student_credentials(self, student_identifier: str) -> str:
+        """Get login credentials for a specific student"""
+        student = None
+        for key, std in self.student_accounts.items():
+            if (student_identifier.lower() in std['name'].lower() or 
+                student_identifier.upper() == std['student_id']):
+                student = std
+                break
+        
+        if not student:
+            return f"❌ Student '{student_identifier}' not found"
+
+        return f"🔑 **Login Credentials for {student['name']}:**\n\n**Student ID:** {student['student_id']}\n**Password:** {student['password']}\n\n📋 Share these credentials with the student for portal access."
+
     def generate_class_report(self) -> str:
         """Generate a comprehensive class report"""
         total_students = len(self.student_accounts)
@@ -307,11 +331,19 @@ class CoralAgent:
         elif "class report" in message or "overview" in message:
             response = self.generate_class_report()
             
+        elif "credentials for" in message or "password for" in message:
+            student_name = message.replace("credentials for", "").replace("password for", "").strip()
+            if student_name:
+                response = self.get_student_credentials(student_name)
+            else:
+                response = "Please specify a student. Example: 'Credentials for Jasmine Rolle'"
+            
         else:
             response = (
                 "🏫 **Coral Teacher Admin Assistant**\n\n"
                 "I can help you with:\n"
                 "• **Student Management:** 'Create student [name]', 'Search [name/ID]'\n"
+                "• **Credentials:** 'Credentials for [student]', 'Password for [name/ID]'\n"
                 "• **Session Tracking:** 'Sessions for [student]', 'Progress for [student]'\n"
                 "• **Class Operations:** 'Show students', 'Today's schedule', 'Class report'\n"
                 "• **Attendance:** 'Mark attendance', 'Show attendance'\n\n"

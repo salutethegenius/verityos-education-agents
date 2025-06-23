@@ -20,15 +20,16 @@
                 </div>
                 
                 <div class="form-group">
-                    <label for="student-name">Full Name:</label>
-                    <input type="text" id="student-name" name="student-name" placeholder="Enter your full name" required>
+                    <label for="student-password">Password:</label>
+                    <input type="password" id="student-password" name="student-password" placeholder="Enter your password" required>
                 </div>
                 
                 <button type="submit" class="login-btn">Login to Learning Portal</button>
             </form>
             
             <div class="login-footer">
-                <p>Need help? Ask your teacher for your Student ID</p>
+                <p>Need help? Ask your teacher for your Student ID and password</p>
+                <p><small>Example: Student ID = JS001, Password = jrolle</small></p>
                 <a href="/">Teacher Portal</a>
             </div>
         </div>
@@ -39,14 +40,36 @@
             e.preventDefault();
             
             const studentId = document.getElementById('student-id').value;
-            const studentName = document.getElementById('student-name').value;
+            const password = document.getElementById('student-password').value;
             
-            // Store student info in session
-            sessionStorage.setItem('student_id', studentId);
-            sessionStorage.setItem('student_name', studentName);
-            
-            // Redirect to student interface
-            window.location.href = `/student?id=${studentId}&name=${encodeURIComponent(studentName)}`;
+            // Validate credentials with server
+            fetch('/api/validate-student', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    student_id: studentId,
+                    password: password
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Store student info in session
+                    sessionStorage.setItem('student_id', studentId);
+                    sessionStorage.setItem('student_name', data.student_name);
+                    
+                    // Redirect to student interface
+                    window.location.href = `/student?id=${studentId}&name=${encodeURIComponent(data.student_name)}`;
+                } else {
+                    alert('Invalid credentials. Please check your Student ID and password.');
+                }
+            })
+            .catch(error => {
+                console.error('Login error:', error);
+                alert('Login failed. Please try again.');
+            });
         });
     </script>
 </body>
