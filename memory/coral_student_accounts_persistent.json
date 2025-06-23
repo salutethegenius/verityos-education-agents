@@ -2,7 +2,7 @@
   "agent_name": "coral",
   "session_id": "student_accounts",
   "memory_type": "persistent",
-  "timestamp": "2025-06-23T16:26:16.945164",
+  "timestamp": "2025-06-23T16:51:34.176136",
   "data": {
     "students": {
       "jasmine_rolle": {
@@ -52,8 +52,17 @@
         "created_date": "2025-06-23",
         "active": true,
         "sessions": []
+      },
+      "kenneth_moncur": {
+        "name": "Kenneth Moncur",
+        "grade": "Grade 8",
+        "student_id": "KM007",
+        "password": "kmoncur",
+        "created_date": "2025-06-23",
+        "active": true,
+        "sessions": []
       }
     },
-    "last_updated": "2025-06-23T16:26:16.945156"
+    "last_updated": "2025-06-23T16:51:34.176128"
   }
 }
