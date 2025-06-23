@@ -52,13 +52,17 @@ def agent_endpoint(agent_name):
         user_type = data.get('user_type', 'student')
 
         # Handle empty or whitespace-only messages
-        if not message or not message.strip():
+        if not message or not message.strip() or message.replace(' ', '').replace('\t', '').replace('\n', '') == '':
             return jsonify({"response": "Please enter a message to get help! 📝"}), 200
         else:
             # Clean up the message - handle encoding issues
             message = str(message).strip()
             # Remove any problematic characters that might cause issues
             message = message.replace('\x00', '').replace('\ufffd', '')
+            
+            # Additional validation for meaningful content
+            if message.replace(' ', '').replace('\t', '').replace('\n', '') == '' or len(message.replace(' ', '')) < 1:
+                return jsonify({"response": "Please enter a meaningful message to get help! 📝"}), 200
 
         # Validate agent name
         valid_agents = ['sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple']

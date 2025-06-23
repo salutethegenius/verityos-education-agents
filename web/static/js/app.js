@@ -622,16 +622,31 @@ async function sendMessage() {
         });
 
         // Don't send empty messages or messages with only whitespace
-        if (!message || message.trim().length === 0) {
+        if (!message || message.trim().length === 0 || message.replace(/\s+/g, '').length === 0) {
             console.log('[DEBUG] Empty or whitespace-only message, not sending');
             messageInput.focus(); // Refocus the input
+            return;
+        }
+        
+        // Validate message contains actual content
+        if (message.replace(/[^a-zA-Z0-9\s]/g, '').trim().length === 0) {
+            console.log('[DEBUG] Message contains no meaningful content');
+            addMessage('Please enter a meaningful question or message.', 'error');
+            messageInput.focus();
             return;
         }
 
         // Prevent double-clicking send button
         const sendButton = document.getElementById('send-button');
-        if (sendButton.disabled) return;
-        sendButton.disabled = true;
+        if (sendButton && sendButton.disabled) {
+            console.log('[DEBUG] Send button already disabled, preventing duplicate send');
+            return;
+        }
+        if (sendButton) {
+            sendButton.disabled = true;
+            sendButton.style.opacity = '0.6';
+            sendButton.style.cursor = 'not-allowed';
+        }
 
         // Update current agent and generate new session if needed
         if (agent !== currentAgent) {
@@ -695,9 +710,13 @@ async function sendMessage() {
             addMessage('Sorry, I encountered an error. Please try again.', 'error');
         })
         .finally(() => {
-            // Re-enable send button
+            // Re-enable send button with proper styling
             const sendButton = document.getElementById('send-button');
-            if (sendButton) sendButton.disabled = false;
+            if (sendButton) {
+                sendButton.disabled = false;
+                sendButton.style.opacity = '1';
+                sendButton.style.cursor = 'pointer';
+            }
         });
 
     } catch (error) {

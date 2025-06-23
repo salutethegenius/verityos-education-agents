@@ -903,9 +903,17 @@ function sendMessage() {
     console.log('[DEBUG] sendMessage called with message:', message);
     
     // Enhanced validation for empty messages
-    if (!message || message.length === 0 || message === '' || message.replace(/\s/g, '').length === 0) {
+    if (!message || message.length === 0 || message === '' || message.replace(/\s+/g, '').length === 0) {
         console.log('[DEBUG] Empty or whitespace-only message detected');
-        // Don't show error message for empty input, just return silently
+        // Prevent sending empty messages
+        messageInput.focus();
+        return;
+    }
+    
+    // Validate message contains actual content (not just special characters)
+    if (message.replace(/[^a-zA-Z0-9\s]/g, '').trim().length === 0) {
+        console.log('[DEBUG] Message contains no meaningful content');
+        addMessage('Please enter a meaningful question or message.', 'error');
         messageInput.focus();
         return;
     }
@@ -925,6 +933,7 @@ function sendMessage() {
         sendButton.disabled = true;
         sendButton.textContent = 'Sending...';
         sendButton.style.opacity = '0.6';
+        sendButton.style.cursor = 'not-allowed';
     }
     
     const subjectSelect = document.getElementById('subject-select');
@@ -991,6 +1000,7 @@ function sendMessage() {
             sendButton.disabled = false;
             sendButton.textContent = 'Send';
             sendButton.style.opacity = '1';
+            sendButton.style.cursor = 'pointer';
         }
         
         // Save session after each message
