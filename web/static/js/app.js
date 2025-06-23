@@ -64,7 +64,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Add temperature slider functionality
         const temperatureSlider = document.getElementById('temperature-slider');
         const temperatureValue = document.getElementById('temperature-value');
-        
+
         if (temperatureSlider && temperatureValue) {
             temperatureSlider.addEventListener('input', function() {
                 temperatureValue.textContent = this.value;
@@ -444,19 +444,10 @@ function updateDropdowns() {
         { value: 'homework', text: 'Homework' }
       ]
     },
-    'nassau': {
-      defaultSubject: 'bahamas studies',
-      defaultTask: 'homework',
-      subjects: [
-        { value: 'bahamas studies', text: 'Bahamas Studies' },
-        { value: 'government', text: 'Government' },
-        { value: 'history', text: 'History' }
-      ],
-      tasks: [
-        { value: 'homework', text: 'Homework' },
-        { value: 'study', text: 'Study' }
-      ]
-    },
+    'coral': {
+            subjects: ['student management', 'attendance', 'schedules', 'oversight'],
+            tasks: ['create accounts', 'view sessions', 'track progress', 'manage class']
+        },
     'pineapple': {
       defaultSubject: 'math',
       defaultTask: 'homework',
@@ -549,7 +540,7 @@ function addMessage(message, type) {
 
 function formatMessageContent(message) {
     if (!message) return '';
-    
+
     // Convert markdown-style formatting to HTML
     let formatted = message
         // Convert **bold** to <strong>bold</strong>
@@ -568,7 +559,7 @@ function formatMessageContent(message) {
 
     // Wrap consecutive list items in ul tags
     formatted = formatted.replace(/(<li>.*<\/li>(?:\s*<li>.*<\/li>)*)/gs, '<ul>$1</ul>');
-    
+
     // Wrap content in paragraphs if it doesn't start with a tag
     if (!formatted.startsWith('<')) {
         formatted = '<p>' + formatted + '</p>';

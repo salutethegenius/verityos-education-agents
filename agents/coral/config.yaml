@@ -1,0 +1,20 @@
+
+name: Coral
+description: Teacher Admin Management Agent for VerityOS Education Suite
+version: 1.0
+role: Manages student accounts, sessions, and provides teacher oversight tools
+author: Kenneth C. Moncur
+commands:
+  - create_student_account
+  - get_student_sessions
+  - view_student_progress
+  - get_today_schedule
+  - mark_attendance
+  - get_attendance_for_day
+  - list_students
+  - search_students
+  - generate_class_report
+memory_mode: advanced
+log_path: /a0/logs/coral/
+summary_path: /a0/memory_system/coral/
+boot_greeting: "Coral is online and ready to assist with student management and classroom oversight."

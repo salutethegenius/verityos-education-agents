@@ -4,7 +4,7 @@ from agents.sage.agent import run_agent as run_sage
 from agents.quill.agent import run_agent as run_quill
 from agents.echo.agent import run_agent as run_echo
 from agents.lucaya.agent import run_agent as run_lucaya
-from agents.nassau.agent import run_agent as run_nassau
+from agents.coral.agent import run_agent as run_coral
 from agents.pineapple.agent import run_agent as run_pineapple
 from utils.safety_filters import SafetyFilter
 import logging
@@ -53,7 +53,7 @@ def agent_endpoint(agent_name):
             message = message.replace('\x00', '').replace('\ufffd', '')
 
         # Validate agent name
-        valid_agents = ['sage', 'quill', 'lucaya', 'nassau', 'echo', 'pineapple']
+        valid_agents = ['sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple']
         if agent_name not in valid_agents:
             return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
 
@@ -76,8 +76,8 @@ def agent_endpoint(agent_name):
                 response = run_quill(message, payload)
             elif agent_name == 'lucaya':
                 response = run_lucaya(message, payload)
-            elif agent_name == 'nassau':
-                response = run_nassau(message, payload)
+            elif agent_name == 'coral':
+                response = run_coral(message, payload)
             elif agent_name == 'echo':
                 response = run_echo(message, payload)
             elif agent_name == 'pineapple':
@@ -104,7 +104,7 @@ def session_endpoint(agent_name):
         action = data.get('action')
         session_id = data.get('session_id', 'default-session')
 
-        valid_agents = ['sage', 'quill', 'lucaya', 'nassau', 'echo', 'pineapple']
+        valid_agents = ['sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple']
         if agent_name not in valid_agents:
             return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
 
