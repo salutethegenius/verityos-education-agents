@@ -6,24 +6,59 @@ function updateDropdowns() {
 
   const selectedAgent = agentSelect.value;
 
-  if (selectedAgent === 'lucaya') {
-    // Show research-focused options for Lucaya
-    const researchSubjects = [
-      'bahamian history', 'government', 'environment', 'literature', 'academic research'
-    ];
-    const researchTasks = [
-      'find sources', 'create outline', 'evaluate sources', 'citation help', 'topic exploration', 'literature review'
-    ];
+  // Define agent-specific options
+  const agentConfigs = {
+    'lucaya': {
+      defaultSubject: 'academic research',
+      defaultTask: 'find sources',
+      preferredSubjects: ['bahamian history', 'government', 'environment', 'literature', 'academic research'],
+      preferredTasks: ['find sources', 'create outline', 'evaluate sources', 'citation help', 'topic exploration', 'literature review']
+    },
+    'sage': {
+      defaultSubject: 'math',
+      defaultTask: 'homework',
+      preferredSubjects: ['math', 'science', 'english', 'history', 'bahamas studies'],
+      preferredTasks: ['homework', 'quiz', 'study']
+    },
+    'quill': {
+      defaultSubject: 'english',
+      defaultTask: 'homework',
+      preferredSubjects: ['english', 'math', 'science', 'history'],
+      preferredTasks: ['homework', 'quiz']
+    },
+    'echo': {
+      defaultSubject: 'english',
+      defaultTask: 'study',
+      preferredSubjects: ['english', 'literature', 'history'],
+      preferredTasks: ['study', 'homework']
+    },
+    'nassau': {
+      defaultSubject: 'bahamas studies',
+      defaultTask: 'homework',
+      preferredSubjects: ['bahamas studies', 'government', 'history'],
+      preferredTasks: ['homework', 'study']
+    },
+    'pineapple': {
+      defaultSubject: 'math',
+      defaultTask: 'homework',
+      preferredSubjects: ['math', 'science', 'english'],
+      preferredTasks: ['homework']
+    }
+  };
 
-    // Set default research subject if currently on generic subject
-    if (!researchSubjects.includes(subjectSelect.value)) {
-      subjectSelect.value = 'academic research';
+  const config = agentConfigs[selectedAgent];
+  if (config) {
+    // Update subject if current selection isn't preferred for this agent
+    if (!config.preferredSubjects.includes(subjectSelect.value)) {
+      subjectSelect.value = config.defaultSubject;
     }
 
-    // Set default research task if currently on generic task
-    if (!researchTasks.includes(taskSelect.value)) {
-      taskSelect.value = 'find sources';
+    // Update task if current selection isn't preferred for this agent
+    if (!config.preferredTasks.includes(taskSelect.value)) {
+      taskSelect.value = config.defaultTask;
     }
+
+    console.log(`[DEBUG] Updated dropdowns for ${selectedAgent}: subject=${subjectSelect.value}, task=${taskSelect.value}`);
   }
 }
 
@@ -35,7 +70,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-function sendMessage() {
+async function sendMessage() {
   const agent = document.getElementById("agent-select").value;
   const subject = document.getElementById("subject-select").value.trim();
   const task = document.getElementById("task-select").value.trim();
