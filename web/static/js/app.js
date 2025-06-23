@@ -23,9 +23,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         if (messageInput) {
+            // Auto-expand textarea as user types
+            messageInput.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+            });
+
             messageInput.addEventListener('keydown', function(event) {
-                if (event.key === 'Enter') {
+                if (event.key === 'Enter' && !event.shiftKey) {
+                    event.preventDefault();
                     sendMessage();
+                } else if (event.key === 'Enter' && event.shiftKey) {
+                    // Allow shift+enter for new lines
+                    return;
                 }
             });
         }
@@ -466,16 +476,19 @@ function addMessage(message, type) {
     const chatWindow = document.getElementById('chat-window');
     const messageDiv = document.createElement('div');
 
+    // Format message content - convert markdown-style formatting to HTML
+    let formattedMessage = formatMessageContent(message);
+
     if (type === 'user') {
         messageDiv.className = 'message user-message';
-        messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+        messageDiv.innerHTML = `<strong>You:</strong> ${formattedMessage}`;
     } else if (type === 'bot' || type === 'agent') {
         messageDiv.className = 'message agent-message';
         const agentName = currentAgent ? currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1) : 'Agent';
-        messageDiv.innerHTML = `<strong>${agentName}:</strong> ${message}`;
+        messageDiv.innerHTML = `<strong>${agentName}:</strong> ${formattedMessage}`;
     } else if (type === 'error') {
         messageDiv.className = 'message error-message';
-        messageDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+        messageDiv.innerHTML = `<strong>Error:</strong> ${formattedMessage}`;
     }
 
     chatWindow.appendChild(messageDiv);
@@ -497,10 +510,42 @@ function addMessage(message, type) {
     // Update sidebar
     loadChatHistorySidebar();
 
-    // Auto-scroll to bottom
-    chatWindow.scrollTop = chatWindow.scrollHeight;
+    // Smooth auto-scroll to bottom with delay
+    setTimeout(() => {
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }, 100);
 
     console.log(`[DEBUG] Added ${type} message: ${message.substring(0, 50)}...`);
+}
+
+function formatMessageContent(message) {
+    if (!message) return '';
+    
+    // Convert markdown-style formatting to HTML
+    let formatted = message
+        // Convert **bold** to <strong>bold</strong>
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        // Convert bullet points (• or -) to proper list items
+        .replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>')
+        // Convert numbered lists
+        .replace(/^\d+\.\s+(.+)$/gm, '<li>$1</li>')
+        // Convert headers (###, ##, #)
+        .replace(/^### (.+)$/gm, '<h4>$1</h4>')
+        .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+        .replace(/^# (.+)$/gm, '<h2>$1</h2>')
+        // Convert line breaks
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/\n/g, '<br>');
+
+    // Wrap consecutive list items in ul tags
+    formatted = formatted.replace(/(<li>.*<\/li>(?:\s*<li>.*<\/li>)*)/gs, '<ul>$1</ul>');
+    
+    // Wrap content in paragraphs if it doesn't start with a tag
+    if (!formatted.startsWith('<')) {
+        formatted = '<p>' + formatted + '</p>';
+    }
+
+    return formatted;
 }
 
 // Alias for backward compatibility
@@ -553,6 +598,7 @@ async function sendMessage() {
         // Add user message to chat
         addMessage(message, 'user');
         messageInput.value = '';
+        messageInput.style.height = 'auto'; // Reset height after sending
 
         // Send to backend
         fetch(`/api/${agent}`, {
