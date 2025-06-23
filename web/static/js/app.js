@@ -33,52 +33,117 @@ function updateDropdowns() {
     'lucaya': {
       defaultSubject: 'academic research',
       defaultTask: 'find sources',
-      preferredSubjects: ['bahamian history', 'government', 'environment', 'literature', 'academic research'],
-      preferredTasks: ['find sources', 'create outline', 'evaluate sources', 'citation help', 'topic exploration', 'literature review']
+      subjects: [
+        { value: 'bahamian history', text: 'Bahamian History & Culture' },
+        { value: 'government', text: 'Government & Civics' },
+        { value: 'environment', text: 'Environment & Marine Science' },
+        { value: 'literature', text: 'Literature & Language Arts' },
+        { value: 'academic research', text: 'General Academic Research' }
+      ],
+      tasks: [
+        { value: 'find sources', text: 'Find Sources' },
+        { value: 'create outline', text: 'Create Outline' },
+        { value: 'evaluate sources', text: 'Evaluate Sources' },
+        { value: 'citation help', text: 'Citation Help' },
+        { value: 'topic exploration', text: 'Topic Exploration' },
+        { value: 'literature review', text: 'Literature Review' }
+      ]
     },
     'sage': {
       defaultSubject: 'math',
       defaultTask: 'homework',
-      preferredSubjects: ['math', 'science', 'english', 'history', 'bahamas studies'],
-      preferredTasks: ['homework', 'quiz', 'study']
+      subjects: [
+        { value: 'math', text: 'Math' },
+        { value: 'science', text: 'Science' },
+        { value: 'english', text: 'English' },
+        { value: 'history', text: 'History' },
+        { value: 'bahamas studies', text: 'Bahamas Studies' }
+      ],
+      tasks: [
+        { value: 'homework', text: 'Homework' },
+        { value: 'quiz', text: 'Quiz' },
+        { value: 'study', text: 'Study' }
+      ]
     },
     'quill': {
       defaultSubject: 'english',
       defaultTask: 'homework',
-      preferredSubjects: ['english', 'math', 'science', 'history'],
-      preferredTasks: ['homework', 'quiz']
+      subjects: [
+        { value: 'english', text: 'English' },
+        { value: 'math', text: 'Math' },
+        { value: 'science', text: 'Science' },
+        { value: 'history', text: 'History' }
+      ],
+      tasks: [
+        { value: 'homework', text: 'Homework' },
+        { value: 'quiz', text: 'Quiz' }
+      ]
     },
     'echo': {
       defaultSubject: 'english',
       defaultTask: 'study',
-      preferredSubjects: ['english', 'literature', 'history'],
-      preferredTasks: ['study', 'homework']
+      subjects: [
+        { value: 'english', text: 'English' },
+        { value: 'literature', text: 'Literature' },
+        { value: 'history', text: 'History' }
+      ],
+      tasks: [
+        { value: 'study', text: 'Study' },
+        { value: 'homework', text: 'Homework' }
+      ]
     },
     'nassau': {
       defaultSubject: 'bahamas studies',
       defaultTask: 'homework',
-      preferredSubjects: ['bahamas studies', 'government', 'history'],
-      preferredTasks: ['homework', 'study']
+      subjects: [
+        { value: 'bahamas studies', text: 'Bahamas Studies' },
+        { value: 'government', text: 'Government' },
+        { value: 'history', text: 'History' }
+      ],
+      tasks: [
+        { value: 'homework', text: 'Homework' },
+        { value: 'study', text: 'Study' }
+      ]
     },
     'pineapple': {
       defaultSubject: 'math',
       defaultTask: 'homework',
-      preferredSubjects: ['math', 'science', 'english'],
-      preferredTasks: ['homework']
+      subjects: [
+        { value: 'math', text: 'Math' },
+        { value: 'science', text: 'Science' },
+        { value: 'english', text: 'English' }
+      ],
+      tasks: [
+        { value: 'homework', text: 'Homework' }
+      ]
     }
   };
 
   const config = agentConfigs[selectedAgent];
   if (config) {
-    // Update subject if current selection isn't preferred for this agent
-    if (!config.preferredSubjects.includes(subjectSelect.value)) {
-      subjectSelect.value = config.defaultSubject;
-    }
+    // Clear existing options
+    subjectSelect.innerHTML = '';
+    taskSelect.innerHTML = '';
 
-    // Update task if current selection isn't preferred for this agent
-    if (!config.preferredTasks.includes(taskSelect.value)) {
-      taskSelect.value = config.defaultTask;
-    }
+    // Populate subject options
+    config.subjects.forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject.value;
+      option.textContent = subject.text;
+      subjectSelect.appendChild(option);
+    });
+
+    // Populate task options
+    config.tasks.forEach(task => {
+      const option = document.createElement('option');
+      option.value = task.value;
+      option.textContent = task.text;
+      taskSelect.appendChild(option);
+    });
+
+    // Set default values
+    subjectSelect.value = config.defaultSubject;
+    taskSelect.value = config.defaultTask;
 
     console.log(`[DEBUG] Updated dropdowns for ${selectedAgent}: subject=${subjectSelect.value}, task=${taskSelect.value}`);
   }
