@@ -1,0 +1,39 @@
+{
+  "agent_name": "lucaya",
+  "session_id": "session-1750692313581-smwjf0ui8",
+  "memory_type": "session",
+  "timestamp": "2025-06-23T15:25:49.185719",
+  "data": {
+    "research_history": [
+      {
+        "timestamp": "2025-06-23T15:25:49.185231",
+        "query": "Who is Kenneth Moncur",
+        "intent": "fact_finding",
+        "subject": "academic research"
+      }
+    ],
+    "level": "middle",
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Who is Kenneth Moncur",
+        "timestamp": "2025-06-23T15:25:45.301886"
+      },
+      {
+        "role": "user",
+        "content": "Who is Kenneth Moncur",
+        "timestamp": "2025-06-23T15:25:45.302051"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83d\udd0d **Research Findings:**\n\nKenneth Moncur was a prominent Bahamian educator and politician who played a significant role in shaping the educational landscape of The Bahamas. He served as the Minister of Education in The Bahamas during the 1970s and was known for his dedication to improving the quality of education in the country.\n\nKenneth Moncur was instrumental in implementing important educational reforms that aimed to enhance the educational opportunities available to Bahamian students. He believed in the power of education to transform lives and worked tirelessly to ensure that all students had access to quality education.\n\nTo learn more about Kenneth Moncur, you can explore resources such as historical archives, books on Bahamian history, and online articles from reputable sources. By delving into the life and work of Kenneth Moncur, you can gain valuable insights into the impact he had on education in The Bahamas.\n\n\ud83d\udcda Look for recent sources to get current information! \ud83d\udcc5",
+        "timestamp": "2025-06-23T15:25:49.185697"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83d\udd0d **Research Findings:**\n\nKenneth Moncur was a prominent Bahamian educator and politician who played a significant role in shaping the educational landscape of The Bahamas. He served as the Minister of Education in The Bahamas during the 1970s and was known for his dedication to improving the quality of education in the country.\n\nKenneth Moncur was instrumental in implementing important educational reforms that aimed to enhance the educational opportunities available to Bahamian students. He believed in the power of education to transform lives and worked tirelessly to ensure that all students had access to quality education.\n\nTo learn more about Kenneth Moncur, you can explore resources such as historical archives, books on Bahamian history, and online articles from reputable sources. By delving into the life and work of Kenneth Moncur, you can gain valuable insights into the impact he had on education in The Bahamas.\n\n\ud83d\udcda Look for recent sources to get current information! \ud83d\udcc5",
+        "timestamp": "2025-06-23T15:25:49.185707"
+      }
+    ]
+  }
+}
