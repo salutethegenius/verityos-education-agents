@@ -445,19 +445,41 @@ function updateDropdowns() {
       ]
     },
     'coral': {
-            subjects: ['student management', 'attendance', 'schedules', 'oversight'],
-            tasks: ['create accounts', 'view sessions', 'track progress', 'manage class']
-        },
-    'pineapple': {
-      defaultSubject: 'math',
-      defaultTask: 'homework',
+      defaultSubject: 'administration',
+      defaultTask: 'manage class',
       subjects: [
-        { value: 'math', text: 'Math' },
-        { value: 'science', text: 'Science' },
-        { value: 'english', text: 'English' }
+        { value: 'administration', text: 'Class Administration' },
+        { value: 'attendance', text: 'Attendance Management' },
+        { value: 'scheduling', text: 'Schedule Planning' },
+        { value: 'student records', text: 'Student Records' },
+        { value: 'reporting', text: 'Academic Reporting' }
       ],
       tasks: [
-        { value: 'homework', text: 'Homework' }
+        { value: 'manage class', text: 'Manage Class' },
+        { value: 'take attendance', text: 'Take Attendance' },
+        { value: 'create schedule', text: 'Create Schedule' },
+        { value: 'student progress', text: 'Track Student Progress' },
+        { value: 'generate report', text: 'Generate Reports' }
+      ]
+    },
+    'pineapple': {
+      defaultSubject: 'all subjects',
+      defaultTask: 'track assignments',
+      subjects: [
+        { value: 'all subjects', text: 'All Subjects' },
+        { value: 'mathematics', text: 'Mathematics' },
+        { value: 'english', text: 'English Language' },
+        { value: 'science', text: 'Science' },
+        { value: 'history', text: 'Bahamian History' },
+        { value: 'geography', text: 'Geography' }
+      ],
+      tasks: [
+        { value: 'track assignments', text: 'Track Assignments' },
+        { value: 'view schedule', text: 'View Study Schedule' },
+        { value: 'update progress', text: 'Update Progress' },
+        { value: 'add homework', text: 'Add New Homework' },
+        { value: 'get tips', text: 'Get Study Tips' },
+        { value: 'view completed', text: 'View Completed Work' }
       ]
     }
   };

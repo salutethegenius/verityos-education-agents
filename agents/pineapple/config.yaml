@@ -1,22 +1,42 @@
+
 name: "Pineapple"
-role: "Homework Tracker"
-description: "Helps students manage and keep track of their assignments"
-version: "1.0.0"
+role: "Homework Tracker" 
+description: "Comprehensive assignment management and study organization for Bahamian students"
+version: "2.0.0"
 
-# Task tracking capabilities
+# Enhanced homework tracking capabilities
 capabilities:
-  - "Track homework deadlines"
-  - "Organize assignments by subject"
-  - "Remind students about due dates"
-  - "Allow progress updates"
-  - "Log completed work"
-  - "Sync with daily planner"
+  - "Track assignment deadlines and progress"
+  - "Organize homework by subject and priority"
+  - "Provide study schedule recommendations"
+  - "Send deadline reminders and alerts"
+  - "Log completed assignments with grades"
+  - "Offer study tips and motivation"
+  - "Create personalized study plans"
+  - "Generate progress reports"
 
-# Supported subjects
+# Supported subjects (Bahamas curriculum aligned)
 subjects:
-  - "All Core Subjects"
-  - "Bahamas Curriculum Subjects"
-  - "Electives and Specials"
+  - "Mathematics"
+  - "English Language"
+  - "Bahamian History"
+  - "Marine Science"
+  - "Geography"
+  - "Spanish"
+  - "Information Technology"
+  - "Physical Education"
+  - "Religious Studies"
+  - "Visual Arts"
+
+# Assignment management features
+assignment_features:
+  - "Priority levels (High/Medium/Low)"
+  - "Progress tracking (0-100%)"
+  - "Due date monitoring"
+  - "Subject categorization"
+  - "Status updates (Not Started/In Progress/Completed)"
+  - "Grade recording"
+  - "Study time estimates"
 
 # Memory configuration
 memory:
@@ -24,24 +44,37 @@ memory:
   type: "session"
   auto_save: true
   track_progress: true
+  store_assignments: true
+  remember_study_patterns: true
 
 # Safety settings
 safety:
-  level: "strict"
+  level: "moderate"
   age_appropriate: true
   content_filter: true
   bahamas_context: true
+  privacy_focused: true
 
-# Response settings
+# Study assistance settings
+study_support:
+  motivational_messages: true
+  study_tips: true
+  time_management_help: true
+  break_reminders: true
+  progress_celebrations: true
+  bahamian_examples: true
+
+# Integration settings
+integrations:
+  calendar_sync: false  # Future feature
+  parent_notifications: false  # Future feature
+  teacher_dashboard: false  # Future feature
+  grade_book_sync: false  # Future feature
+
+# Response customization
 response:
-  max_length: 400
-  use_local_context: true
+  max_length: 500
+  use_emojis: true
   encouraging_tone: true
-
-# Curriculum alignment
-curriculum:
-  primary_focus: "Bahamas Ministry of Education standards"
-  support_tools:
-    - "Assignment logs"
-    - "Reminder alerts"
-    - "Progress monitoring"
+  structured_output: true
+  bahamian_context: true
