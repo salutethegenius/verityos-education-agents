@@ -1,0 +1,18 @@
+{
+  "agent_name": "lucaya",
+  "session_id": "default-session",
+  "memory_type": {
+    "research_history": [
+      {
+        "timestamp": "2025-06-23T14:57:17.608954",
+        "query": "Bahamas in 2025",
+        "intent": "general_research",
+        "subject": "academic research"
+      }
+    ],
+    "level": "middle",
+    "last_updated": "2025-06-23T14:57:17.608967"
+  },
+  "timestamp": "2025-06-23T14:57:17.608982",
+  "data": "session"
+}
