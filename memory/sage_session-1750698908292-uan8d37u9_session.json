@@ -1,0 +1,39 @@
+{
+  "agent_name": "sage",
+  "session_id": "session-1750698908292-uan8d37u9",
+  "memory_type": "session",
+  "timestamp": "2025-06-23T17:16:43.233793",
+  "data": {
+    "progress": {
+      "timestamp": "2025-06-23T17:16:43.233400",
+      "intent": "general_tutoring",
+      "subject": null,
+      "topic": null,
+      "interaction_count": 2
+    },
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "who first discovered The Bahamas?",
+        "timestamp": "2025-06-23T17:16:41.929160"
+      },
+      {
+        "role": "user",
+        "content": "who first discovered The Bahamas?",
+        "timestamp": "2025-06-23T17:16:41.929206"
+      },
+      {
+        "role": "assistant",
+        "content": "Hey there! \ud83c\udf34 The Bahamas was first discovered by the Lucayan people, who were the original inhabitants of these beautiful islands. They were skilled seafarers and lived here for centuries before the arrival of European explorers like Christopher Columbus. The Lucayans were known for their peaceful way of life and their expert craftsmanship in making tools and pottery. Isn't that cool? If you want to learn more about the Lucayan people and their history in The Bahamas, just let me know! How you doin'?",
+        "timestamp": "2025-06-23T17:16:43.233774"
+      },
+      {
+        "role": "assistant",
+        "content": "Hey there! \ud83c\udf34 The Bahamas was first discovered by the Lucayan people, who were the original inhabitants of these beautiful islands. They were skilled seafarers and lived here for centuries before the arrival of European explorers like Christopher Columbus. The Lucayans were known for their peaceful way of life and their expert craftsmanship in making tools and pottery. Isn't that cool? If you want to learn more about the Lucayan people and their history in The Bahamas, just let me know! How you doin'?",
+        "timestamp": "2025-06-23T17:16:43.233782"
+      }
+    ]
+  }
+}
