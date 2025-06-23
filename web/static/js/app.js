@@ -535,8 +535,8 @@ async function sendMessage() {
         });
 
         // Don't send empty messages or messages with only whitespace
-        if (!message || message.length === 0) {
-            console.log('[DEBUG] Empty message, not sending');
+        if (!message || message.trim().length === 0) {
+            console.log('[DEBUG] Empty or whitespace-only message, not sending');
             messageInput.focus(); // Refocus the input
             return;
         }
