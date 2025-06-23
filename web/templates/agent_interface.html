@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>VerityOS Education Agents</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+  <h1>VerityOS Education Agents</h1>
+
+  <div id="chat-container">
+    <div id="chat-box" style="height: 300px; overflow-y: scroll; border: 1px solid #ccc; padding: 10px; margin-bottom: 15px;">
+      <div class="message bot">Welcome to the VerityOS Education Agents! How can I help you today?</div>
+    </div>
+    <div id="response-area"></div>
+
+    <div id="input-area">
+      <select id="agent-select">
+        <option value="sage">Sage (Tutor)</option>
+        <option value="quill">Quill (Autograder)</option>
+        <option value="lucaya">Lucaya (Research)</option>
+        <option value="echo">Echo (Comprehension)</option>
+        <option value="nassau">Nassau (Admin)</option>
+        <option value="pineapple">Pineapple (Homework)</option>
+      </select>
+      <select id="subject-select">
+        <option value="math">Math</option>
+        <option value="science">Science</option>
+        <option value="english">English</option>
+        <option value="history">History</option>
+        <option value="bahamas studies">Bahamas Studies</option>
+      </select>
+      <select id="task-select">
+        <option value="homework">Homework</option>
+        <option value="quiz">Quiz</option>
+        <option value="study">Study</option>
+      </select>
+      <input type="text" id="user-input" placeholder="Type your message here..." onkeydown="if(event.key === 'Enter'){sendMessage();}">
+      <button id="send-button" onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
+  <!-- Chat logic must be handled in app.js for full interactivity -->
+  <script src="/static/js/app.js"></script>
+</body>
+</html>

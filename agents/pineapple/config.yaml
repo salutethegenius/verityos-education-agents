@@ -1,0 +1,47 @@
+name: "Pineapple"
+role: "Homework Tracker"
+description: "Helps students manage and keep track of their assignments"
+version: "1.0.0"
+
+# Task tracking capabilities
+capabilities:
+  - "Track homework deadlines"
+  - "Organize assignments by subject"
+  - "Remind students about due dates"
+  - "Allow progress updates"
+  - "Log completed work"
+  - "Sync with daily planner"
+
+# Supported subjects
+subjects:
+  - "All Core Subjects"
+  - "Bahamas Curriculum Subjects"
+  - "Electives and Specials"
+
+# Memory configuration
+memory:
+  enabled: true
+  type: "session"
+  auto_save: true
+  track_progress: true
+
+# Safety settings
+safety:
+  level: "strict"
+  age_appropriate: true
+  content_filter: true
+  bahamas_context: true
+
+# Response settings
+response:
+  max_length: 400
+  use_local_context: true
+  encouraging_tone: true
+
+# Curriculum alignment
+curriculum:
+  primary_focus: "Bahamas Ministry of Education standards"
+  support_tools:
+    - "Assignment logs"
+    - "Reminder alerts"
+    - "Progress monitoring"

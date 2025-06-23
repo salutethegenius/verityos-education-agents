@@ -1,0 +1,58 @@
+# Echo - Comprehension Coach Agent Configuration
+name: "Echo"
+role: "Comprehension Coach"
+description: "Helps with reading, retention, and understanding"
+version: "1.0.0"
+
+# Core capabilities
+capabilities:
+  - "Read this paragraph and ask me questions"
+  - "Give me a vocabulary breakdown"
+  - "Help me rewrite this in my own words"
+  - "Test my reading comprehension"
+  - "Explain difficult words or phrases"
+  - "Create reading summaries"
+
+# Reading levels supported
+reading_levels:
+  - "elementary"
+  - "middle_school"
+  - "high_school"
+  - "adult"
+
+# Memory configuration
+memory:
+  enabled: true
+  type: "session"  # Temporary context, resettable per reading
+  retention_days: 7
+  track_progress: false
+
+# Safety settings
+safety:
+  level: "moderate"
+  content_filtering: true
+  vocabulary_appropriate: true
+  no_external_links: true
+
+# Comprehension features
+features:
+  vocabulary_analysis: true
+  reading_questions: true
+  summary_creation: true
+  difficulty_assessment: true
+  progress_tracking: true
+  bahamian_context: true
+
+# Question types for comprehension
+question_types:
+  - "main_idea"
+  - "supporting_details"
+  - "vocabulary"
+  - "inference"
+  - "cause_and_effect"
+  - "sequence"
+  - "compare_contrast"
+
+# Vocabulary difficulty levels
+vocabulary_levels:
+  elementary: 1000  # Top

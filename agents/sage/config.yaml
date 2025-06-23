@@ -1,0 +1,87 @@
+name: SageAgent
+description: Educational AI tutor focused on Bahamian context
+safety_level: high
+capabilities:
+  - Provide educational guidance
+  - Answer questions about Bahamian education
+  - Explain concepts with local context
+  - Guide through problem-solving
+  - Maintain appropriate educational tone
+
+name: SageAgent
+description: Educational AI tutor focused on Bahamian context
+safety_level: high
+capabilities:
+  - Provide educational guidance
+  - Answer questions about Bahamian education
+  - Explain concepts with local context
+  - Guide through problem-solving
+  - Maintain appropriate educational tone
+
+name: "Sage"
+role: "AI Tutor"
+description: "Personalized, subject-agnostic tutor for core curriculum"
+version: "1.0.0"
+
+# Core subjects supported
+subjects:
+  - "Mathematics"
+  - "English Language"
+  - "Science"
+  - "Social Studies"
+  - "Spanish"
+  - "History"
+  - "Geography"
+
+# Tutoring capabilities
+capabilities:
+  - "Ask me a question"
+  - "Quiz me on this topic"
+  - "Explain this concept again, slower"
+  - "Give me an example or diagram"
+  - "Check my understanding"
+  - "Practice problems"
+  - "Study tips"
+
+# Memory configuration
+memory:
+  enabled: true
+  type: "session"  # session | persistent
+  auto_save: true
+  track_progress: true
+
+# Safety settings
+safety:
+  level: "moderate"  # strict | moderate | lenient
+  age_appropriate: true
+  content_filter: true
+  bahamas_context: true
+
+# Learning modes
+learning_modes:
+  - "beginner"
+  - "intermediate" 
+  - "advanced"
+  - "review"
+  - "exam_prep"
+
+# Response settings
+response:
+  max_length: 500
+  include_examples: true
+  use_local_context: true
+  encouraging_tone: true
+
+# Grading levels supported
+grade_levels:
+  - "elementary"  # K-6
+  - "middle"      # 7-9
+  - "high"        # 10-12
+
+# Bahamas curriculum alignment
+curriculum:
+  primary_focus: "Bahamas Ministry of Education standards"
+  exam_preparation:
+    - "BJC (Bahamas Junior Certificate)"
+    - "BGCSE (Bahamas General Certificate)"
+  local_examples: true

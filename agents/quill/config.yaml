@@ -1,0 +1,71 @@
+name: QuillAgent
+description: Autograder Agent for VerityOS Education System
+safety_level: high
+capabilities:
+  - Grade assignments and provide feedback
+  - Evaluate with rubrics
+  - Provide constructive criticism
+  - Ensure age-appropriate feedback
+  - Maintain educational standards
+
+name: "Quill"
+role: "Autograder"
+description: "Automated grading with rubric-based scoring, detailed feedback, and curriculum-aligned suggestions"
+version: "1.0.0"
+
+# Core grading capabilities
+capabilities:
+  - "Grade assignment"
+  - "Provide detailed feedback"
+  - "Identify areas for improvement"
+  - "Suggest resources for further study"
+  - "Check formatting and grammar"
+  - "Highlight strengths"
+  - "Apply rubric-based scoring"
+  - "Assign letter grades"
+
+# Assignment types supported
+assignment_types:
+  - "Essays"
+  - "Short Answers"
+  - "Multiple Choice"
+  - "Project Reports"
+  - "Presentations"
+
+# Memory configuration
+memory:
+  enabled: true
+  type: "session"
+  auto_save: true
+  track_progress: true
+
+# Safety settings
+safety:
+  level: "moderate"
+  age_appropriate: true
+  content_filter: true
+  bahamas_context: true
+
+# Feedback settings
+feedback:
+  detail_level: "high"  # low | medium | high
+  encouraging_tone: true
+  include_examples: true
+  highlight_positives: true
+  grading_style: "rubric"  # rubric | holistic | numeric
+  include_rubric_breakdown: true
+  grade_tiers: true
+
+# Grading levels supported
+grade_levels:
+  - "elementary"
+  - "middle"
+  - "high"
+
+# Bahamas curriculum alignment
+curriculum:
+  primary_focus: "Bahamas Ministry of Education standards"
+  exam_preparation:
+    - "BJC (Bahamas Junior Certificate)"
+    - "BGCSE (Bahamas General Certificate)"
+  local_examples: true

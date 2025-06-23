@@ -1,0 +1,88 @@
+{
+  "geography": {
+    "location": "Caribbean archipelago",
+    "capital": "Nassau",
+    "islands": ["New Providence", "Grand Bahama", "Abaco", "Eleuthera", "Andros"],
+    "total_islands": "700+ islands and cays"
+  },
+  "history": {
+    "independence": "July 10, 1973",
+    "colonial_history": "British colony until independence",
+    "indigenous_people": "Lucayan Taíno people",
+    "important_dates": {
+      "1492": "Christopher Columbus first landing",
+      "1973": "Independence from Britain"
+    }
+  },
+  "education": {
+    "system": "British-based education system",
+    "grades": "Primary (K-6), Junior High (7-9), Senior High (10-12)",
+    "subjects": ["Mathematics", "English Language", "Science", "Social Studies", "Spanish"],
+    "exams": ["BJC (Bahamas Junior Certificate)", "BGCSE (Bahamas General Certificate)"]
+  },
+  "culture": {
+    "language": "English (official), Bahamian dialect",
+    "religion": "Predominantly Christian",
+    "festivals": ["Junkanoo", "Independence Day", "Emancipation Day"],
+    "music": ["Rake and scrape", "Calypso", "Reggae"],
+    "greetings": ["Good day!", "What's going on?", "How tings?", "Everything cool?"]
+  },
+  "economy": {
+    "currency": "Bahamian Dollar (BSD)",
+    "main_industries": ["Tourism", "Banking", "Fishing", "Agriculture"],
+    "major_exports": ["Pharmaceuticals", "Rum", "Salt", "Aragonite"]
+  },
+  "subject_examples": {
+    "Mathematics": {
+      "elementary": "If you catch 5 snappers and your cousin gives you 3 more, how many snappers do you have?",
+      "middle": "A coconut vendor sells coconuts for $3 each. How much money does he make if he sells 20 coconuts?",
+      "high": "You plan a trip from Nassau to Eleuthera costing $200 round trip per person. What's the total cost for 4 family members?",
+      "elementary_additional": "If a conch shell costs $4 and you buy 3, how much do you spend?",
+      "middle_additional": "Calculate the area of a rectangular garden that measures 10 meters by 15 meters at a Bahamian school.",
+      "high_additional": "Analyze the rate of change in the population of Nassau over 5 years using the given data."
+    },
+    "Science": {
+      "elementary": "Name two animals you might see while snorkeling at Clifton Heritage Park.",
+      "middle": "What are two ways mangroves help protect coastal areas in The Bahamas?",
+      "high": "Explain how coral bleaching affects marine biodiversity in the Bahamian waters.",
+      "elementary_additional": "Identify three types of fish commonly found in Bahamian waters.",
+      "middle_additional": "Describe the life cycle of the queen conch and its importance to the ecosystem.",
+      "high_additional": "Discuss the impact of rising sea temperatures on the Bahamian coral reefs and local fisheries."
+    },
+    "History": {
+      "elementary": "Who were the first inhabitants of The Bahamas?",
+      "middle": "What significant event occurred in The Bahamas on July 10, 1973?",
+      "high": "Discuss the economic impact of piracy during the Golden Age of Piracy on The Bahamas.",
+      "elementary_additional": "Name a famous Bahamian leader and one thing they are known for.",
+      "middle_additional": "Explain the role of The Bahamas in the transatlantic slave trade.",
+      "high_additional": "Analyze how Bahamian culture was shaped by British colonial rule and emancipation."
+    }
+  },
+  "local_resources": {
+    "libraries": [
+      "Nassau Public Library",
+      "Sir Charles Hayward Library, Freeport",
+      "University of The Bahamas Library",
+      "Lynden Pindling Library, Nassau",
+      "Grand Bahama Public Library"
+    ],
+    "educational_sites": [
+      "Pompey Museum of Slavery & Emancipation",
+      "Bahamas Historical Society Museum",
+      "Ardastra Gardens & Wildlife Conservation Centre",
+      "The Bahamas National Trust",
+      "Rand Nature Centre"
+    ]
+  },
+  "cultural_notes": {
+    "junkanoo": "Junkanoo is a vibrant cultural festival celebrated on Boxing Day and New Year's Day, featuring music, elaborate costumes, and dance.",
+    "conch": "Conch is an iconic Bahamian seafood delicacy featured in popular dishes like conch salad, fritters, and chowder.",
+    "goombay": "Goombay is a traditional Bahamian music style characterized by rhythmic drums and lively melodies, often heard during festivals.",
+    "bahamian_dialect": "The Bahamian dialect is a unique blend of English with African influences, reflecting the islands' rich cultural heritage."
+  },
+  "exam_information": {
+    "BJC": "The Bahamas Junior Certificate (BJC) assesses students typically in grades 7 through 9 across various subjects.",
+    "BGCSE": "The Bahamas General Certificate of Secondary Education (BGCSE) is a critical examination for high school students in grades 10 through 12, required for graduation and higher education entry.",
+    "GLAT": "The Grade Level Assessment Test (GLAT) is administered to Bahamian students in primary school (grades 3 and 6) to assess core academic skills in subjects such as Mathematics, Language Arts, Science, and Social Studies."
+  }
+}

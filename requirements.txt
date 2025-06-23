@@ -1,0 +1,11 @@
+flask==2.3.3
+jinja2==3.1.2
+pyyaml==6.0.1
+numpy==1.24.3
+pandas==2.0.3
+torch==2.1.0
+transformers==4.35.2
+sentence-transformers==2.2.2
+chromadb==0.4.15
+gunicorn==21.2.0
+python-dotenv==1.0.0
