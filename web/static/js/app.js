@@ -39,8 +39,14 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
 
+        // Initialize session management
+        if (!currentSessionId) {
+            currentSessionId = generateSessionId();
+        }
+        currentAgent = 'sage';
+        
         // Load initial session
-        loadAgentSession('sage');
+        loadSessionHistory('sage');
 
     } catch (error) {
         console.error('[ERROR] Failed to initialize:', error);
@@ -280,6 +286,36 @@ function updateDropdowns() {
   }
 }
 
+function addMessage(message, type) {
+    const chatWindow = document.getElementById('chat-window');
+    const messageDiv = document.createElement('div');
+    
+    if (type === 'user') {
+        messageDiv.className = 'message user-message';
+        messageDiv.innerHTML = `<strong>You:</strong> ${message}`;
+    } else if (type === 'bot' || type === 'agent') {
+        messageDiv.className = 'message agent-message';
+        const agentName = currentAgent ? currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1) : 'Agent';
+        messageDiv.innerHTML = `<strong>${agentName}:</strong> ${message}`;
+    } else if (type === 'error') {
+        messageDiv.className = 'message error-message';
+        messageDiv.innerHTML = `<strong>Error:</strong> ${message}`;
+    }
+    
+    chatWindow.appendChild(messageDiv);
+    
+    // Auto-scroll to bottom
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    
+    console.log(`[DEBUG] Added ${type} message: ${message.substring(0, 50)}...`);
+}
+
+// Alias for backward compatibility
+function loadAgentSession(agent) {
+    console.log(`[DEBUG] loadAgentSession called for ${agent}`);
+    loadSessionHistory(agent);
+}
+
 async function sendMessage() {
     try {
         const messageInput = document.getElementById('message-input');
@@ -307,7 +343,17 @@ async function sendMessage() {
 
         // Don't send empty messages
         if (!message) {
+            console.log('[DEBUG] Empty message, not sending');
             return;
+        }
+        
+        // Update current agent and generate new session if needed
+        if (agent !== currentAgent) {
+            currentAgent = agent;
+            if (!currentSessionId) {
+                currentSessionId = generateSessionId();
+            }
+            console.log(`[DEBUG] Agent switched to ${agent}, session: ${currentSessionId}`);
         }
 
         // Add user message to chat

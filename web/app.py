@@ -58,7 +58,7 @@ def agent_endpoint(agent_name):
             return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
 
         # Log the incoming request with session info
-        app.logger.info(f"Incoming request for agent {agent_name}: {{'message': '{message}', 'subject': '{subject}', 'task': '{task}', 'session_id': '{session_id}'}}")
+        app.logger.info(f"Incoming request for agent {agent_name}: {{'message': '{message[:50]}...', 'subject': '{subject}', 'task': '{task}', 'session_id': '{session_id}'}}")
 
         # Prepare payload with session information
         payload = {
@@ -69,24 +69,22 @@ def agent_endpoint(agent_name):
         }
 
         # Route to appropriate agent with session data
-        if agent_name == 'sage':
-            from agents.sage.agent import run_agent
-            response = run_agent(message, payload)
-        elif agent_name == 'quill':
-            from agents.quill.agent import run_agent
-            response = run_agent(message, payload)
-        elif agent_name == 'lucaya':
-            from agents.lucaya.agent import run_agent
-            response = run_agent(message, payload)
-        elif agent_name == 'nassau':
-            from agents.nassau.agent import run_agent
-            response = run_agent(message, payload)
-        elif agent_name == 'echo':
-            from agents.echo.agent import run_agent
-            response = run_agent(message, payload)
-        elif agent_name == 'pineapple':
-            from agents.pineapple.agent import run_agent
-            response = run_agent(message, payload)
+        try:
+            if agent_name == 'sage':
+                response = run_sage(message, payload)
+            elif agent_name == 'quill':
+                response = run_quill(message, payload)
+            elif agent_name == 'lucaya':
+                response = run_lucaya(message, payload)
+            elif agent_name == 'nassau':
+                response = run_nassau(message, payload)
+            elif agent_name == 'echo':
+                response = run_echo(message, payload)
+            elif agent_name == 'pineapple':
+                response = run_pineapple(message, payload)
+        except Exception as agent_error:
+            app.logger.error(f"Agent {agent_name} error: {str(agent_error)}")
+            response = f"I'm having trouble processing that request. Please try again or contact support if the issue persists."
 
         # Ensure response is valid
         if response is None:
