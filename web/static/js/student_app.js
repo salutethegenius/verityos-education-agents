@@ -425,12 +425,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('subject-select').addEventListener('change', function() {
         console.log('[DEBUG] Subject changed to:', this.value);
         updateTaskOptions();
-        updateAgentHelp();
+        setTimeout(() => updateAgentHelp(), 50);
     });
     
     document.getElementById('task-select').addEventListener('change', function() {
         console.log('[DEBUG] Task changed to:', this.value);
-        updateAgentHelp();
+        setTimeout(() => updateAgentHelp(), 50);
     });
     
     // Set up send button with better error handling
@@ -469,11 +469,16 @@ document.addEventListener('DOMContentLoaded', function() {
     updateTaskOptions();
     
     console.log('[DEBUG] Initializing help content...');
-    // Force update help content immediately
+    // Force multiple attempts to update help content
+    updateAgentHelp();
     setTimeout(() => {
         updateAgentHelp();
-        console.log('[DEBUG] Initial help content update completed');
-    }, 200);
+        console.log('[DEBUG] First help content update completed');
+    }, 100);
+    setTimeout(() => {
+        updateAgentHelp();
+        console.log('[DEBUG] Second help content update completed');
+    }, 300);
     
     loadChatHistorySidebar();
     
@@ -501,11 +506,16 @@ function switchAgent(agentName) {
     // Update task options for the new agent
     updateTaskOptions();
     
-    // Wait for dropdowns to update, then update help content
+    // Multiple attempts to update help content with different delays
     setTimeout(() => {
         updateAgentHelp();
-        console.log('[DEBUG] Agent switched and help updated');
-    }, 100);
+        console.log('[DEBUG] Agent switched and help updated (first attempt)');
+    }, 50);
+    
+    setTimeout(() => {
+        updateAgentHelp();
+        console.log('[DEBUG] Agent switched and help updated (second attempt)');
+    }, 200);
     
     // Start a new chat for the new agent
     startNewChat();
@@ -641,38 +651,41 @@ function updateAgentHelp() {
         console.log('[DEBUG] Using generic fallback help content');
     }
     
-    // Update the help content
-    helpContent.innerHTML = `
-        <h4>${help.title}</h4>
-        <div class="help-samples">
-            ${help.samples.map(sample => `<div class="sample-text">${sample}</div>`).join('')}
-        </div>
-    `;
+    // Clear and update the help content
+    helpContent.innerHTML = '';
     
-    console.log('[DEBUG] Help content updated successfully');
+    const titleElement = document.createElement('h4');
+    titleElement.textContent = help.title;
+    helpContent.appendChild(titleElement);
     
-    // Add click handlers for sample texts after a short delay
-    setTimeout(() => {
-        const sampleTexts = document.querySelectorAll('.sample-text');
-        console.log('[DEBUG] Adding click handlers to', sampleTexts.length, 'sample texts');
+    const samplesContainer = document.createElement('div');
+    samplesContainer.className = 'help-samples';
+    
+    help.samples.forEach(sample => {
+        const sampleElement = document.createElement('div');
+        sampleElement.className = 'sample-text';
+        sampleElement.textContent = sample;
         
-        sampleTexts.forEach(sample => {
-            sample.addEventListener('click', function() {
-                let text = this.textContent.replace('• "', '').replace('"', '');
-                // Remove any extra quotes that might be at the end
-                if (text.endsWith('"')) {
-                    text = text.slice(0, -1);
-                }
-                
-                const messageInput = document.getElementById('message-input');
-                if (messageInput) {
-                    messageInput.value = text;
-                    messageInput.focus();
-                    console.log('[DEBUG] Sample text clicked, input set to:', text);
-                }
-            });
+        // Add click handler immediately
+        sampleElement.addEventListener('click', function() {
+            let text = this.textContent.replace(/^• "/, '').replace(/"$/, '');
+            // Clean up any remaining quotes
+            text = text.replace(/^"/, '').replace(/"$/, '');
+            
+            const messageInput = document.getElementById('message-input');
+            if (messageInput) {
+                messageInput.value = text;
+                messageInput.focus();
+                console.log('[DEBUG] Sample text clicked, input set to:', text);
+            }
         });
-    }, 100);
+        
+        samplesContainer.appendChild(sampleElement);
+    });
+    
+    helpContent.appendChild(samplesContainer);
+    
+    console.log('[DEBUG] Help content updated successfully with', help.samples.length, 'samples');
 }
 
 function getAgentEmoji(agent) {
@@ -845,7 +858,17 @@ function sendMessage() {
     
     console.log('[DEBUG] sendMessage called with message:', message);
     
-    if (!message || message.length === 0) {
+    // Enhanced validation for empty messages
+    if (!message || message.length === 0 || message === '') {
+        console.log('[DEBUG] Empty message detected, showing error');
+        addMessage('📝 Please enter a message before sending!', 'error');
+        messageInput.focus();
+        return;
+    }
+    
+    // Additional check for whitespace-only messages
+    if (message.replace(/\s/g, '').length === 0) {
+        console.log('[DEBUG] Whitespace-only message detected');
         addMessage('📝 Please enter a message before sending!', 'error');
         messageInput.focus();
         return;
