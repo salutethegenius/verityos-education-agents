@@ -44,8 +44,13 @@ document.addEventListener('DOMContentLoaded', function() {
             agentSelect.addEventListener('change', function() {
                 console.log('[DEBUG] Agent changed to:', this.value);
                 try {
-                    updateDropdowns();
-                    loadAgentSession(this.value);
+                    const newAgent = this.value;
+                    if (newAgent !== currentAgent) {
+                        // Start fresh conversation when switching agents
+                        currentAgent = newAgent;
+                        updateDropdowns();
+                        startNewChat(); // This will create a new chat with the new agent
+                    }
                 } catch (error) {
                     console.error('[ERROR] Failed to update agent:', error);
                 }
@@ -97,10 +102,15 @@ function startNewChat() {
     saveChatSession();
   }
 
+  // Get current agent from dropdown if available
+  const agentSelect = document.getElementById('agent-select');
+  const selectedAgent = agentSelect ? agentSelect.value : 'sage';
+  currentAgent = selectedAgent;
+
   // Create new chat session
   const newChat = {
     id: generateSessionId(),
-    agent: currentAgent || 'sage',
+    agent: currentAgent,
     title: 'New Chat',
     lastMessage: '',
     timestamp: new Date().toISOString(),
@@ -234,6 +244,15 @@ function loadChatHistorySidebar() {
 function switchAgent() {
   const agentSelect = document.getElementById('agent-select');
   const newAgent = agentSelect.value;
+
+  // Check if agent is disabled (like Quill)
+  const selectedOption = agentSelect.options[agentSelect.selectedIndex];
+  if (selectedOption.disabled) {
+    console.log('[DEBUG] Cannot switch to disabled agent:', newAgent);
+    // Revert to previous agent
+    agentSelect.value = currentAgent;
+    return;
+  }
 
   if (newAgent !== currentAgent) {
     // Save current conversation for old agent
@@ -596,6 +615,11 @@ async function sendMessage() {
             return;
         }
 
+        // Prevent double-clicking send button
+        const sendButton = document.getElementById('send-button');
+        if (sendButton.disabled) return;
+        sendButton.disabled = true;
+
         // Update current agent and generate new session if needed
         if (agent !== currentAgent) {
             currentAgent = agent;
@@ -656,6 +680,11 @@ async function sendMessage() {
         .catch(error => {
             console.error('[ERROR] Fetch failed:', error);
             addMessage('Sorry, I encountered an error. Please try again.', 'error');
+        })
+        .finally(() => {
+            // Re-enable send button
+            const sendButton = document.getElementById('send-button');
+            if (sendButton) sendButton.disabled = false;
         });
 
     } catch (error) {
