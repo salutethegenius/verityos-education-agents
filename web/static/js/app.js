@@ -252,16 +252,20 @@ async function loadSessionHistory(agent) {
 
   // Check if we have local conversation history first
   if (conversationHistory[agent] && conversationHistory[agent].length > 0) {
-    // Restore from local storage
-    conversationHistory[agent].forEach(msg => {
-      const messageDiv = document.createElement('div');
-      messageDiv.className = msg.className;
-      messageDiv.innerHTML = msg.content;
-      chatWindow.appendChild(messageDiv);
-    });
+        // Restore from local storage
+        conversationHistory[agent].forEach(msg => {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = msg.className;
+            messageDiv.innerHTML = msg.content;
+            chatWindow.appendChild(messageDiv);
+        });
 
-    console.log(`[SESSION] Loaded ${conversationHistory[agent].length} messages from local history for ${agent}`);
-  } else {
+        console.log(`[SESSION] Loaded ${conversationHistory[agent].length} messages from local history for ${agent}`);
+
+        // Scroll to bottom and return early to avoid server call
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return;
+    } else {
     // Only load from server if no local history exists
     try {
       const response = await fetch(`/api/${agent}/session`, {
