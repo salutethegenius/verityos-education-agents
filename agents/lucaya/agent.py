@@ -1,4 +1,3 @@
-
 """
 Lucaya - Research Assistant Agent for VerityOS Education System
 Helps students find, summarize, and cite information with Bahamian context
@@ -43,7 +42,7 @@ class LucayaAgent(BaseAgent):
     def initialize_session(self, session_id: str, user_type: str = "student", **kwargs) -> None:
         """Initialize research session"""
         super().initialize_session(session_id, user_type)
-        
+
         # Load research history if available
         if self.memory_enabled:
             saved_data = self.memory_manager.load_memory("lucaya", session_id, "session")
@@ -95,7 +94,7 @@ class LucayaAgent(BaseAgent):
     def _identify_research_intent(self, query: str) -> str:
         """Identify the type of research request"""
         query_lower = query.lower()
-        
+
         if any(phrase in query_lower for phrase in ["outline", "structure", "organize", "plan research"]):
             return "research_outline"
         elif any(phrase in query_lower for phrase in ["cite", "citation", "reference", "bibliography"]):
@@ -141,7 +140,7 @@ Student level: {self.student_level}"""
 
             # Format with research structure
             formatted_response = f"🔍 **Research Findings:**\n\n{raw_response}\n\n📚 {self.prompts.get_research_tip()}"
-            
+
             return formatted_response
 
         except Exception as e:
@@ -180,7 +179,7 @@ Make it practical for Bahamian educational context."""
             print(f"[DEBUG] Research outline response: {raw_response}")
 
             formatted_response = f"📋 **Research Outline:**\n\n{raw_response}\n\n🎯 {self.prompts.get_research_tip()}"
-            
+
             return formatted_response
 
         except Exception as e:
@@ -206,7 +205,7 @@ Make it practical for Bahamian educational context."""
             "",
             f"🌟 {self.prompts.get_research_tip()}"
         ]
-        
+
         return "\n".join(tips)
 
     def _handle_citation_help(self, query: str) -> str:
@@ -233,7 +232,7 @@ Make it practical for Bahamian educational context."""
             "",
             f"📚 {self.prompts.get_research_tip()}"
         ]
-        
+
         return "\n".join(citation_guide)
 
     def _handle_topic_exploration(self, query: str, subject: str) -> str:
@@ -268,7 +267,7 @@ Always maintain educational focus and Bahamian perspective."""
             print(f"[DEBUG] Topic exploration response: {raw_response}")
 
             formatted_response = f"🌟 **Topic Exploration:**\n\n{raw_response}\n\n🔍 {self.prompts.get_research_tip()}"
-            
+
             return formatted_response
 
         except Exception as e:
@@ -287,9 +286,9 @@ Always maintain educational focus and Bahamian perspective."""
             "geography": "Study the unique geography of our 700+ islands and their formation.",
             "culture": "Research Junkanoo, local traditions, or Bahamian art and music."
         }
-        
+
         context_tip = bahamian_examples.get(subject.lower(), "")
-        
+
         response = [
             f"🔍 **Research Topic:** {query}",
             f"**Subject:** {subject}",
@@ -301,12 +300,12 @@ Always maintain educational focus and Bahamian perspective."""
             "• Check publication dates for current information",
             ""
         ]
-        
+
         if context_tip:
             response.extend([f"**Bahamian Context:** {context_tip}", ""])
-        
+
         response.append(f"📚 {self.prompts.get_research_tip()}")
-        
+
         return "\n".join(response)
 
     def _generate_basic_outline(self, query: str, subject: str) -> str:
@@ -338,7 +337,7 @@ Always maintain educational focus and Bahamian perspective."""
             "",
             f"🎯 {self.prompts.get_research_tip()}"
         ]
-        
+
         return "\n".join(outline)
 
     def _update_research_history(self, query: str, intent: str, subject: str) -> None:
@@ -349,13 +348,13 @@ Always maintain educational focus and Bahamian perspective."""
             "intent": intent,
             "subject": subject
         }
-        
+
         self.research_history.append(research_entry)
-        
+
         # Keep only last 10 research entries
         if len(self.research_history) > 10:
             self.research_history = self.research_history[-10:]
-        
+
         # Save to memory
         if self.memory_enabled:
             memory_data = {
@@ -375,32 +374,56 @@ Always maintain educational focus and Bahamian perspective."""
             "Organize research findings"
         ]
 
-    def process_message(self, message: str) -> str:
-        """Process direct student messages"""
-        return self.process_research_query(message, subject="General")
+    def process_message(self, message: str, **kwargs) -> str:
+        """Process research queries and provide comprehensive responses"""
+        print(f"[DEBUG] Lucaya received message: {message}")
+
+        try:
+            # Check if this is a student user and apply limitations
+            user_type = kwargs.get('user_type', 'teacher')
+            if user_type == 'student':
+                # Student-specific research limitations
+                blocked_topics = ['violence', 'drugs', 'adult content', 'inappropriate']
+                if any(topic in message.lower() for topic in blocked_topics):
+                    return "🔍 Let's research educational topics that will help with your studies! Try asking about science, history, or academic subjects."
+
+                # Limit research to educational topics
+                if 'personal information' in message.lower() or 'private' in message.lower():
+                    return "🔍 I focus on educational research and public information. What school topic would you like to explore?"
+
+            # Validate input safety
+            is_safe, safety_message = self.safety_filter.validate_student_input(message)
+            if not is_safe:
+                return f"🔍 {safety_message} Let's focus on educational research! What topic would you like to explore?"
+
+            return self.process_research_query(message, subject="General")
+
+        except Exception as e:
+            print(f"[ERROR] Message processing failed: {e}")
+            return "I'm having a small issue with that request. Could you please try again or rephrase your question? 🔍"
 
 def run_agent(message: str, payload: Optional[Dict[str, Any]] = None) -> str:
     """Main entry point for Lucaya agent with session management"""
     agent = LucayaAgent()
-    
+
     if payload:
         session_id = payload.get("session_id", "default-session")
         user_type = payload.get("user_type", "student")
         subject = payload.get("subject", "General")
         task = payload.get("task", "research")
-        
+
         # Initialize session
         agent.initialize_session(session_id, user_type)
-        
+
         # Add user message to context
         agent.add_to_context(message, "user")
-        
+
         # Process research query
         response = agent.process_research_query(message, subject=subject)
-        
+
         # Add agent response to context
         agent.add_to_context(response, "assistant")
-        
+
         # Save conversation to memory
         if agent.memory_enabled:
             conversation_history = agent.context
@@ -410,7 +433,7 @@ def run_agent(message: str, payload: Optional[Dict[str, Any]] = None) -> str:
                 "conversation_history": conversation_history
             }
             agent.memory_manager.save_memory("lucaya", session_id, session_data, "session")
-        
+
         return response
     else:
         # Initialize with default session

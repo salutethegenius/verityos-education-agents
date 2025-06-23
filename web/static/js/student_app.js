@@ -66,6 +66,17 @@ function sendMessage() {
     
     if (!message) return;
     
+    // Student-specific limitations
+    if (message.length > 300) {
+        addMessage('📝 Please keep your questions shorter (under 300 characters) so I can help you better!', 'error');
+        return;
+    }
+    
+    // Prevent button spamming
+    const sendButton = document.getElementById('send-button');
+    if (sendButton.disabled) return;
+    sendButton.disabled = true;
+    
     const subject = document.getElementById('subject-select').value;
     const task = document.getElementById('task-select').value;
     
@@ -102,6 +113,10 @@ function sendMessage() {
     .catch(error => {
         console.error('Error:', error);
         addMessage('Sorry, I encountered an error. Please try again.', 'error');
+    })
+    .finally(() => {
+        // Re-enable send button
+        sendButton.disabled = false;
     });
 }
 

@@ -505,3 +505,17 @@ body {
 .logout-btn:hover {
     background: #c0392b;
 }
+
+.student-notice {
+    text-align: center;
+    margin-top: 8px;
+    color: #7f8c8d;
+    font-size: 12px;
+}
+
+.student-notice small {
+    display: inline-block;
+    padding: 4px 8px;
+    background: #ecf0f1;
+    border-radius: 12px;
+}
