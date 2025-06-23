@@ -420,6 +420,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Set up help content updates when subject or task changes
     document.getElementById('subject-select').addEventListener('change', function() {
+        updateTaskOptions();
         updateAgentHelp();
     });
     
@@ -446,6 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('new-chat-btn').addEventListener('click', startNewChat);
     
     // Initialize
+    updateTaskOptions();
     updateAgentHelp();
     loadChatHistorySidebar();
     
@@ -472,21 +474,97 @@ function generateSessionId() {
 }
 
 function switchAgent(agentName) {
-    console.log(`[DEBUG] Agent changed to: ${agentName}`);
-    
-    // Save current conversation if switching agents
-    if (currentAgent && currentAgent !== agentName) {
-        saveConversationState(currentAgent);
+    // Save current chat session before switching
+    if (currentChatIndex >= 0) {
+        saveChatSession();
     }
     
     currentAgent = agentName;
-    currentSessionId = generateSessionId();
+    
+    // Update task options for the new agent
+    updateTaskOptions();
     
     // Update help content
     updateAgentHelp();
     
-    // Load agent session
-    loadAgentSession(agentName);
+    // Start a new chat for the new agent
+    startNewChat();
+}
+
+function updateTaskOptions() {
+    const taskSelect = document.getElementById('task-select');
+    const subjectSelect = document.getElementById('subject-select');
+    
+    // Clear current options
+    taskSelect.innerHTML = '';
+    
+    if (currentAgent === 'lucaya') {
+        // Research-specific tasks
+        const researchTasks = [
+            { value: 'find sources', text: 'Find Sources' },
+            { value: 'create outline', text: 'Create Outline' },
+            { value: 'evaluate sources', text: 'Evaluate Sources' },
+            { value: 'citation help', text: 'Citation Help' },
+            { value: 'topic exploration', text: 'Topic Exploration' },
+            { value: 'literature review', text: 'Literature Review' }
+        ];
+        
+        researchTasks.forEach(task => {
+            const option = document.createElement('option');
+            option.value = task.value;
+            option.textContent = task.text;
+            taskSelect.appendChild(option);
+        });
+        
+        // Update subject options for research
+        subjectSelect.innerHTML = '';
+        const researchSubjects = [
+            { value: 'academic research', text: 'Academic Research' },
+            { value: 'history', text: 'History' },
+            { value: 'government', text: 'Government' },
+            { value: 'science', text: 'Science' }
+        ];
+        
+        researchSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.value;
+            option.textContent = subject.text;
+            subjectSelect.appendChild(option);
+        });
+        
+    } else {
+        // Regular learning tasks
+        const regularTasks = [
+            { value: 'homework', text: 'Homework Help' },
+            { value: 'study', text: 'Study Session' },
+            { value: 'quiz', text: 'Practice Quiz' },
+            { value: 'review', text: 'Review' }
+        ];
+        
+        regularTasks.forEach(task => {
+            const option = document.createElement('option');
+            option.value = task.value;
+            option.textContent = task.text;
+            taskSelect.appendChild(option);
+        });
+        
+        // Reset to standard subjects
+        subjectSelect.innerHTML = '';
+        const standardSubjects = [
+            { value: 'math', text: 'Mathematics' },
+            { value: 'science', text: 'Science' },
+            { value: 'english', text: 'English' },
+            { value: 'history', text: 'History' },
+            { value: 'bahamas studies', text: 'Bahamas Studies' }
+        ];
+        
+        standardSubjects.forEach(subject => {
+            const option = document.createElement('option');
+            option.value = subject.value;
+            option.textContent = subject.text;
+            subjectSelect.appendChild(option);
+        });
+    }
 }
 
 function updateAgentHelp() {
@@ -576,7 +654,7 @@ function startNewChat() {
     // Update sidebar
     loadChatHistorySidebar();
     
-    console.log('[DEBUG] Started new chat:', newChat.id);
+    // New chat started successfully
 }
 
 function loadChatHistorySidebar() {
@@ -664,7 +742,7 @@ function saveConversationState(agent) {
         className: msg.className
     }));
 
-    console.log(`[SESSION] Saved conversation state for ${agent}: ${conversationHistory[agent].length} messages`);
+    // Conversation state saved
 }
 
 async function loadAgentSession(agent) {
@@ -681,7 +759,7 @@ async function loadAgentSession(agent) {
             chatWindow.appendChild(messageDiv);
         });
 
-        console.log(`[SESSION] Loaded ${conversationHistory[agent].length} messages from local history for ${agent}`);
+        // Messages loaded from local history
     }
 
     // Scroll to bottom
@@ -693,6 +771,7 @@ function sendMessage() {
     const message = messageInput.value.trim();
     
     if (!message || message.length === 0) {
+        addMessage('📝 Please enter a message before sending!', 'error');
         messageInput.focus();
         return;
     }

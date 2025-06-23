@@ -1,6 +1,3 @@
-
-# coral/agent.py
-
 import datetime
 import json
 import os
@@ -28,7 +25,7 @@ class CoralAgent:
                 return accounts_data['students']
         except:
             pass
-        
+
         # Default students if no saved data
         return {
             "jasmine_rolle": {
@@ -114,7 +111,7 @@ class CoralAgent:
             "active": True,
             "sessions": []
         }
-        
+
         self._save_student_accounts()
         return f"✅ **Student Account Created**\n\n**Name:** {name}\n**Student ID:** {student_id}\n**Password:** {password}\n**Grade:** {grade}\n\n📝 *Give these credentials to the student for login access.*"
 
@@ -122,14 +119,14 @@ class CoralAgent:
         """Search for students by name or ID"""
         query = query.lower()
         matches = []
-        
+
         for key, student in self.student_accounts.items():
             if (query in student['name'].lower() or 
                 query in student['student_id'].lower() or
                 query in key):
                 status = "🟢 Active" if student['active'] else "🔴 Inactive"
                 matches.append(f"• {student['name']} (ID: {student['student_id']}) - {student['grade']} {status}")
-        
+
         if matches:
             return f"🔍 **Search Results for '{query}':**\n" + "\n".join(matches)
         else:
@@ -139,7 +136,7 @@ class CoralAgent:
         """Get all sessions for a specific student"""
         student = None
         student_key = None
-        
+
         # Find student by name or ID
         for key, std in self.student_accounts.items():
             if (student_identifier.lower() in std['name'].lower() or 
@@ -147,14 +144,14 @@ class CoralAgent:
                 student = std
                 student_key = key
                 break
-        
+
         if not student:
             return f"❌ Student '{student_identifier}' not found"
 
         # Load session data from memory system
         sessions = []
         memory_files = os.listdir("memory") if os.path.exists("memory") else []
-        
+
         for filename in memory_files:
             if filename.endswith("_session.json"):
                 try:
@@ -179,7 +176,7 @@ class CoralAgent:
         for i, session in enumerate(sessions[-10:], 1):  # Show last 10 sessions
             result += f"{i}. **{session['agent'].title()}** Agent - {session['messages']} messages\n"
             result += f"   Session: {session['session_id'][:8]}... | {session['timestamp'][:10]}\n\n"
-        
+
         return result
 
     def view_student_progress(self, student_identifier: str) -> str:
@@ -190,7 +187,7 @@ class CoralAgent:
                 student_identifier.upper() == std['student_id']):
                 student = std
                 break
-        
+
         if not student:
             return f"❌ Student '{student_identifier}' not found"
 
@@ -199,14 +196,14 @@ class CoralAgent:
         report += f"**Grade:** {student['grade']}\n"
         report += f"**Account Created:** {student['created_date']}\n"
         report += f"**Status:** {'🟢 Active' if student['active'] else '🔴 Inactive'}\n\n"
-        
+
         # Add session summary
         sessions_info = self.get_student_sessions(student_identifier)
         if "No sessions found" not in sessions_info:
             report += "**Recent Activity:**\n" + sessions_info.split("Session History**\n\n")[1]
         else:
             report += "**Recent Activity:**\n❌ No recent sessions\n"
-        
+
         return report
 
     def get_today_schedule(self):
@@ -224,11 +221,11 @@ class CoralAgent:
     def get_attendance_for_day(self, date: str = None) -> str:
         if not date:
             date = datetime.date.today().isoformat()
-        
+
         attendance = self.attendance_log.get(date, {})
         if not attendance:
             return f"📋 No attendance recorded for {date}"
-        
+
         result = f"📋 **Attendance for {date}:**\n"
         for student, status in attendance.items():
             emoji = "✅" if status == "present" else "❌" if status == "absent" else "⚠️"
@@ -238,7 +235,7 @@ class CoralAgent:
     def list_students(self) -> str:
         if not self.student_accounts:
             return "❌ No students registered"
-        
+
         result = "👥 **Student Roster:**\n"
         for i, (key, student) in enumerate(self.student_accounts.items(), 1):
             status = "🟢" if student['active'] else "🔴"
@@ -253,7 +250,7 @@ class CoralAgent:
                 student_identifier.upper() == std['student_id']):
                 student = std
                 break
-        
+
         if not student:
             return f"❌ Student '{student_identifier}' not found"
 
@@ -263,15 +260,15 @@ class CoralAgent:
         """Generate a comprehensive class report"""
         total_students = len(self.student_accounts)
         active_students = sum(1 for s in self.student_accounts.values() if s['active'])
-        
+
         report = f"📊 **Class Overview Report**\n\n"
         report += f"**Total Students:** {total_students}\n"
         report += f"**Active Students:** {active_students}\n"
         report += f"**Inactive Students:** {total_students - active_students}\n\n"
-        
+
         # Today's schedule
         report += self.get_today_schedule() + "\n\n"
-        
+
         # Recent attendance
         today = datetime.date.today().isoformat()
         if today in self.attendance_log:
@@ -281,13 +278,13 @@ class CoralAgent:
                 report += f"{emoji} {student}\n"
         else:
             report += "**Today's Attendance:** Not yet recorded\n"
-        
+
         return report
 
     def process_message(self, message: str) -> str:
         print(f"[DEBUG] Coral received message: {message}")
         message = message.lower()
-        
+
         # Student account management
         if "create student" in message or "add student" in message:
             # Extract name from message
@@ -297,47 +294,47 @@ class CoralAgent:
                 response = self.create_student_account(name)
             else:
                 response = "Please specify a student name. Example: 'Create student John Smith'"
-            
+
         elif "search" in message:
             query = message.replace("search", "").replace("student", "").strip()
             if query:
                 response = self.search_students(query)
             else:
                 response = "Please specify search terms. Example: 'Search Smith' or 'Search JS001'"
-                
+
         elif "sessions for" in message or "view sessions" in message:
             student_name = message.replace("sessions for", "").replace("view sessions", "").strip()
             if student_name:
                 response = self.get_student_sessions(student_name)
             else:
                 response = "Please specify a student. Example: 'Sessions for Jasmine Rolle'"
-                
+
         elif "progress for" in message or "view progress" in message:
             student_name = message.replace("progress for", "").replace("view progress", "").strip()
             if student_name:
                 response = self.view_student_progress(student_name)
             else:
                 response = "Please specify a student. Example: 'Progress for JS001'"
-                
+
         elif "schedule" in message:
             response = self.get_today_schedule()
-            
+
         elif "students" in message or "roster" in message:
             response = self.list_students()
-            
+
         elif "attendance" in message:
             response = self.get_attendance_for_day()
-            
+
         elif "class report" in message or "overview" in message:
             response = self.generate_class_report()
-            
+
         elif "credentials for" in message or "password for" in message:
             student_name = message.replace("credentials for", "").replace("password for", "").strip()
             if student_name:
                 response = self.get_student_credentials(student_name)
             else:
                 response = "Please specify a student. Example: 'Credentials for Jasmine Rolle'"
-            
+
         else:
             response = (
                 "🏫 **Coral Teacher Admin Assistant**\n\n"
@@ -349,7 +346,7 @@ class CoralAgent:
                 "• **Attendance:** 'Mark attendance', 'Show attendance'\n\n"
                 "Try asking: 'Show students' or 'Create student Alex Thompson'"
             )
-        
+
         print(f"[DEBUG] Coral response: {response}")
         return response
 
@@ -357,11 +354,11 @@ class CoralAgent:
 def run_agent(message: str, payload: dict = None) -> str:
     """
     Entry point function for the Coral Agent that processes incoming messages.
-    
+
     Args:
         message (str): The user message to process
         payload (dict): Additional context and session information
-        
+
     Returns:
         str: The response from the agent
     """
