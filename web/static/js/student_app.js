@@ -14,40 +14,398 @@ if (!studentId || !studentName) {
     window.location.href = '/student-login';
 }
 
-// Agent help content
-const agentHelp = {
+// Dynamic help content based on agent, subject, and activity
+const dynamicHelp = {
     'sage': {
-        title: '🧙‍♂️ Sage - Your Tutor',
-        samples: [
-            '• "What is 25 + 47?"',
-            '• "Explain fractions using Bahamian examples"',
-            '• "Help me solve: 2x + 5 = 15"',
-            '• "Quiz me on multiplication tables"',
-            '• "What is photosynthesis?"',
-            '• "Why do hurricanes form in our region?"'
-        ]
+        'math': {
+            'homework': {
+                title: '🧙‍♂️ Sage - Math Homework Help',
+                samples: [
+                    '• "What is 25 + 47?"',
+                    '• "Help me solve: 2x + 5 = 15"',
+                    '• "If a conch salad costs $8 BSD and I buy 3, how much do I spend?"',
+                    '• "What\'s the area of Nassau if it\'s 21 miles long and 7 miles wide?"',
+                    '• "Check my work: 12 × 8 = 96"',
+                    '• "I need help with fractions"'
+                ]
+            },
+            'study': {
+                title: '🧙‍♂️ Sage - Math Study Session',
+                samples: [
+                    '• "Explain fractions using Bahamian examples"',
+                    '• "Give me study tips for my BGCSE math exam"',
+                    '• "Practice problems for division please"',
+                    '• "I don\'t understand fractions at all"',
+                    '• "Create a study plan for geometry"',
+                    '• "Help me memorize the multiplication tables"'
+                ]
+            },
+            'quiz': {
+                title: '🧙‍♂️ Sage - Math Practice Quiz',
+                samples: [
+                    '• "Quiz me on multiplication tables"',
+                    '• "Test me on fractions"',
+                    '• "Give me 5 algebra problems"',
+                    '• "Quiz me on area and perimeter"',
+                    '• "Practice questions for my math test"',
+                    '• "Random math problems please"'
+                ]
+            }
+        },
+        'science': {
+            'homework': {
+                title: '🧙‍♂️ Sage - Science Homework Help',
+                samples: [
+                    '• "What is photosynthesis?"',
+                    '• "Explain how coral reefs work in the Bahamas"',
+                    '• "Help me with my biology worksheet"',
+                    '• "What animals live in Bahamian mangroves?"',
+                    '• "How does climate change affect our islands?"',
+                    '• "Explain the water cycle"'
+                ]
+            },
+            'study': {
+                title: '🧙‍♂️ Sage - Science Study Session',
+                samples: [
+                    '• "Why do hurricanes form in our region?"',
+                    '• "Study guide for marine biology"',
+                    '• "Help me understand ecosystems"',
+                    '• "Review photosynthesis with me"',
+                    '• "Explain Bahamian wildlife adaptations"',
+                    '• "Study tips for my science exam"'
+                ]
+            },
+            'quiz': {
+                title: '🧙‍♂️ Sage - Science Practice Quiz',
+                samples: [
+                    '• "Quiz me on marine biology"',
+                    '• "Test my knowledge about coral reefs"',
+                    '• "Practice questions on ecosystems"',
+                    '• "Quiz me about Bahamian wildlife"',
+                    '• "Science vocabulary test please"',
+                    '• "Random science questions"'
+                ]
+            }
+        },
+        'history': {
+            'homework': {
+                title: '🧙‍♂️ Sage - History Homework Help',
+                samples: [
+                    '• "What is the capital of The Bahamas?"',
+                    '• "When did we gain independence?"',
+                    '• "Who were the Lucayans?"',
+                    '• "Help me with my history assignment"',
+                    '• "How many islands are in The Bahamas?"',
+                    '• "Explain Bahamian government structure"'
+                ]
+            },
+            'study': {
+                title: '🧙‍♂️ Sage - History Study Session',
+                samples: [
+                    '• "Tell me about Junkanoo festival"',
+                    '• "Study guide for Bahamian independence"',
+                    '• "Review colonial history with me"',
+                    '• "Help me understand our government"',
+                    '• "Timeline of important Bahamian events"',
+                    '• "Study tips for history exam"'
+                ]
+            },
+            'quiz': {
+                title: '🧙‍♂️ Sage - History Practice Quiz',
+                samples: [
+                    '• "Quiz me on Bahamian history"',
+                    '• "Test me on independence facts"',
+                    '• "Practice questions about Lucayans"',
+                    '• "Quiz me on Junkanoo traditions"',
+                    '• "History dates and events test"',
+                    '• "Random Bahamian history questions"'
+                ]
+            }
+        },
+        'english': {
+            'homework': {
+                title: '🧙‍♂️ Sage - English Homework Help',
+                samples: [
+                    '• "Help me with my essay about coral reefs"',
+                    '• "Check my grammar in this paragraph"',
+                    '• "What does this poem mean?"',
+                    '• "Help me write a story about Nassau"',
+                    '• "Explain this reading assignment"',
+                    '• "Help with my book report"'
+                ]
+            },
+            'study': {
+                title: '🧙‍♂️ Sage - English Study Session',
+                samples: [
+                    '• "Study tips for reading comprehension"',
+                    '• "Help me improve my writing"',
+                    '• "Practice analyzing poems"',
+                    '• "Vocabulary building exercises"',
+                    '• "Grammar review session"',
+                    '• "Essay writing techniques"'
+                ]
+            },
+            'quiz': {
+                title: '🧙‍♂️ Sage - English Practice Quiz',
+                samples: [
+                    '• "Quiz me on vocabulary words"',
+                    '• "Test my grammar knowledge"',
+                    '• "Practice reading comprehension"',
+                    '• "Quiz me on literary terms"',
+                    '• "Spelling test please"',
+                    '• "Random English questions"'
+                ]
+            }
+        },
+        'bahamas studies': {
+            'homework': {
+                title: '🧙‍♂️ Sage - Bahamas Studies Help',
+                samples: [
+                    '• "Research project on Out Islands"',
+                    '• "Help me understand Bahamian economy"',
+                    '• "What makes Bahamian culture unique?"',
+                    '• "Assignment about local government"',
+                    '• "Tourism impact on our islands"',
+                    '• "Bahamian art and music project"'
+                ]
+            },
+            'study': {
+                title: '🧙‍♂️ Sage - Bahamas Studies Session',
+                samples: [
+                    '• "Study guide for Bahamian geography"',
+                    '• "Review our cultural traditions"',
+                    '• "Learn about local economy"',
+                    '• "Understanding our dialect and language"',
+                    '• "Environmental challenges we face"',
+                    '• "Study tips for Bahamas Studies exam"'
+                ]
+            },
+            'quiz': {
+                title: '🧙‍♂️ Sage - Bahamas Studies Quiz',
+                samples: [
+                    '• "Quiz me on Bahamian geography"',
+                    '• "Test my knowledge of local culture"',
+                    '• "Practice questions about our economy"',
+                    '• "Quiz me on Out Island facts"',
+                    '• "Bahamian traditions and customs test"',
+                    '• "Random Bahamas Studies questions"'
+                ]
+            }
+        }
     },
     'echo': {
-        title: '🗣️ Echo - Reading Coach',
-        samples: [
-            '• "Help me understand this text about coral reefs"',
-            '• "Create questions about this passage"',
-            '• "What does \'archipelago\' mean?"',
-            '• "Summarize this paragraph for me"',
-            '• "Make this text easier to read"',
-            '• "Test my comprehension"'
-        ]
+        'english': {
+            'homework': {
+                title: '🗣️ Echo - Reading Homework Help',
+                samples: [
+                    '• "Help me understand this text about coral reefs"',
+                    '• "What does \'archipelago\' mean?"',
+                    '• "Summarize this paragraph for me"',
+                    '• "Create questions about this passage"',
+                    '• "Help me analyze this poem"',
+                    '• "Explain this story\'s theme"'
+                ]
+            },
+            'study': {
+                title: '🗣️ Echo - Reading Study Session',
+                samples: [
+                    '• "Improve my reading comprehension"',
+                    '• "Practice reading strategies"',
+                    '• "Help me understand difficult texts"',
+                    '• "Vocabulary building exercises"',
+                    '• "Reading tips for my exam"',
+                    '• "Make this text easier to read"'
+                ]
+            },
+            'quiz': {
+                title: '🗣️ Echo - Reading Comprehension Quiz',
+                samples: [
+                    '• "Test my comprehension"',
+                    '• "Quiz me on vocabulary"',
+                    '• "Reading comprehension practice"',
+                    '• "Test my understanding of this text"',
+                    '• "Practice answering reading questions"',
+                    '• "Comprehension skills test"'
+                ]
+            }
+        },
+        'history': {
+            'homework': {
+                title: '🗣️ Echo - History Reading Help',
+                samples: [
+                    '• "Help me understand this history text"',
+                    '• "Summarize this chapter on independence"',
+                    '• "What are the key points about Lucayans?"',
+                    '• "Break down this historical document"',
+                    '• "Explain this timeline to me"',
+                    '• "Help me read this primary source"'
+                ]
+            },
+            'study': {
+                title: '🗣️ Echo - History Reading Study',
+                samples: [
+                    '• "Reading strategies for history texts"',
+                    '• "Help me take better notes from reading"',
+                    '• "Understand historical vocabulary"',
+                    '• "Practice reading historical documents"',
+                    '• "Improve comprehension of timelines"',
+                    '• "Reading tips for history exam"'
+                ]
+            },
+            'quiz': {
+                title: '🗣️ Echo - History Reading Quiz',
+                samples: [
+                    '• "Test my understanding of this chapter"',
+                    '• "Quiz me on historical terms"',
+                    '• "Reading comprehension on independence"',
+                    '• "Test my knowledge from this text"',
+                    '• "Practice questions on this reading"',
+                    '• "Historical reading comprehension test"'
+                ]
+            }
+        },
+        'science': {
+            'homework': {
+                title: '🗣️ Echo - Science Reading Help',
+                samples: [
+                    '• "Help me understand this marine biology text"',
+                    '• "Summarize this chapter on ecosystems"',
+                    '• "What are the main ideas about coral reefs?"',
+                    '• "Break down this science article"',
+                    '• "Explain these scientific terms"',
+                    '• "Help me read this research study"'
+                ]
+            },
+            'study': {
+                title: '🗣️ Echo - Science Reading Study',
+                samples: [
+                    '• "Reading strategies for science texts"',
+                    '• "Help me understand scientific vocabulary"',
+                    '• "Practice reading research papers"',
+                    '• "Improve comprehension of experiments"',
+                    '• "Reading tips for science exam"',
+                    '• "Better note-taking from science texts"'
+                ]
+            },
+            'quiz': {
+                title: '🗣️ Echo - Science Reading Quiz',
+                samples: [
+                    '• "Test my understanding of this science chapter"',
+                    '• "Quiz me on scientific terms"',
+                    '• "Reading comprehension on marine life"',
+                    '• "Test my knowledge from this article"',
+                    '• "Practice questions on this research"',
+                    '• "Scientific reading comprehension test"'
+                ]
+            }
+        }
     },
     'lucaya': {
-        title: '🔍 Lucaya - Research Assistant',
-        samples: [
-            '• "Research Bahamian independence"',
-            '• "Find sources about coral bleaching"',
-            '• "Help me outline my essay"',
-            '• "What are the main points about Junkanoo?"',
-            '• "Create a bibliography"',
-            '• "Fact-check this information"'
-        ]
+        'academic research': {
+            'find sources': {
+                title: '🔍 Lucaya - Finding Research Sources',
+                samples: [
+                    '• "Find sources about coral bleaching"',
+                    '• "Research Bahamian independence"',
+                    '• "Sources for my essay on marine conservation"',
+                    '• "Academic articles about climate change"',
+                    '• "Reliable sources on Junkanoo history"',
+                    '• "Find research on Out Island economics"'
+                ]
+            },
+            'create outline': {
+                title: '🔍 Lucaya - Creating Research Outlines',
+                samples: [
+                    '• "Help me outline my essay on coral reefs"',
+                    '• "Create structure for independence research"',
+                    '• "Outline for marine biology project"',
+                    '• "Organize my research on climate change"',
+                    '• "Structure my paper on Bahamian culture"',
+                    '• "Help organize my findings"'
+                ]
+            },
+            'evaluate sources': {
+                title: '🔍 Lucaya - Evaluating Sources',
+                samples: [
+                    '• "Is this source reliable for my research?"',
+                    '• "Help me evaluate these websites"',
+                    '• "Check if this article is credible"',
+                    '• "Compare these different sources"',
+                    '• "Which sources are best for my topic?"',
+                    '• "Help me fact-check this information"'
+                ]
+            },
+            'citation help': {
+                title: '🔍 Lucaya - Citation and Bibliography',
+                samples: [
+                    '• "How do I cite this website?"',
+                    '• "Create a bibliography for my sources"',
+                    '• "Help me format these citations"',
+                    '• "MLA format for this article"',
+                    '• "Add this source to my references"',
+                    '• "Check my citation format"'
+                ]
+            },
+            'topic exploration': {
+                title: '🔍 Lucaya - Topic Exploration',
+                samples: [
+                    '• "Explore the topic of marine conservation"',
+                    '• "What are the main aspects of Junkanoo?"',
+                    '• "Help me understand climate change impacts"',
+                    '• "Explore Bahamian economic development"',
+                    '• "Research angles for my project"',
+                    '• "Brainstorm research questions"'
+                ]
+            },
+            'literature review': {
+                title: '🔍 Lucaya - Literature Review Help',
+                samples: [
+                    '• "Help me review research on coral reefs"',
+                    '• "Summarize key studies on hurricanes"',
+                    '• "Literature review on tourism impacts"',
+                    '• "Compare different research findings"',
+                    '• "Synthesize these academic sources"',
+                    '• "What do experts say about this topic?"'
+                ]
+            }
+        },
+        'history': {
+            'find sources': {
+                title: '🔍 Lucaya - History Research Sources',
+                samples: [
+                    '• "Find primary sources on Bahamian independence"',
+                    '• "Research about Lucayan civilization"',
+                    '• "Sources for colonial period study"',
+                    '• "Historical documents about slavery"',
+                    '• "Research on piracy in Bahamas"',
+                    '• "Find archives about Out Island history"'
+                ]
+            },
+            'create outline': {
+                title: '🔍 Lucaya - History Research Outline',
+                samples: [
+                    '• "Outline for independence timeline project"',
+                    '• "Structure my paper on Lucayan culture"',
+                    '• "Organize research on colonial history"',
+                    '• "Outline for Junkanoo history essay"',
+                    '• "Structure study of piracy era"',
+                    '• "Organize findings on slavery period"'
+                ]
+            }
+        },
+        'government': {
+            'find sources': {
+                title: '🔍 Lucaya - Government Research',
+                samples: [
+                    '• "Research Bahamian parliamentary system"',
+                    '• "Find sources on local government structure"',
+                    '• "Constitutional research for my project"',
+                    '• "Sources about political parties"',
+                    '• "Research election processes"',
+                    '• "Find information on prime ministers"'
+                ]
+            }
+        }
     }
 };
 
@@ -58,6 +416,15 @@ document.addEventListener('DOMContentLoaded', function() {
     // Set up agent switching
     document.getElementById('agent-select').addEventListener('change', function() {
         switchAgent(this.value);
+    });
+    
+    // Set up help content updates when subject or task changes
+    document.getElementById('subject-select').addEventListener('change', function() {
+        updateAgentHelp();
+    });
+    
+    document.getElementById('task-select').addEventListener('change', function() {
+        updateAgentHelp();
     });
     
     // Set up send button
@@ -124,7 +491,35 @@ function switchAgent(agentName) {
 
 function updateAgentHelp() {
     const helpContent = document.getElementById('help-content');
-    const help = agentHelp[currentAgent];
+    const subject = document.getElementById('subject-select').value;
+    const task = document.getElementById('task-select').value;
+    
+    // Get specific help content based on agent, subject, and task
+    let help = null;
+    
+    if (dynamicHelp[currentAgent] && 
+        dynamicHelp[currentAgent][subject] && 
+        dynamicHelp[currentAgent][subject][task]) {
+        help = dynamicHelp[currentAgent][subject][task];
+    } else if (dynamicHelp[currentAgent] && dynamicHelp[currentAgent][subject]) {
+        // Fallback to first available task for this subject
+        const availableTasks = Object.keys(dynamicHelp[currentAgent][subject]);
+        if (availableTasks.length > 0) {
+            help = dynamicHelp[currentAgent][subject][availableTasks[0]];
+        }
+    } else {
+        // Generic fallback
+        help = {
+            title: `${currentAgent.charAt(0).toUpperCase() + currentAgent.slice(1)} - ${subject} ${task}`,
+            samples: [
+                '• "Ask me anything about this subject"',
+                '• "Help me understand this topic"',
+                '• "I need assistance with my work"',
+                '• "Can you explain this concept?"',
+                '• "Practice questions please"'
+            ]
+        };
+    }
     
     helpContent.innerHTML = `
         <h4>${help.title}</h4>
