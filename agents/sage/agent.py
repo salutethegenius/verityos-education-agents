@@ -299,75 +299,205 @@ class SageAgent(BaseAgent):
         return simple_response
     
     def _general_tutoring_response(self, message: str, **kwargs) -> str:
-        """General tutoring conversation"""
+        """General tutoring conversation with context awareness"""
+        
+        # Check if this is a follow-up question
+        if self.current_subject and self.current_topic:
+            return f"I see you're asking about {message}. This connects to our {self.current_subject} discussion on {self.current_topic}. Let me help clarify this for you!\n\n" + self._explain_concept(message, **kwargs)
+        
+        # Check for common student expressions
+        message_lower = message.lower()
+        if any(phrase in message_lower for phrase in ["i don't understand", "confused", "help", "stuck"]):
+            return "No worries at all! That's exactly what I'm here for. 😊 Let me help break this down step by step.\n\nWhat specific topic or concept would you like me to explain? I can make it as simple or detailed as you need."
+        
+        # Check for homework-related queries
+        if any(phrase in message_lower for phrase in ["homework", "assignment", "project", "study for"]):
+            return "Great! I love helping with schoolwork. 📚\n\nWhat subject is your homework in? I can:\n• Explain concepts you're struggling with\n• Help you practice problems\n• Give you study tips\n• Quiz you to check your understanding\n\nJust tell me what you're working on!"
+        
+        # Default greeting response
         greeting = self.bahamas_context.get_cultural_greeting()
         
-        response = f"{greeting}! I'm Sage, your AI tutor, and I'm here to help you learn! 🎓\n\n"
-        response += "I can help you with:\n"
-        response += "• 📝 Explaining concepts in any subject\n"
-        response += "• ❓ Creating quizzes to test your knowledge\n"
-        response += "• 💪 Generating practice problems\n"
-        response += "• 📚 Providing study tips and strategies\n"
-        response += "• ✅ Checking your work and giving feedback\n\n"
+        response = f"{greeting}! I'm Sage, your VerityOS tutor for students in The Bahamas! 🇧🇸\n\n"
         
-        response += "What subject would you like to work on today? Math, Science, English, Social Studies, or something else?\n\n"
-        response += "🇧🇸 I'll make sure to use examples from our beautiful Bahamas to make learning more meaningful!"
+        # Personalized based on time or interaction count
+        interaction_count = self.session_progress.get("interaction_count", 0)
+        if interaction_count > 5:
+            response += "Welcome back! I see we've been learning together. "
+        
+        response += "I'm here to help you succeed in:\n"
+        response += "• 🧮 **Mathematics** - From basic arithmetic to algebra\n"
+        response += "• 🔬 **Science** - Biology, chemistry, physics, and environmental science\n"
+        response += "• 📚 **History & Social Studies** - Bahamian and world history\n"
+        response += "• 🌍 **Geography** - Our islands and the world around us\n"
+        response += "• 📝 **English** - Reading, writing, and grammar\n\n"
+        
+        response += "💡 **What I can do:**\n"
+        response += "• Explain concepts using Bahamian examples\n"
+        response += "• Create practice problems and quizzes\n"
+        response += "• Help with homework and assignments\n"
+        response += "• Give study tips for BJC and BGCSE prep\n\n"
+        
+        response += "What would you like to learn about today? You can ask me anything like:\n"
+        response += "• 'Explain fractions using Bahamian examples'\n"
+        response += "• 'Quiz me on Bahamas history'\n"
+        response += "• 'Help me with my math homework'\n"
+        response += "• 'What is photosynthesis?'\n\n"
+        
+        response += "🌴 Let's make learning fun and meaningful!"
         
         return response
     
     # Helper methods
     def _extract_topic(self, message: str) -> str:
-        """Extract topic from student message"""
-        # Simplified topic extraction
-        words = message.lower().split()
+        """Extract topic from student message with better recognition"""
+        message_lower = message.lower()
+        words = message_lower.split()
         
-        # Look for subject keywords
-        subjects = {
-            "math": ["math", "mathematics", "algebra", "geometry", "arithmetic"],
-            "science": ["science", "biology", "chemistry", "physics"],
-            "english": ["english", "grammar", "writing", "reading"],
-            "history": ["history", "historical", "past"],
-            "geography": ["geography", "map", "location", "countries"]
+        # Enhanced topic extraction with more specific patterns
+        math_topics = {
+            "addition": ["add", "addition", "plus", "sum"],
+            "subtraction": ["subtract", "subtraction", "minus", "difference"],
+            "multiplication": ["multiply", "multiplication", "times", "product"],
+            "division": ["divide", "division", "quotient"],
+            "fractions": ["fraction", "numerator", "denominator", "half", "quarter"],
+            "percentages": ["percent", "percentage", "%"],
+            "algebra": ["algebra", "equation", "variable", "solve for"],
+            "geometry": ["geometry", "angle", "triangle", "circle", "area", "perimeter"]
         }
         
-        for subject, keywords in subjects.items():
-            for keyword in keywords:
-                if keyword in words:
-                    self.current_subject = subject
-                    return keyword
+        science_topics = {
+            "biology": ["biology", "life", "organism", "cell", "animal", "plant"],
+            "chemistry": ["chemistry", "element", "compound", "reaction", "atom"],
+            "physics": ["physics", "force", "energy", "motion", "gravity"],
+            "ecology": ["ecosystem", "environment", "habitat", "coral", "reef"]
+        }
         
-        # Default
+        history_topics = {
+            "independence": ["independence", "freedom", "colony", "1973"],
+            "slavery": ["slavery", "emancipation", "plantation"],
+            "pirates": ["pirate", "blackbeard", "buccaneer"],
+            "lucayans": ["lucayan", "taino", "indigenous", "native"]
+        }
+        
+        # Check for specific topics first
+        all_topics = {**math_topics, **science_topics, **history_topics}
+        
+        for topic, keywords in all_topics.items():
+            if any(keyword in message_lower for keyword in keywords):
+                # Set subject based on topic
+                if topic in math_topics:
+                    self.current_subject = "math"
+                elif topic in science_topics:
+                    self.current_subject = "science"
+                elif topic in history_topics:
+                    self.current_subject = "history"
+                
+                self.current_topic = topic
+                return topic
+        
+        # Look for question patterns
+        if "capital" in message_lower and ("bahamas" in message_lower or "country" in message_lower):
+            self.current_subject = "geography"
+            self.current_topic = "bahamas_capital"
+            return "bahamas_capital"
+        
+        if any(word in words for word in ["who", "what", "when", "where", "why", "how"]):
+            # Extract the main subject of the question
+            question_words = message_lower.replace("what is", "").replace("who is", "").replace("when did", "").strip()
+            if question_words:
+                self.current_topic = question_words.split()[0] if question_words.split() else "general"
+                return self.current_topic
+        
+        # Default extraction
         return "this topic"
     
     def _create_quiz_questions(self, topic: str, subject: str, num_questions: int) -> List[str]:
-        """Create quiz questions for the topic"""
-        # Simplified question generation
+        """Create topic-specific quiz questions with Bahamian context"""
         questions = []
         
-        if subject == "math":
-            questions = [
-                f"What is 25 + 37? (Show your work)",
-                f"If you have 100 BSD and spend 35 BSD at Solomon's, how much do you have left?",
-                f"A conch salad costs 8 BSD. How much would 3 conch salads cost?"
+        # Topic-specific question banks
+        topic_questions = {
+            "addition": [
+                "If Cable Beach has 47 palm trees and Paradise Island has 29 palm trees, how many palm trees are there in total?",
+                "A junkanoo group has 25 dancers and 18 musicians. How many performers are in the group altogether?",
+                "You collect 36 conch shells on Monday and 42 on Tuesday. What's your total collection?"
+            ],
+            
+            "subtraction": [
+                "You have 85 BSD and buy school supplies for 47 BSD. How much money do you have left?",
+                "A fishing boat caught 120 snappers but 35 were too small and released. How many snappers did they keep?",
+                "Nassau has 274,400 people and Freeport has 46,994. How many more people live in Nassau?"
+            ],
+            
+            "multiplication": [
+                "If each Family Island ferry holds 150 passengers and 4 ferries leave today, how many passengers can travel?",
+                "A Bahamian bakery makes 48 Johnny cakes per batch. How many cakes do they make in 6 batches?",
+                "Junkanoo costumes need 12 feathers each. How many feathers are needed for 15 costumes?"
+            ],
+            
+            "independence": [
+                "On what date did The Bahamas gain independence from Britain?",
+                "Who was the first Prime Minister of independent Bahamas?",
+                "What is celebrated on July 10th each year in The Bahamas?",
+                "How many years has The Bahamas been independent as of 2024?"
+            ],
+            
+            "bahamas_capital": [
+                "What is the capital city of The Bahamas?",
+                "On which island is Nassau located?",
+                "Nassau is the capital, but what is the second-largest city in The Bahamas?",
+                "What body of water separates Nassau from Paradise Island?"
+            ],
+            
+            "coral_reef": [
+                "What type of marine ecosystem surrounds many Bahamian islands?",
+                "Name two types of fish commonly found in Bahamian coral reefs.",
+                "Why are coral reefs important for protecting our islands?",
+                "What threatens coral reefs in The Bahamas?"
+            ],
+            
+            "ecosystem": [
+                "What is an ecosystem? Give a Bahamian example.",
+                "How do mangroves help protect the Bahamian coastline?",
+                "Name three animals that live in the pine forests of Abaco.",
+                "What role do coral reefs play in the marine ecosystem?"
             ]
-        elif subject == "science":
-            questions = [
-                f"What type of ecosystem are the coral reefs around the Bahamas?",
-                f"During which months is hurricane season in the Caribbean?",
-                f"What is the main gas that fish extract from water to breathe?"
-            ]
-        elif subject == "history":
-            questions = [
-                f"In what year did the Bahamas gain independence?",
-                f"Who were the original inhabitants of the Bahamas?",
-                f"What is the significance of July 10th in Bahamian history?"
-            ]
+        }
+        
+        # Get topic-specific questions
+        if topic in topic_questions:
+            available_questions = topic_questions[topic]
+            questions = available_questions[:num_questions]
         else:
-            questions = [
-                f"Can you explain the main idea about {topic}?",
-                f"Give an example of {topic} in everyday life.",
-                f"Why is {topic} important to understand?"
-            ]
+            # Generate subject-based questions if no specific topic questions
+            if subject == "math":
+                questions = [
+                    f"Solve this problem about {topic}: If you have 24 items and need to share them equally among 6 people, how many does each person get?",
+                    f"A store in Nassau sells items related to {topic}. If each costs 15 BSD and you buy 4, what's the total cost?",
+                    f"Create a word problem about {topic} using a Bahamian setting."
+                ]
+            elif subject == "science":
+                questions = [
+                    f"Explain how {topic} affects life in The Bahamas.",
+                    f"Give an example of {topic} that you can observe in our islands.",
+                    f"Why is understanding {topic} important for Bahamian students?"
+                ]
+            elif subject == "history":
+                questions = [
+                    f"How does {topic} relate to Bahamian history?",
+                    f"What impact did {topic} have on the development of The Bahamas?",
+                    f"Can you connect {topic} to modern-day Bahamas?"
+                ]
+            else:
+                questions = [
+                    f"Explain the main concept of {topic}.",
+                    f"Give a real-world example of {topic} from Bahamian life.",
+                    f"Why is {topic} important to understand?"
+                ]
+        
+        # Ensure we have enough questions
+        while len(questions) < num_questions:
+            questions.append(f"What is one important thing to remember about {topic}?")
         
         return questions[:num_questions]
     
@@ -397,15 +527,57 @@ class SageAgent(BaseAgent):
         return problems[:num_problems]
     
     def _get_concept_explanation(self, topic: str, subject: str) -> str:
-        """Get basic concept explanation"""
-        # This would be more sophisticated with actual LLM integration
+        """Get comprehensive concept explanation with Bahamian context"""
+        
         explanations = {
-            "addition": "Addition is combining numbers to find their total. When we add, we're putting groups together to see how many we have in all.",
-            "photosynthesis": "Photosynthesis is how plants make their own food using sunlight, water, and carbon dioxide from the air.",
-            "independence": "Independence means a country governs itself without being controlled by another country."
+            # Math concepts
+            "addition": "Addition is combining numbers to find their total. For example, if you have 5 conch shells and find 3 more on Cable Beach, you add them together: 5 + 3 = 8 shells total.",
+            
+            "subtraction": "Subtraction is taking away from a number to find the difference. If you had 12 BSD and spent 7 BSD on lunch at Arawak Cay, you subtract: 12 - 7 = 5 BSD left.",
+            
+            "multiplication": "Multiplication is repeated addition - adding the same number multiple times. If 4 students each bring 6 conch fritters to share, that's 4 × 6 = 24 fritters total.",
+            
+            "fractions": "A fraction represents part of a whole. If you cut a Bahamian Johnny cake into 8 pieces and eat 3, you ate 3/8 of the cake.",
+            
+            "percentages": "A percentage shows parts out of 100. If 75% of students at your school are from New Providence, that means 75 out of every 100 students are from there.",
+            
+            # Science concepts
+            "photosynthesis": "Photosynthesis is how plants make food using sunlight, water, and carbon dioxide. The beautiful sea grape trees along our beaches use this process to grow and provide shade.",
+            
+            "ecosystem": "An ecosystem is all the living and non-living things in an area that work together. The Andros Barrier Reef is a perfect example - coral, fish, water, and sunlight all depend on each other.",
+            
+            "coral_reef": "Coral reefs are underwater structures made by tiny animals called coral polyps. The Bahamas has the third-largest barrier reef in the world, protecting our islands from storms and providing homes for fish.",
+            
+            # History concepts
+            "independence": "Independence means a country governs itself without being controlled by another country. The Bahamas gained independence from Britain on July 10, 1973, becoming a free nation.",
+            
+            "bahamas_capital": "Nassau is the capital and largest city of The Bahamas, located on New Providence island. It's been our center of government, business, and culture since colonial times.",
+            
+            "lucayans": "The Lucayans were the indigenous Taíno people who first lived in The Bahamas. They were peaceful people who fished, farmed, and lived in harmony with the islands before Columbus arrived in 1492.",
+            
+            "slavery": "Slavery was a dark period when people were forced to work without pay. Many enslaved Africans were brought to The Bahamas to work on plantations. Emancipation Day (August 1st) celebrates the end of slavery in 1834.",
+            
+            # Geography concepts
+            "archipelago": "An archipelago is a group of islands. The Bahamas is an archipelago of over 700 islands and cays, though only about 30 are inhabited.",
+            
+            "climate": "Climate is the typical weather patterns of a place over many years. The Bahamas has a tropical climate with warm temperatures year-round, wet summers, and dry winters."
         }
         
-        return explanations.get(topic.lower(), f"Let me explain {topic} in simple terms...")
+        topic_key = topic.lower().replace(" ", "_")
+        explanation = explanations.get(topic_key)
+        
+        if explanation:
+            return explanation
+        
+        # Generate contextual explanation for unknown topics
+        if subject == "math":
+            return f"Let me explain {topic} step by step using examples from our daily life in The Bahamas. Math helps us solve real problems like calculating distances between islands, managing money, or measuring ingredients for traditional recipes."
+        elif subject == "science":
+            return f"Science helps us understand {topic} and how it works in our world. In The Bahamas, we can see science everywhere - from our coral reefs to our weather patterns to the way our islands were formed."
+        elif subject == "history":
+            return f"Understanding {topic} helps us learn about our past and how it shaped The Bahamas today. Our history includes the indigenous Lucayans, European colonization, slavery, and our journey to independence."
+        else:
+            return f"Let me break down {topic} in simple terms that connect to your experience as a student in The Bahamas. Understanding this concept will help you in your studies and daily life."
     
     def _get_subject_specific_tips(self, subject: str) -> List[str]:
         """Get study tips specific to subject"""
