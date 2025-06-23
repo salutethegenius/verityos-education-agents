@@ -1,0 +1,59 @@
+{
+  "agent_name": "coral",
+  "session_id": "student_accounts",
+  "memory_type": "persistent",
+  "timestamp": "2025-06-23T16:26:16.945164",
+  "data": {
+    "students": {
+      "jasmine_rolle": {
+        "name": "Jasmine Rolle",
+        "grade": "Grade 8",
+        "student_id": "JS001",
+        "created_date": "2025-01-15",
+        "active": true,
+        "sessions": []
+      },
+      "kofi_smith": {
+        "name": "Kofi Smith",
+        "grade": "Grade 8",
+        "student_id": "KS002",
+        "created_date": "2025-01-15",
+        "active": true,
+        "sessions": []
+      },
+      "tiana_clarke": {
+        "name": "Tiana Clarke",
+        "grade": "Grade 8",
+        "student_id": "TC003",
+        "created_date": "2025-01-15",
+        "active": true,
+        "sessions": []
+      },
+      "malik_johnson": {
+        "name": "Malik Johnson",
+        "grade": "Grade 8",
+        "student_id": "MJ004",
+        "created_date": "2025-01-15",
+        "active": true,
+        "sessions": []
+      },
+      "zaria_knowles": {
+        "name": "Zaria Knowles",
+        "grade": "Grade 8",
+        "student_id": "ZK005",
+        "created_date": "2025-01-15",
+        "active": true,
+        "sessions": []
+      },
+      "[kenneth]": {
+        "name": "[Kenneth]",
+        "grade": "Grade 8",
+        "student_id": "[X006",
+        "created_date": "2025-06-23",
+        "active": true,
+        "sessions": []
+      }
+    },
+    "last_updated": "2025-06-23T16:26:16.945156"
+  }
+}
