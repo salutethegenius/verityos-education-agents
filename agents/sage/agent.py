@@ -152,9 +152,11 @@ class SageAgent(BaseAgent):
 
         subject = kwargs.get("subject", self.current_subject or "general")
         # Get conversation context
-        #context_summary = self.get_context_summary() #This function does not exist in the original code
-        context_summary = ""
-        bahamas_info = self.bahamas_context.get_cultural_context()
+        context_summary = self.get_context_summary()
+        
+        # Get Bahamian cultural context
+        cultural_greeting = self.bahamas_context.get_cultural_greeting()
+        local_expression = self.bahamas_context.get_local_expression()
 
         # Build system prompt with strong Bahamas emphasis
         system_prompt = f"""You are Sage, an AI tutor for students in The Bahamas. You MUST:
@@ -172,7 +174,7 @@ Student intent: {intent}
 
 Previous conversation: {context_summary}
 
-Bahamas context: The Bahamas has 700+ islands, Nassau is the capital, currency is BSD, tropical climate, tourism-based economy, rich cultural heritage."""
+Bahamas context: The Bahamas has 700+ islands, Nassau is the capital, currency is BSD (Bahamian dollars), tropical climate, tourism-based economy, rich cultural heritage. Use local expressions like "{local_expression}" and greetings like "{cultural_greeting}" when appropriate."""
 
         user_prompt = f"Student message: {message}"
 
