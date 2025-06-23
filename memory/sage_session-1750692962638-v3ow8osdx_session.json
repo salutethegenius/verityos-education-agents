@@ -1,0 +1,39 @@
+{
+  "agent_name": "sage",
+  "session_id": "session-1750692962638-v3ow8osdx",
+  "memory_type": "session",
+  "timestamp": "2025-06-23T15:47:37.973462",
+  "data": {
+    "progress": {
+      "timestamp": "2025-06-23T15:47:37.972802",
+      "intent": "greeting",
+      "subject": null,
+      "topic": null,
+      "interaction_count": 1
+    },
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Hi",
+        "timestamp": "2025-06-23T15:47:36.805620"
+      },
+      {
+        "role": "user",
+        "content": "Hi",
+        "timestamp": "2025-06-23T15:47:36.805980"
+      },
+      {
+        "role": "assistant",
+        "content": "Good morning! How are you today? Ready to tackle some math? \ud83c\udf1e\ud83c\udde7\ud83c\uddf8 Let's dive into some numbers and equations together! If you have any questions or need help, feel free to ask. Let's make learning fun and engaging!",
+        "timestamp": "2025-06-23T15:47:37.973442"
+      },
+      {
+        "role": "assistant",
+        "content": "Good morning! How are you today? Ready to tackle some math? \ud83c\udf1e\ud83c\udde7\ud83c\uddf8 Let's dive into some numbers and equations together! If you have any questions or need help, feel free to ask. Let's make learning fun and engaging!",
+        "timestamp": "2025-06-23T15:47:37.973451"
+      }
+    ]
+  }
+}
