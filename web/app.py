@@ -22,9 +22,9 @@ logging.basicConfig(
     handlers=[
         logging.StreamHandler(),
         logging.FileHandler('app.log', mode='a')
-    ]
-)
+    ])
 logger = logging.getLogger(__name__)
+
 
 @app.route("/")
 def index():
@@ -34,6 +34,7 @@ def index():
         print(f"Error rendering index: {e}")
         return f"Error loading page: {str(e)}", 500
 
+
 @app.route("/student-login")
 def student_login():
     try:
@@ -42,17 +43,21 @@ def student_login():
         app.logger.error(f"Error rendering student login: {e}")
         return "Student login temporarily unavailable", 500
 
+
 @app.route("/student")
 def student_interface():
     return render_template("student_interface.html")
+
 
 @app.route("/student-goodbye")
 def student_goodbye():
     return render_template("student_goodbye.html")
 
+
 @app.route("/dashboard")
 def teacher_dashboard():
     return render_template("teacher_dashboard.html")
+
 
 @app.route('/api/<agent_name>', methods=['POST'])
 def agent_endpoint(agent_name):
@@ -76,7 +81,8 @@ def agent_endpoint(agent_name):
 
         # Handle empty or whitespace-only messages
         if not message or not message.strip():
-            return jsonify({"response": "Please enter a message to get help! 📝"}), 200
+            return jsonify(
+                {"response": "Please enter a message to get help! 📝"}), 200
 
         # Clean up the message - handle encoding issues
         message = str(message).strip()
@@ -84,22 +90,30 @@ def agent_endpoint(agent_name):
         message = message.replace('\x00', '').replace('\ufffd', '')
 
         # Additional validation for meaningful content
-        if len(message.replace(' ', '').replace('\t', '').replace('\n', '')) < 2:
-            return jsonify({"response": "Please enter a meaningful message to get help! 📝"}), 200
+        if len(message.replace(' ', '').replace('\t', '').replace('\n',
+                                                                  '')) < 2:
+            return jsonify({
+                "response":
+                "Please enter a meaningful message to get help! 📝"
+            }), 200
 
         # Validate agent name
-        valid_agents = ['sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple']
+        valid_agents = [
+            'sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple'
+        ]
         if agent_name not in valid_agents:
             return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
 
         # Log the incoming request with session info
-        app.logger.info(f"Incoming request for agent {agent_name}: {{'message': '{message[:50]}...', 'subject': '{subject}', 'task': '{task}', 'session_id': '{session_id}'}}")
+        app.logger.info(
+            f"Incoming request for agent {agent_name}: {{'message': '{message[:50]}...', 'subject': '{subject}', 'task': '{task}', 'session_id': '{session_id}'}}"
+        )
 
         # Prepare payload with session information
         payload = {
-            "subject": subject, 
-            "task": task, 
-            "session_id": session_id, 
+            "subject": subject,
+            "task": task,
+            "session_id": session_id,
             "user_type": user_type
         }
 
@@ -119,7 +133,7 @@ def agent_endpoint(agent_name):
                 response = run_pineapple(message, payload)
         except Exception as agent_error:
             app.logger.error(f"Agent {agent_name} error: {str(agent_error)}")
-            response = f"I'm having trouble processing that request. Please try again or contact support if the issue persists."
+            response = "I'm having trouble processing that request. Please try again or contact support if the issue persists."
 
         # Ensure response is valid
         if response is None:
@@ -128,8 +142,10 @@ def agent_endpoint(agent_name):
         return jsonify({"response": response})
 
     except Exception as e:
-        app.logger.error(f"Error processing request for {agent_name}: {str(e)}")
+        app.logger.error(
+            f"Error processing request for {agent_name}: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
+
 
 @app.route('/api/validate-student', methods=['POST'])
 def validate_student():
@@ -140,7 +156,10 @@ def validate_student():
         password = data.get('password', '').strip()
 
         if not student_id or not password:
-            return jsonify({"success": False, "message": "Missing credentials"}), 400
+            return jsonify({
+                "success": False,
+                "message": "Missing credentials"
+            }), 400
 
         # Import and use Coral agent to validate credentials
         from agents.coral.agent import CoralAgent
@@ -148,20 +167,23 @@ def validate_student():
 
         # Check if student exists and password matches
         for key, student in coral.student_accounts.items():
-            if (student['student_id'].upper() == student_id.upper() and 
-                student['password'] == password and 
-                student['active']):
+            if (student['student_id'].upper() == student_id.upper()
+                    and student['password'] == password and student['active']):
                 return jsonify({
                     "success": True,
                     "student_name": student['name'],
                     "grade": student['grade']
                 })
 
-        return jsonify({"success": False, "message": "Invalid credentials"}), 401
+        return jsonify({
+            "success": False,
+            "message": "Invalid credentials"
+        }), 401
 
     except Exception as e:
         app.logger.error(f"Student validation error: {str(e)}")
         return jsonify({"success": False, "message": "Server error"}), 500
+
 
 @app.route('/api/<agent_name>/session', methods=['POST'])
 def session_endpoint(agent_name):
@@ -171,7 +193,9 @@ def session_endpoint(agent_name):
         action = data.get('action')
         session_id = data.get('session_id', 'default-session')
 
-        valid_agents = ['sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple']
+        valid_agents = [
+            'sage', 'quill', 'lucaya', 'coral', 'echo', 'pineapple'
+        ]
         if agent_name not in valid_agents:
             return jsonify({"error": f"Unknown agent: {agent_name}"}), 404
 
@@ -181,13 +205,17 @@ def session_endpoint(agent_name):
                 from core.memory_manager import MemoryManager
                 memory_manager = MemoryManager()
 
-                session_data = memory_manager.load_memory(agent_name, session_id, "session")
+                session_data = memory_manager.load_memory(
+                    agent_name, session_id, "session")
 
                 if session_data and 'conversation_history' in session_data:
                     return jsonify({
-                        "conversation_history": session_data['conversation_history'],
-                        "session_id": session_id,
-                        "agent": agent_name
+                        "conversation_history":
+                        session_data['conversation_history'],
+                        "session_id":
+                        session_id,
+                        "agent":
+                        agent_name
                     })
                 else:
                     return jsonify({
@@ -208,8 +236,10 @@ def session_endpoint(agent_name):
         return jsonify({"error": "Unknown action"}), 400
 
     except Exception as e:
-        app.logger.error(f"Error in session endpoint for {agent_name}: {str(e)}")
+        app.logger.error(
+            f"Error in session endpoint for {agent_name}: {str(e)}")
         return jsonify({"error": "Internal server error"}), 500
+
 
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=3000)
