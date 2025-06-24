@@ -281,6 +281,57 @@ textarea {
   transition: all 300ms ease;
 }
 
+/* Search functionality */
+#chat-search-container {
+  position: relative;
+  margin-bottom: var(--space-3);
+  transition: all 300ms ease;
+}
+
+#chat-search-input {
+  width: 100%;
+  background: #2d2d2d;
+  border: 1px solid #404040;
+  color: white;
+  padding: var(--space-2) var(--space-3) var(--space-2) 40px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  transition: all 150ms ease;
+}
+
+#chat-search-input:focus {
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1);
+}
+
+#chat-search-input::placeholder {
+  color: #8e8ea0;
+}
+
+#search-icon {
+  position: absolute;
+  left: var(--space-3);
+  top: 50%;
+  transform: translateY(-50%);
+  color: #8e8ea0;
+  font-size: 14px;
+  pointer-events: none;
+  transition: color 150ms ease;
+}
+
+#chat-search-input:focus + #search-icon {
+  color: var(--primary-blue);
+}
+
+/* Hide search in collapsed state */
+#sidebar.collapsed #chat-search-container {
+  opacity: 0;
+  visibility: hidden;
+  height: 0;
+  margin: 0;
+  overflow: hidden;
+}
+
 #new-chat-btn {
   width: 100%;
   background: transparent;

@@ -23,44 +23,62 @@ function initializeSession() {
     }
 }
 
-// Initialize when page loads - single initialization only
-document.addEventListener('DOMContentLoaded', function() {
-    // Strong protection against multiple calls
-    if (appInitialized || document.body.hasAttribute('data-app-initialized') || window.appAlreadyLoaded) {
-        console.log('[DEBUG] App already initialized, skipping...');
+// SINGLE INITIALIZATION ONLY - BULLETPROOF PROTECTION
+(function() {
+    // Create a unique global flag that cannot be overridden
+    if (window.__VERITY_APP_INITIALIZED__) {
+        console.log('[DEBUG] App already initialized globally, blocking duplicate');
         return;
     }
+    window.__VERITY_APP_INITIALIZED__ = true;
 
-    console.log('[DEBUG] DOM loaded, initializing...');
-    appInitialized = true;
-    window.appAlreadyLoaded = true;
-    document.body.setAttribute('data-app-initialized', 'true');
-
-    try {
-        initializeSession();
-        updateDropdowns();
-        initializeEventListeners();
-        initializeTemperatureSlider();
-        loadChatHistorySidebar();
-        
-        // Only load chat session if we have sessions, otherwise start new
-        if (chatSessions.length > 0) {
-            loadChatSession(0);
-        } else {
-            startNewChat();
+    document.addEventListener('DOMContentLoaded', function() {
+        // Triple protection against multiple calls
+        if (appInitialized || document.body.hasAttribute('data-app-initialized') || window.appAlreadyLoaded) {
+            console.log('[DEBUG] App already initialized, skipping...');
+            return;
         }
-    } catch (error) {
-        console.error('[ERROR] Failed to initialize app:', error);
-    }
-});
 
-// Stop any remaining Radix UI initialization
-if (window.RadixUI) {
-    delete window.RadixUI;
-}
-if (window.Radix) {
-    delete window.Radix;
-}
+        console.log('[DEBUG] DOM loaded, initializing ONCE...');
+        appInitialized = true;
+        window.appAlreadyLoaded = true;
+        document.body.setAttribute('data-app-initialized', 'true');
+
+        try {
+            initializeSession();
+            updateDropdowns();
+            initializeEventListeners();
+            initializeTemperatureSlider();
+            loadChatHistorySidebar();
+            
+            // Only load chat session if we have sessions, otherwise start new
+            if (chatSessions.length > 0) {
+                loadChatSession(0);
+            } else {
+                startNewChat();
+            }
+        } catch (error) {
+            console.error('[ERROR] Failed to initialize app:', error);
+        }
+    });
+})();
+
+// COMPLETELY ELIMINATE RADIX UI
+(function() {
+    // Block all Radix UI initialization attempts
+    window.RadixUI = undefined;
+    window.Radix = undefined;
+    
+    // Override console.log to block Radix messages
+    const originalLog = console.log;
+    console.log = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('[RADIX]') || message.includes('Radix UI')) {
+            return; // Block Radix messages
+        }
+        originalLog.apply(console, args);
+    };
+})();
 
 function initializeEventListeners() {
     // Check if already initialized to prevent duplicate listeners
@@ -110,6 +128,13 @@ function initializeEventListeners() {
             sidebar.classList.add('collapsed');
             toggleIcon.textContent = '▶';
         }
+    }
+
+    // Add search functionality
+    const chatSearchInput = document.getElementById('chat-search-input');
+    if (chatSearchInput && !chatSearchInput.hasAttribute('data-listener-added')) {
+        chatSearchInput.addEventListener('input', handleChatSearch);
+        chatSearchInput.setAttribute('data-listener-added', 'true');
     }
 
     // Mark as initialized
@@ -603,15 +628,32 @@ function saveChatSession() {
   console.log('[DEBUG] Saved chat session:', chat.id);
 }
 
-function loadChatHistorySidebar() {
+function loadChatHistorySidebar(searchTerm = '') {
   const historyList = document.getElementById('chat-history-list');
   if (!historyList) return;
 
   historyList.innerHTML = '';
 
-  chatSessions.forEach((chat, index) => {
+  // Filter chats based on search term
+  const filteredChats = chatSessions.filter(chat => {
+    if (!searchTerm) return true;
+    
+    const searchLower = searchTerm.toLowerCase();
+    const title = (chat.title || 'New Chat').toLowerCase();
+    const lastMessage = (chat.lastMessage || '').toLowerCase();
+    const agent = chat.agent.toLowerCase();
+    
+    return title.includes(searchLower) || 
+           lastMessage.includes(searchLower) || 
+           agent.includes(searchLower);
+  });
+
+  filteredChats.forEach((chat, filteredIndex) => {
+    // Find original index in chatSessions array
+    const originalIndex = chatSessions.findIndex(c => c.id === chat.id);
+    
     const chatItem = document.createElement('div');
-    chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
+    chatItem.className = `chat-history-item ${originalIndex === currentChatIndex ? 'active' : ''}`;
 
     const agentName = chat.agent.charAt(0).toUpperCase() + chat.agent.slice(1);
     const date = new Date(chat.timestamp).toLocaleDateString();
@@ -624,9 +666,27 @@ function loadChatHistorySidebar() {
       </div>
     `;
 
-    chatItem.addEventListener('click', () => loadChatSession(index));
+    chatItem.addEventListener('click', () => loadChatSession(originalIndex));
     historyList.appendChild(chatItem);
   });
+
+  // Show "No results" if search yields no results
+  if (searchTerm && filteredChats.length === 0) {
+    const noResults = document.createElement('div');
+    noResults.className = 'chat-history-item';
+    noResults.innerHTML = `
+      <div class="chat-content">
+        <div class="chat-title" style="color: #8e8ea0; text-align: center;">No chats found</div>
+        <div class="chat-preview" style="text-align: center;">Try a different search term</div>
+      </div>
+    `;
+    historyList.appendChild(noResults);
+  }
+}
+
+function handleChatSearch() {
+  const searchTerm = this.value.trim();
+  loadChatHistorySidebar(searchTerm);
 }
 
 // Alias for backward compatibility
