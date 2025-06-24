@@ -12,7 +12,7 @@ from openai import OpenAI
 
 from core.agent_base import BaseAgent
 from core.memory_manager import MemoryManager
-fromcore.rag_system import RAGSystem
+from core.rag_system import RAGSystem
 from utils.bahamas_context import BahamasContext
 from utils.safety_filters import SafetyFilter
 from .prompts import LucayaPrompts
