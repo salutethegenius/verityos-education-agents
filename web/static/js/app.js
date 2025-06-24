@@ -199,11 +199,11 @@ class ChatInterface {
     toggleSidebar() {
         const sidebar = document.getElementById('sidebar');
         const toggleIcon = document.getElementById('toggle-icon');
-        
+
         if (sidebar && toggleIcon) {
             sidebar.classList.toggle('collapsed');
             toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '⟩' : '⟨';
-            
+
             // Save state
             localStorage.setItem('agentSidebarCollapsed', sidebar.classList.contains('collapsed'));
         }
@@ -351,12 +351,12 @@ class ChatInterface {
                 }));
 
                 chatSessions[currentChatIndex].messages = messages;
-                
+
                 // Update last message and title
                 if (messages.length > 0) {
                     const lastMsg = messages[messages.length - 1];
                     chatSessions[currentChatIndex].lastMessage = lastMsg.content.replace(/<[^>]*>/g, '').substring(0, 100);
-                    
+
                     // Set title from first user message
                     const firstUserMsg = messages.find(m => m.className.includes('user'));
                     if (firstUserMsg && chatSessions[currentChatIndex].title === 'New Chat') {
@@ -374,7 +374,7 @@ class ChatInterface {
     loadSessionHistory() {
         // Load chat sessions from localStorage and backend
         this.loadChatHistorySidebar();
-        
+
         // Try to load previous session
         const savedSessionId = localStorage.getItem('agentCurrentSessionId');
         if (savedSessionId) {
@@ -389,7 +389,7 @@ class ChatInterface {
 
         // Load from localStorage first
         const sessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
-        
+
         historyList.innerHTML = '';
 
         sessions.forEach((chat, index) => {
@@ -539,3 +539,5 @@ class ChatInterface {
         console.log('[DEBUG] Loaded chat session:', chat.id);
     }
 }
+
+})(); // Close the IIFE wrapper
