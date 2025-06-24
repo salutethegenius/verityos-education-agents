@@ -127,7 +127,7 @@ class ChatInterface {
         });
 
         // Send message button and input
-        const sendBtn = document.getElementById('send-btn');
+        const sendBtn = document.getElementById('send-button');
         const messageInput = document.getElementById('message-input');
 
         if (sendBtn) {
@@ -144,9 +144,17 @@ class ChatInterface {
         }
 
         // New conversation button
-        const newConversationBtn = document.getElementById('new-conversation');
+        const newConversationBtn = document.getElementById('new-chat-btn');
         if (newConversationBtn) {
             newConversationBtn.addEventListener('click', () => this.startNewConversation());
+        }
+
+        // Agent selection dropdown
+        const agentSelect = document.getElementById('agent-select');
+        if (agentSelect) {
+            agentSelect.addEventListener('change', (e) => {
+                this.switchAgent(e.target.value);
+            });
         }
     }
 
