@@ -1061,6 +1061,27 @@ input[type="range"]::-moz-range-thumb {
   color: #764ba2;
 }
 
+/* Return to Student Portal button styling */
+a[href*="student-login"] {
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  color: white !important;
+  padding: var(--space-3) var(--space-6);
+  border-radius: var(--radius-lg);
+  text-decoration: none;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all 150ms ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+a[href*="student-login"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+  color: white !important;
+}
+
 .error-message {
   background: #fef2f2;
   border: 1px solid #fca5a5;
