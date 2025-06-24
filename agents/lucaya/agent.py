@@ -206,9 +206,6 @@ Make it practical for Bahamian educational context."""
             f"🌟 {self.prompts.get_research_tip()}"
         ]
         
-        return "\n".join(tips)"
-        ]
-
         return "\n".join(tips)
 
     def _handle_citation_help(self, query: str) -> str:
