@@ -1,4 +1,3 @@
-
 // Student portal JavaScript
 let currentAgent = 'sage';
 let currentSessionId = generateSessionId();
@@ -80,17 +79,17 @@ function updateHelpContent() {
     const agentSelect = document.getElementById('agent-select');
     const subjectSelect = document.getElementById('subject-select');
     const helpContent = document.getElementById('help-content');
-    
+
     if (!agentSelect || !subjectSelect || !helpContent) return;
-    
+
     const agent = agentSelect.value;
     const subject = subjectSelect.value;
-    
+
     const content = HELP_CONTENT[agent]?.[subject] || HELP_CONTENT[agent]?.math || {
         title: "💡 Learning Assistant",
         samples: ["Ask me anything about your studies!"]
     };
-    
+
     helpContent.innerHTML = `
         <h4>${content.title}</h4>
         <div class="help-samples">
@@ -112,11 +111,11 @@ function fillSampleText(text) {
 function updateTaskOptions() {
     const agentSelect = document.getElementById('agent-select');
     const taskSelect = document.getElementById('task-select');
-    
+
     if (!agentSelect || !taskSelect) return;
-    
+
     const agent = agentSelect.value;
-    
+
     const agentTasks = {
         'sage': [
             { value: 'homework', text: 'Homework Help' },
@@ -135,10 +134,10 @@ function updateTaskOptions() {
             { value: 'topic exploration', text: 'Topic Exploration' }
         ]
     };
-    
+
     const tasks = agentTasks[agent] || agentTasks['sage'];
     taskSelect.innerHTML = '';
-    
+
     tasks.forEach(task => {
         const option = document.createElement('option');
         option.value = task.value;
@@ -196,8 +195,20 @@ function setupEventListeners() {
     if (newChatBtn) {
         newChatBtn.addEventListener('click', startNewChat);
     }
-}
 
+        // Add sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const toggleIcon = document.getElementById('toggle-icon');
+
+        if (sidebarToggle && sidebar && toggleIcon) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+            });
+        }
+
+        // Load chat history and initial session
 async function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
@@ -295,7 +306,7 @@ function addMessage(message, type) {
     if (!chatWindow) return;
 
     const messageDiv = document.createElement('div');
-    
+
     let formattedMessage = formatMessageContent(message);
 
     if (type === 'user') {
@@ -322,7 +333,7 @@ function addMessage(message, type) {
 
 function formatMessageContent(message) {
     if (!message) return '';
-    
+
     return message
         .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
         .replace(/^[•\-]\s+(.+)$/gm, '<li>$1</li>')
@@ -356,7 +367,7 @@ function startNewChat() {
     const chatWindow = document.getElementById('chat-window');
     if (chatWindow) {
         chatWindow.innerHTML = '';
-        
+
         // Add welcome message
         const welcomeMessage = document.createElement('div');
         welcomeMessage.className = 'message agent-message';
@@ -367,7 +378,7 @@ function startNewChat() {
 
     // Update sidebar
     loadChatHistorySidebar();
-    
+
     console.log('[STUDENT DEBUG] Started new chat:', newChat.id);
 }
 
@@ -418,7 +429,7 @@ function loadChatSession(index) {
 
     // Update sidebar
     loadChatHistorySidebar();
-    
+
     console.log('[STUDENT DEBUG] Loaded chat session:', chat.id);
 }
 
@@ -453,7 +464,7 @@ function saveChatSession() {
 
     // Save to localStorage
     localStorage.setItem('studentChatSessions', JSON.stringify(chatSessions));
-    
+
     console.log('[STUDENT DEBUG] Saved chat session:', chat.id);
 }
 

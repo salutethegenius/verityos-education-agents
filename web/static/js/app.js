@@ -61,6 +61,18 @@ document.addEventListener('DOMContentLoaded', function() {
             newChatBtn.addEventListener('click', startNewChat);
         }
 
+        // Add sidebar toggle functionality
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const toggleIcon = document.getElementById('toggle-icon');
+
+        if (sidebarToggle && sidebar && toggleIcon) {
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('collapsed');
+                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+            });
+        }
+
         // Add temperature slider functionality
         const temperatureSlider = document.getElementById('temperature-slider');
         const temperatureValue = document.getElementById('temperature-value');
