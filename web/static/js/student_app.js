@@ -14,33 +14,41 @@ function initializeStudentSession() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    if (studentAppInitialized) {
+    // Use both memory flag and DOM attribute to prevent conflicts
+    if (studentAppInitialized || document.body.hasAttribute('data-student-app-initialized')) {
         console.log('[STUDENT DEBUG] App already initialized, skipping...');
         return;
     }
 
     console.log('[STUDENT DEBUG] DOM loaded, initializing student app...');
     studentAppInitialized = true;
+    document.body.setAttribute('data-student-app-initialized', 'true');
 
     try {
         initializeStudentSession();
         initializeStudentEventListeners();
         updateHelpContent();
         loadStudentInfo();
+        
+        // Load chat history and initial session
+        loadChatHistorySidebar();
+        if (chatSessions.length === 0) {
+            startNewStudentChat();
+        } else {
+            loadChatSession(0);
+        }
     } catch (error) {
         console.error('[STUDENT ERROR] Failed to initialize student app:', error);
-    }
-
-    // Load chat history and initial session
-    loadChatHistorySidebar();
-    if (chatSessions.length === 0) {
-        startNewStudentChat();
-    } else {
-        loadChatSession(0);
     }
 });
 
 function initializeStudentEventListeners() {
+    // Check if already initialized to prevent duplicate listeners
+    if (document.body.hasAttribute('data-student-events-initialized')) {
+        console.log('[STUDENT DEBUG] Event listeners already initialized, skipping...');
+        return;
+    }
+
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
     const agentSelect = document.getElementById('agent-select');
@@ -49,43 +57,45 @@ function initializeStudentEventListeners() {
     const newChatBtn = document.getElementById('new-chat-btn');
     const sidebarToggle = document.getElementById('sidebar-toggle');
 
-    if (messageInput) {
-        messageInput.removeEventListener('input', handleStudentTextareaResize);
-        messageInput.removeEventListener('keydown', handleStudentKeydown);
-
+    if (messageInput && !messageInput.hasAttribute('data-student-listeners-added')) {
         messageInput.addEventListener('input', handleStudentTextareaResize);
         messageInput.addEventListener('keydown', handleStudentKeydown);
+        messageInput.setAttribute('data-student-listeners-added', 'true');
     }
 
-    if (sendButton) {
-        sendButton.removeEventListener('click', sendStudentMessage);
+    if (sendButton && !sendButton.hasAttribute('data-student-listener-added')) {
         sendButton.addEventListener('click', sendStudentMessage);
+        sendButton.setAttribute('data-student-listener-added', 'true');
     }
 
-    if (agentSelect) {
-        agentSelect.removeEventListener('change', handleStudentAgentChange);
+    if (agentSelect && !agentSelect.hasAttribute('data-student-listener-added')) {
         agentSelect.addEventListener('change', handleStudentAgentChange);
+        agentSelect.setAttribute('data-student-listener-added', 'true');
     }
 
-    if (subjectSelect) {
-        subjectSelect.removeEventListener('change', updateHelpContent);
+    if (subjectSelect && !subjectSelect.hasAttribute('data-student-listener-added')) {
         subjectSelect.addEventListener('change', updateHelpContent);
+        subjectSelect.setAttribute('data-student-listener-added', 'true');
     }
 
-    if (taskSelect) {
-        taskSelect.removeEventListener('change', updateHelpContent);
+    if (taskSelect && !taskSelect.hasAttribute('data-student-listener-added')) {
         taskSelect.addEventListener('change', updateHelpContent);
+        taskSelect.setAttribute('data-student-listener-added', 'true');
     }
 
-    if (newChatBtn) {
-        newChatBtn.removeEventListener('click', startNewStudentChat);
+    if (newChatBtn && !newChatBtn.hasAttribute('data-student-listener-added')) {
         newChatBtn.addEventListener('click', startNewStudentChat);
+        newChatBtn.setAttribute('data-student-listener-added', 'true');
     }
 
-    if (sidebarToggle) {
-        sidebarToggle.removeEventListener('click', toggleSidebar);
+    if (sidebarToggle && !sidebarToggle.hasAttribute('data-student-listener-added')) {
         sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarToggle.setAttribute('data-student-listener-added', 'true');
     }
+
+    // Mark as initialized
+    document.body.setAttribute('data-student-events-initialized', 'true');
+    console.log('[STUDENT DEBUG] Event listeners initialized');
 }
 
 function handleStudentTextareaResize() {

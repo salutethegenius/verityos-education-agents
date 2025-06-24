@@ -11,23 +11,31 @@ function generateSessionId() {
     return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// Initialize session
+// Initialize session - smarter session management
 function initializeSession() {
-    if (!currentSessionId) {
+    // Check if we have existing sessions first
+    if (chatSessions.length > 0 && chatSessions[0].id) {
+        currentSessionId = chatSessions[0].id;
+        console.log('[DEBUG] Using existing session:', currentSessionId);
+    } else if (!currentSessionId) {
         currentSessionId = generateSessionId();
         console.log('[DEBUG] New session created:', currentSessionId);
+    } else {
+        console.log('[DEBUG] Session already exists:', currentSessionId);
     }
 }
 
-// Initialize when page loads
+// Initialize when page loads - with better protection against multiple calls
 document.addEventListener('DOMContentLoaded', function() {
-    if (appInitialized) {
+    // Use both memory flag and DOM attribute to prevent conflicts
+    if (appInitialized || document.body.hasAttribute('data-app-initialized')) {
         console.log('[DEBUG] App already initialized, skipping...');
         return;
     }
 
     console.log('[DEBUG] DOM loaded, initializing...');
     appInitialized = true;
+    document.body.setAttribute('data-app-initialized', 'true');
 
     try {
         initializeSession();
@@ -35,45 +43,56 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeEventListeners();
         initializeTemperatureSlider();
         loadChatHistorySidebar();
-        loadChatSession(0);
+        
+        // Only load chat session if we have sessions, otherwise start new
+        if (chatSessions.length > 0) {
+            loadChatSession(0);
+        } else {
+            startNewChat();
+        }
     } catch (error) {
         console.error('[ERROR] Failed to initialize app:', error);
     }
 });
 
 function initializeEventListeners() {
+    // Check if already initialized to prevent duplicate listeners
+    if (document.body.hasAttribute('data-events-initialized')) {
+        console.log('[DEBUG] Event listeners already initialized, skipping...');
+        return;
+    }
+
     const sendButton = document.getElementById('send-button');
     const messageInput = document.getElementById('message-input');
     const agentSelect = document.getElementById('agent-select');
     const newChatBtn = document.getElementById('new-chat-btn');
     const sidebarToggle = document.getElementById('sidebar-toggle');
 
-    if (sendButton) {
-        sendButton.removeEventListener('click', sendMessage);
+    // Use { once: false } to prevent duplicate listeners but allow proper cleanup
+    if (sendButton && !sendButton.hasAttribute('data-listener-added')) {
         sendButton.addEventListener('click', sendMessage);
+        sendButton.setAttribute('data-listener-added', 'true');
     }
 
-    if (messageInput) {
-        messageInput.removeEventListener('input', handleTextareaResize);
-        messageInput.removeEventListener('keydown', handleKeydown);
-
+    if (messageInput && !messageInput.hasAttribute('data-listeners-added')) {
         messageInput.addEventListener('input', handleTextareaResize);
         messageInput.addEventListener('keydown', handleKeydown);
+        messageInput.setAttribute('data-listeners-added', 'true');
     }
 
-    if (agentSelect) {
-        agentSelect.removeEventListener('change', handleAgentChange);
+    if (agentSelect && !agentSelect.hasAttribute('data-listener-added')) {
         agentSelect.addEventListener('change', handleAgentChange);
+        agentSelect.setAttribute('data-listener-added', 'true');
     }
 
-    if (newChatBtn) {
-        newChatBtn.removeEventListener('click', startNewChat);
+    if (newChatBtn && !newChatBtn.hasAttribute('data-listener-added')) {
         newChatBtn.addEventListener('click', startNewChat);
+        newChatBtn.setAttribute('data-listener-added', 'true');
     }
 
-    if (sidebarToggle) {
-        sidebarToggle.removeEventListener('click', toggleSidebar);
+    if (sidebarToggle && !sidebarToggle.hasAttribute('data-listener-added')) {
         sidebarToggle.addEventListener('click', toggleSidebar);
+        sidebarToggle.setAttribute('data-listener-added', 'true');
 
         // Restore saved state
         const sidebar = document.getElementById('sidebar');
@@ -85,6 +104,10 @@ function initializeEventListeners() {
             toggleIcon.textContent = '▶';
         }
     }
+
+    // Mark as initialized
+    document.body.setAttribute('data-events-initialized', 'true');
+    console.log('[DEBUG] Event listeners initialized');
 }
 
 function handleTextareaResize() {

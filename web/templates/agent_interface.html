@@ -135,5 +135,10 @@
   </div>
 
   <script src="/static/js/app.js"></script>
+    <script>
+        // Clear any Radix UI initialization from localStorage/sessionStorage
+        sessionStorage.removeItem('radix_ui_initialized');
+        localStorage.removeItem('radix_ui_initialized');
+    </script>
 </body>
 </html>

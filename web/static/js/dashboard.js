@@ -2,13 +2,15 @@ let dashboardInitialized = false;
 let dashboardSessionId = 'dashboard-session';
 
 document.addEventListener('DOMContentLoaded', function() {
-    if (dashboardInitialized) {
+    // Use both memory flag and DOM attribute to prevent conflicts
+    if (dashboardInitialized || document.body.hasAttribute('data-dashboard-initialized')) {
         console.log('[DASHBOARD] Already initialized, skipping...');
         return;
     }
 
     console.log('[DASHBOARD] DOM loaded, initializing dashboard...');
     dashboardInitialized = true;
+    document.body.setAttribute('data-dashboard-initialized', 'true');
 
     try {
         initializeDashboardEventListeners();
