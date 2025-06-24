@@ -10,7 +10,11 @@ let conversationHistory = [];
 
 // Check if this is the agent interface page
 function isAgentInterface() {
-    return document.title.includes('VerityOS Education Agents') && !document.body.classList.contains('student-interface');
+    const isAgentTitle = document.title.includes('VerityOS Education Agents');
+    const isNotStudent = !document.body.classList.contains('student-interface');
+    const hasAgentElements = document.getElementById('agent-select') !== null;
+    
+    return isAgentTitle && isNotStudent && hasAgentElements;
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -19,8 +23,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Prevent multiple initializations
-    if (appInitialized || document.body.hasAttribute('data-agent-app-initialized')) {
+    // Prevent multiple initializations more robustly
+    if (window.chatInterfaceInstance || appInitialized || document.body.hasAttribute('data-agent-app-initialized')) {
         console.log('[DEBUG] App already initialized, skipping...');
         return;
     }
@@ -29,8 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
     appInitialized = true;
     document.body.setAttribute('data-agent-app-initialized', 'true');
 
-    // Initialize chat interface
-    new ChatInterface();
+    // Initialize chat interface and store reference
+    window.chatInterfaceInstance = new ChatInterface();
 });
 
 // Chat Interface Application
@@ -41,6 +45,11 @@ class ChatInterface {
         this.conversationHistory = [];
 
         this.init();
+        
+        // Add cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            this.saveChatSession();
+        });
     }
 
     init() {
@@ -65,6 +74,9 @@ class ChatInterface {
         const agentSelect = document.getElementById('agent-select');
         if (agentSelect) {
             agentSelect.value = this.currentAgent;
+        } else {
+            console.warn('[WARN] Agent select element not found');
+            return;
         }
 
         // Initialize subject and task dropdowns based on current agent
@@ -352,7 +364,7 @@ class ChatInterface {
                     message: message,
                     subject: subject,
                     task: task,
-                    temperature: parseFloat(temperature) / 10, // Convert to 0-1 range
+                    temperature: Math.min(1.0, Math.max(0.0, parseFloat(temperature) / 10)), // Convert to 0-1 range safely
                     response_length: responseLength,
                     focus_mode: focusMode,
                     explanation_style: explanationStyle,
@@ -625,10 +637,16 @@ class ChatInterface {
 
             if (response.ok) {
                 const sessionData = await response.json();
-                this.loadSessionFromData(sessionData, agent);
+                if (sessionData && sessionData.session_id) {
+                    this.loadSessionFromData(sessionData, agent);
+                } else {
+                    console.warn('[WARN] Invalid session data received:', sessionData);
+                }
+            } else {
+                console.warn('[WARN] Failed to load backend session:', response.status, response.statusText);
             }
         } catch (error) {
-            console.error('[ERROR] Failed to load backend session:', error);
+            console.error('[ERROR] Failed to load backend session:', error.message || error);
         }
     }
 
