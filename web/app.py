@@ -23,6 +23,7 @@ logging.basicConfig(
         logging.StreamHandler(),
         logging.FileHandler('app.log', mode='a')
     ]
+)
 logger = logging.getLogger(__name__)
 
 @app.route("/")
