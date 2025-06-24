@@ -1,0 +1,23 @@
+{
+  "agent_name": "sage",
+  "session_id": "test-session",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T19:36:36.167462",
+  "data": {
+    "progress": {},
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Hello",
+        "timestamp": "2025-06-24T19:36:36.166851"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83e\udd14 Let's keep our conversation educational and appropriate. Let's keep our focus on learning! How can I help you with your studies today?",
+        "timestamp": "2025-06-24T19:36:36.167331"
+      }
+    ]
+  }
+}

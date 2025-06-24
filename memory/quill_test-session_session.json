@@ -1,0 +1,22 @@
+{
+  "agent_name": "quill",
+  "session_id": "test-session",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T19:36:36.178685",
+  "data": {
+    "grading_history": [],
+    "level": "middle",
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Hello",
+        "timestamp": "2025-06-24T19:36:36.178237"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83d\udcdd **Hello! I'm Quill, your AI autograder!** \n\nI can help you by:\n\u2022 **Grading assignments** - Submit your work and I'll evaluate it\n\u2022 **Providing detailed feedback** - Get specific suggestions for improvement\n\u2022 **Rubric-based scoring** - Fair assessment across multiple criteria\n\u2022 **Supporting various subjects** - Math, English, Science, History, and more\n\nJust paste your assignment, essay, or homework answer, and I'll provide:\n- A detailed grade breakdown\n- Constructive feedback\n- Suggestions for improvement\n- Bahamian context when relevant\n\nWhat would you like me to grade today? \ud83c\udf34",
+        "timestamp": "2025-06-24T19:36:36.178411"
+      }
+    ]
+  }
+}

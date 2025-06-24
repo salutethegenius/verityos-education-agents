@@ -1,0 +1,22 @@
+{
+  "agent_name": "lucaya",
+  "session_id": "test-session",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T19:36:36.212679",
+  "data": {
+    "research_history": [],
+    "level": "middle",
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Hello",
+        "timestamp": "2025-06-24T19:36:36.212474"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83e\udd14 Let's keep our conversation educational and appropriate. Let's keep our research focused on educational topics.",
+        "timestamp": "2025-06-24T19:36:36.212537"
+      }
+    ]
+  }
+}
