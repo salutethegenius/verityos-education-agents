@@ -80,6 +80,8 @@ body {
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   min-height: 0; /* Allow flex shrinking */
+  height: 100vh; /* Ensure it stays within viewport */
+  max-height: 100vh;
 }
 
 /* Typography */
@@ -529,6 +531,7 @@ textarea {
   min-height: 0;
   position: relative;
   max-height: calc(100vh - 120px);
+  overflow: hidden; /* Prevent overflow */
 }
 
 #chat-window {
@@ -542,7 +545,7 @@ textarea {
   flex-direction: column;
   gap: var(--space-3);
   height: 100%;
-  max-height: 100%;
+  max-height: calc(100vh - 250px); /* Account for header, input area, and padding */
   min-height: 300px;
 }
 
@@ -751,12 +754,20 @@ textarea {
   padding: var(--space-2) 0;
   border-top: 1px solid #e2e8f0;
   margin-top: auto;
+  position: sticky;
+  bottom: 0;
+  width: 100%;
+  max-width: 100%;
 }
 
 #message-input {
   flex: 1;
   min-height: 2.5rem;
+  max-height: 120px;
   resize: none;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 #send-button {
