@@ -79,9 +79,10 @@ body {
   border-left: 1px solid #e2e8f0;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
-  min-height: 0; /* Allow flex shrinking */
-  height: 100vh; /* Ensure it stays within viewport */
+  min-height: 0;
+  height: 100vh;
   max-height: 100vh;
+  position: relative;
 }
 
 /* Typography */
@@ -525,13 +526,12 @@ textarea {
   flex: 1;
   display: flex;
   flex-direction: column;
-  padding: var(--space-3);
+  padding: var(--space-4);
   gap: var(--space-3);
-  height: 100%;
+  height: calc(100vh - 140px); /* Fixed height to prevent overflow */
   min-height: 0;
   position: relative;
-  max-height: calc(100vh - 120px);
-  overflow: hidden; /* Prevent overflow */
+  overflow: hidden;
 }
 
 #chat-window {
@@ -539,14 +539,14 @@ textarea {
   overflow-y: auto;
   border: none;
   border-radius: var(--radius-lg);
-  padding: var(--space-3);
+  padding: var(--space-4);
   background: #ffffff;
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  height: 100%;
-  max-height: calc(100vh - 250px); /* Account for header, input area, and padding */
-  min-height: 300px;
+  min-height: 0;
+  border: 1px solid #e2e8f0;
+  box-shadow: var(--shadow-sm);
 }
 
 /* MacBook Pro 13-inch specific optimizations */
@@ -751,13 +751,13 @@ textarea {
   align-items: flex-end;
   flex-shrink: 0;
   background: #ffffff;
-  padding: var(--space-2) 0;
+  padding: var(--space-3);
   border-top: 1px solid #e2e8f0;
-  margin-top: auto;
-  position: sticky;
-  bottom: 0;
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
   width: 100%;
   max-width: 100%;
+  box-shadow: var(--shadow-sm);
 }
 
 #message-input {
