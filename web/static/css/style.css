@@ -75,12 +75,12 @@ body {
 #main-content {
   display: flex;
   flex-direction: column;
+  height: 100vh;
   background: #ffffff;
   border-left: 1px solid #e2e8f0;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   min-height: 0;
-  height: 100vh;
   max-height: 100vh;
   position: relative;
 }
@@ -523,20 +523,21 @@ textarea {
 
 /* Chat area */
 #chat-container {
-  flex: 1;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  max-height: 100vh;
+  overflow: hidden;
   padding: var(--space-4);
   gap: var(--space-3);
-  height: calc(100vh - 140px); /* Fixed height to prevent overflow */
-  min-height: 0;
   position: relative;
-  overflow: hidden;
 }
 
 #chat-window {
   flex: 1;
   overflow-y: auto;
+  min-height: 0;
   border: none;
   border-radius: var(--radius-lg);
   padding: var(--space-4);
@@ -544,7 +545,6 @@ textarea {
   display: flex;
   flex-direction: column;
   gap: var(--space-3);
-  min-height: 0;
   border: 1px solid #e2e8f0;
   box-shadow: var(--shadow-sm);
 }
@@ -750,14 +750,12 @@ textarea {
   gap: var(--space-3);
   align-items: flex-end;
   flex-shrink: 0;
-  background: #ffffff;
   padding: var(--space-3);
-  border-top: 1px solid #e2e8f0;
-  border-radius: var(--radius-md);
-  margin-top: var(--space-3);
+  background: white;
+  border-top: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
   width: 100%;
   max-width: 100%;
-  box-shadow: var(--shadow-sm);
 }
 
 #message-input {
