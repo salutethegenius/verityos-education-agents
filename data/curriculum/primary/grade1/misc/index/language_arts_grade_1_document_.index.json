@@ -1,0 +1,22 @@
+{
+  "grade": "grade1",
+  "subject": "misc",
+  "title": "Language Arts (Grade 1)",
+  "summary": "Bahamas Ministry of Education \u2013 Grade 1 Primary Language Arts Curriculum 2022-2027                                                                                                                                      1                COMMONWEALTH OF THE BAHAMAS  MINISTRY OF EDUCATION   AND TECHNICAL AND VOCATIONAL TRAINING      LANGUAGE ARTS  CURRICULUM GUIDELINES      GRADE 1                                                                                                                          ...",
+  "topics": [
+    "interrupt",
+    "scenario",
+    "bite",
+    "hundred",
+    "goats",
+    "selection",
+    "fingers",
+    "marker",
+    "alike",
+    "popular"
+  ],
+  "source_url": "https://www.curriculumbahamas.com/uploads/1/1/1/0/111058113/language_arts_grade_1_document_.pdf",
+  "last_updated": "2025-06-24",
+  "s3_path": "datasets/curriculum/primary/grade1/misc/guide/language_arts_grade_1_document_.md",
+  "type": "curriculum"
+}

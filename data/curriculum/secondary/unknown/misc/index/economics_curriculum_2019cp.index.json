@@ -1,0 +1,22 @@
+{
+  "grade": "unknown",
+  "subject": "misc",
+  "title": "Economics",
+  "summary": "    Commonwealth of The Bahamas  Ministry of Education  Career & Technical Education Section            Business Studies Unit   Economics Curriculum  Grades 10-12      September 2019-2024        Table of Contents    ACKNOWLEDGEMENTS .............................................................................................. iii  OVERVIEW OF THE SUBJECT ........................................................................................... iii  GENERAL COURSE OBJECTIVES .......................",
+  "topics": [
+    "historical",
+    "bjcs",
+    "plotting",
+    "skill",
+    "critique",
+    "construction",
+    "uses",
+    "location",
+    "junior",
+    "oral"
+  ],
+  "source_url": "https://www.curriculumbahamas.com/uploads/1/1/1/0/111058113/economics_curriculum_2019cp.pdf",
+  "last_updated": "2025-06-24",
+  "s3_path": "datasets/curriculum/secondary/unknown/misc/guide/economics_curriculum_2019cp.md",
+  "type": "curriculum"
+}

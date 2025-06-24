@@ -1,0 +1,22 @@
+{
+  "grade": "unknown",
+  "subject": "misc",
+  "title": "Visual Arts",
+  "summary": "1        Ministry of Education  Visual Arts  Curriculum Guideline  Grades 1-6    August 2021       2        Table of Contents  Vision, Mission and Belief Statement\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026.. 3-4  General Objectives\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026 5  Grade One: Topics\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026 6-7  Grade One: Objectives, Content, Activities and assessment\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026\u2026...",
+  "topics": [
+    "malone",
+    "egyptians",
+    "treasure",
+    "felt",
+    "skill",
+    "critique",
+    "construction",
+    "indicate",
+    "uses",
+    "portfolios"
+  ],
+  "source_url": "https://www.curriculumbahamas.com/uploads/1/1/1/0/111058113/visual_arts_curriculum_guideline__primary_school__2021_edited_version.pdf",
+  "last_updated": "2025-06-24",
+  "s3_path": "datasets/curriculum/primary/unknown/misc/guide/visual_arts_curriculum_guideline__primary_school__2021_edited_version.md",
+  "type": "curriculum"
+}
