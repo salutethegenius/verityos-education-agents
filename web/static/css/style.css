@@ -205,22 +205,26 @@ body {
 
 .slider-container {
   width: 100%;
+  max-width: 100%;
   margin: 0.5rem 0;
   box-sizing: border-box;
   padding: 0.5rem;
   background: #f8f9fa;
   border-radius: 6px;
   border: 1px solid #e9ecef;
+  overflow: hidden;
 }
 
 .slider-wrapper {
   position: relative;
   width: 100%;
+  max-width: 100%;
   height: 50px;
   display: flex;
   align-items: center;
   gap: 0.75rem;
   box-sizing: border-box;
+  overflow: hidden;
 }
 
 .slider-track {
@@ -230,6 +234,8 @@ body {
   background: linear-gradient(to right, #3498db 0%, #f39c12 50%, #e74c3c 100%);
   border-radius: 3px;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.1);
+  min-width: 0;
+  overflow: hidden;
 }
 
 #temperature-slider {
@@ -320,11 +326,14 @@ body {
   padding: 0.3rem 0.6rem;
   border-radius: 15px;
   min-width: 30px;
+  max-width: 50px;
   text-align: center;
   font-size: 0.8rem;
   border: 1px solid #ced4da;
   flex-shrink: 0;
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .checkbox-group {
@@ -551,16 +560,26 @@ body {
 
   /* Fix slider container overflow */
   .slider-container {
-    width: 100%;
-    max-width: calc(100% - 10px);
+    width: calc(100% - 1rem);
+    max-width: calc(100vw - 2rem);
     margin: 0.5rem 0;
     box-sizing: border-box;
+    padding: 0.4rem;
+    overflow: hidden;
   }
 
   .slider-wrapper {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    gap: 0.5rem;
+    overflow: hidden;
+  }
+
+  .slider-track {
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
   }
 
   #temperature-slider {
@@ -574,6 +593,12 @@ body {
     max-width: 100%;
     box-sizing: border-box;
     font-size: 0.7rem;
+  }
+
+  #temperature-value {
+    max-width: 40px;
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
   }
 
   #input-area {
@@ -631,42 +656,54 @@ body {
   /* Fix temperature slider on small screens */
   .slider-container {
     margin: 0.25rem 0;
-    max-width: 100%;
-    padding: 0.4rem;
+    width: calc(100% - 0.5rem);
+    max-width: calc(100vw - 1.5rem);
+    padding: 0.3rem;
+    overflow: hidden;
   }
 
   .slider-wrapper {
-    height: 40px;
-    gap: 0.5rem;
+    height: 35px;
+    gap: 0.4rem;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   .slider-track {
-    height: 5px;
+    height: 4px;
+    min-width: 0;
+    flex: 1;
   }
 
   #temperature-slider {
-    height: 5px;
+    height: 4px;
+    width: 100%;
   }
 
   #temperature-slider::-webkit-slider-thumb {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   #temperature-slider::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
   }
 
   .slider-labels {
-    font-size: 0.65rem;
-    margin-top: 0.25rem;
+    font-size: 0.6rem;
+    margin-top: 0.2rem;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   #temperature-value {
-    font-size: 0.7rem;
-    padding: 0.2rem 0.4rem;
-    min-width: 25px;
+    font-size: 0.65rem;
+    padding: 0.15rem 0.3rem;
+    min-width: 20px;
+    max-width: 35px;
+    white-space: nowrap;
+    overflow: hidden;
   }
 }
 
