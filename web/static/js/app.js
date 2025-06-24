@@ -84,8 +84,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const temperatureValue = document.getElementById('temperature-value');
 
         if (temperatureSlider && temperatureValue) {
+            // Initialize value display
+            temperatureValue.textContent = temperatureSlider.value;
+            
+            // Handle input changes
             temperatureSlider.addEventListener('input', function() {
                 temperatureValue.textContent = this.value;
+            });
+            
+            // Handle change events for better mobile support
+            temperatureSlider.addEventListener('change', function() {
+                temperatureValue.textContent = this.value;
+            });
+            
+            // Prevent slider from causing page scrolling on mobile
+            temperatureSlider.addEventListener('touchstart', function(e) {
+                e.stopPropagation();
+            });
+            
+            temperatureSlider.addEventListener('touchmove', function(e) {
+                e.stopPropagation();
             });
         }
 

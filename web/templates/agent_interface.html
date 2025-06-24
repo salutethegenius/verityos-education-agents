@@ -74,11 +74,13 @@
         <div class="control-group">
           <label for="temperature-slider">Creativity Level:</label>
           <div class="slider-container">
-            <input type="range" id="temperature-slider" min="0" max="10" value="7" step="1">
+            <div class="slider-wrapper">
+              <input type="range" id="temperature-slider" min="0" max="10" value="7" step="1">
+            </div>
             <div class="slider-labels">
-              <span>Focused</span>
+              <span class="left-label">Focused</span>
               <span id="temperature-value">7</span>
-              <span>Creative</span>
+              <span class="right-label">Creative</span>
             </div>
           </div>
         </div>
