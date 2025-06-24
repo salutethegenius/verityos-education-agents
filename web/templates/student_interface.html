@@ -1,13 +1,16 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerityOS Education - Student Portal</title>
+    <title>VerityOS Student Portal</title>
+    <!-- Radix UI Themes CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@radix-ui/themes@3.0.0/styles.css">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
+    <!-- Radix UI Theme Provider -->
+    <div class="radix-themes" data-accent-color="green" data-gray-color="slate" data-radius="medium" data-scaling="100%">
     <div id="app-container">
         <!-- Sidebar for chat history -->
         <div id="sidebar">
@@ -42,7 +45,7 @@
                     <textarea id="message-input" placeholder="Ask me anything about your studies... (Max 300 characters)" maxlength="300"></textarea>
                     <button id="send-button">Send</button>
                 </div>
-                
+
                 <div class="student-notice">
                     <small>💡 Keep questions focused on your studies. Teachers can see your learning progress!</small>
                 </div>
@@ -61,7 +64,7 @@
                         <option value="lucaya">🔍 Lucaya - Research</option>
                     </select>
                 </div>
-                
+
                 <div class="control-group">
                     <label>📖 Subject</label>
                     <select id="subject-select">
@@ -72,7 +75,7 @@
                         <option value="bahamas studies">Bahamas Studies</option>
                     </select>
                 </div>
-                
+
                 <div class="control-group">
                     <label>📝 Activity</label>
                     <select id="task-select">
@@ -96,6 +99,7 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <script src="/static/js/student_app.js"></script>

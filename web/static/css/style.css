@@ -1,9 +1,22 @@
 body {
-  font-family: sans-serif;
+  font-family: var(--default-font-family, sans-serif);
   margin: 0;
-  background: #f5f5f5;
+  background: var(--gray-2, #f5f5f5);
   height: 100vh;
   overflow: hidden;
+}
+
+/* Radix UI integration */
+.radix-themes {
+  height: 100vh;
+  width: 100vw;
+}
+
+/* Enhanced buttons using Radix UI tokens */
+.rt-button, .radix-button {
+  --button-height: var(--space-6);
+  font-family: var(--default-font-family);
+  border-radius: var(--radius-2);
 }
 
 #app-container {
@@ -175,10 +188,11 @@ body {
 }
 
 #agent-controls, #ai-settings {
-  background: white;
-  border-radius: 8px;
-  padding: 1rem;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  background: var(--color-panel-solid);
+  border-radius: var(--radius-3);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-2);
+  border: 1px solid var(--gray-6);
 }
 
 #agent-controls h3, #ai-settings h3 {
@@ -209,11 +223,19 @@ body {
 
 .control-group select {
   width: 100%;
-  padding: 0.5rem;
-  border: 1px solid #ced4da;
-  border-radius: 4px;
-  background: white;
-  font-size: 0.9rem;
+  padding: var(--space-2);
+  border: 1px solid var(--gray-7);
+  border-radius: var(--radius-2);
+  background: var(--color-background);
+  font-size: var(--font-size-2);
+  color: var(--gray-12);
+  transition: border-color 0.2s ease;
+}
+
+.control-group select:focus {
+  outline: none;
+  border-color: var(--accent-8);
+  box-shadow: 0 0 0 1px var(--accent-8);
 }
 
 .slider-container {
@@ -418,17 +440,24 @@ body {
 }
 
 #send-button {
-  padding: 10px 20px;
-  background: #3498db;
-  color: white;
+  padding: var(--space-3) var(--space-4);
+  background: var(--accent-9);
+  color: var(--accent-9-contrast);
   border: none;
-  border-radius: 5px;
+  border-radius: var(--radius-2);
   cursor: pointer;
-  font-size: 1rem;
+  font-size: var(--font-size-2);
+  transition: background-color 0.2s ease;
 }
 
 #send-button:hover {
-  background: #2980b9;
+  background: var(--accent-10);
+}
+
+#send-button:disabled {
+  background: var(--gray-6);
+  color: var(--gray-11);
+  cursor: not-allowed;
 }
 
 .message {

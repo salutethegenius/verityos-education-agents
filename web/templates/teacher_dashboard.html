@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerityOS Education - Teacher Dashboard</title>
+    <title>VerityOS Teacher Dashboard</title>
+    <!-- Radix UI Themes CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@radix-ui/themes@3.0.0/styles.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
         .dashboard-grid {
@@ -163,111 +165,114 @@
     </style>
 </head>
 <body>
-    <div id="app-container">
-        <div id="main-content" style="width: 100%; padding: 20px;">
-            <div class="dashboard-header">
-                <h1>🏫 Teacher Dashboard - VerityOS Education</h1>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <p>Monitor student activity, manage classes, and track progress</p>
-                    <div>
-                        <span id="last-updated">Last updated: --:--</span>
-                        <a href="/" style="margin-left: 20px;">← Back to Agent Interface</a>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Quick Stats -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number" id="total-students">0</div>
-                    <div class="stat-label">Total Students</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="active-students">0</div>
-                    <div class="stat-label">Active Today</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="total-sessions">0</div>
-                    <div class="stat-label">Sessions Today</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="avg-questions">0</div>
-                    <div class="stat-label">Avg Questions</div>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <button class="action-btn btn-primary" onclick="takeAttendance()">📋 Take Attendance</button>
-                <button class="action-btn btn-success" onclick="createStudent()">👤 Add Student</button>
-                <button class="action-btn btn-warning" onclick="generateReport()">📊 Generate Report</button>
-                <button class="action-btn btn-info" onclick="viewSchedule()">📅 View Schedule</button>
-                <button class="action-btn btn-primary" onclick="refreshDashboard()">🔄 Refresh</button>
-            </div>
-
-            <!-- Main Dashboard Grid -->
-            <div class="dashboard-grid">
-                <!-- Student List -->
-                <div class="dashboard-card">
-                    <h3>👥 Student Roster</h3>
-                    <div class="student-list" id="student-list">
-                        <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
-                            Loading students...
+    <!-- Radix UI Theme Provider -->
+    <div class="radix-themes" data-accent-color="purple" data-gray-color="slate" data-radius="medium" data-scaling="100%">
+        <div id="app-container">
+            <div id="main-content" style="width: 100%; padding: 20px;">
+                <div class="dashboard-header">
+                    <h1>🏫 Teacher Dashboard - VerityOS Education</h1>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <p>Monitor student activity, manage classes, and track progress</p>
+                        <div>
+                            <span id="last-updated">Last updated: --:--</span>
+                            <a href="/" style="margin-left: 20px;">← Back to Agent Interface</a>
                         </div>
                     </div>
                 </div>
 
-                <!-- Recent Activity -->
-                <div class="dashboard-card">
-                    <h3>📈 Recent Activity</h3>
-                    <div class="activity-feed" id="activity-feed">
-                        <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
-                            Loading activity...
+                <!-- Quick Stats -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-students">0</div>
+                        <div class="stat-label">Total Students</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="active-students">0</div>
+                        <div class="stat-label">Active Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="total-sessions">0</div>
+                        <div class="stat-number" id="total-sessions">Sessions Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="avg-questions">0</div>
+                        <div class="stat-label">Avg Questions</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <button class="action-btn btn-primary" onclick="takeAttendance()">📋 Take Attendance</button>
+                    <button class="action-btn btn-success" onclick="createStudent()">👤 Add Student</button>
+                    <button class="action-btn btn-warning" onclick="generateReport()">📊 Generate Report</button>
+                    <button class="action-btn btn-info" onclick="viewSchedule()">📅 View Schedule</button>
+                    <button class="action-btn btn-primary" onclick="refreshDashboard()">🔄 Refresh</button>
+                </div>
+
+                <!-- Main Dashboard Grid -->
+                <div class="dashboard-grid">
+                    <!-- Student List -->
+                    <div class="dashboard-card">
+                        <h3>👥 Student Roster</h3>
+                        <div class="student-list" id="student-list">
+                            <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
+                                Loading students...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="dashboard-card">
+                        <h3>📈 Recent Activity</h3>
+                        <div class="activity-feed" id="activity-feed">
+                            <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
+                                Loading activity...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Today's Schedule -->
+                    <div class="dashboard-card">
+                        <h3>📅 Today's Schedule</h3>
+                        <div id="schedule-display">
+                            <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
+                                Loading schedule...
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Class Overview -->
+                    <div class="dashboard-card">
+                        <h3>📊 Class Overview</h3>
+                        <div id="class-overview">
+                            <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
+                                Loading overview...
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Today's Schedule -->
-                <div class="dashboard-card">
-                    <h3>📅 Today's Schedule</h3>
-                    <div id="schedule-display">
-                        <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
-                            Loading schedule...
-                        </div>
+                <!-- Detailed Student Monitor -->
+                <div class="dashboard-card" style="margin-top: 20px;">
+                    <h3>🔍 Student Monitor</h3>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <input type="text" id="student-search" placeholder="Search student name or ID..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+                        <button class="action-btn btn-info" onclick="searchStudent()">Search</button>
                     </div>
-                </div>
-
-                <!-- Class Overview -->
-                <div class="dashboard-card">
-                    <h3>📊 Class Overview</h3>
-                    <div id="class-overview">
-                        <div style="text-align: center; padding: 20px; color: #495057; font-weight: 500;">
-                            Loading overview...
+                    <div id="student-details" style="min-height: 200px;">
+                        <div style="text-align: center; padding: 40px; color: #6c757d;">
+                            Search for a student to view detailed information
                         </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Detailed Student Monitor -->
-            <div class="dashboard-card" style="margin-top: 20px;">
-                <h3>🔍 Student Monitor</h3>
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <input type="text" id="student-search" placeholder="Search student name or ID..." style="flex: 1; padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
-                    <button class="action-btn btn-info" onclick="searchStudent()">Search</button>
-                </div>
-                <div id="student-details" style="min-height: 200px;">
-                    <div style="text-align: center; padding: 40px; color: #6c757d;">
-                        Search for a student to view detailed information
                     </div>
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Refresh Button -->
-    <button class="refresh-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
-        🔄
-    </button>
+        <!-- Refresh Button -->
+        <button class="refresh-btn" onclick="refreshDashboard()" title="Refresh Dashboard">
+            🔄
+        </button>
+    </div>
 
     <script src="/static/js/dashboard.js"></script>
 </body>
