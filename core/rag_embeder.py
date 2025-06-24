@@ -80,7 +80,14 @@ def build_index():
     chunks = load_text_chunks()
     print(f"Loaded {len(chunks)} chunks")
 
-    # Initialize ChromaDB
+    # Initialize ChromaDB with OpenAI embedding function
+    from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
+    
+    embedding_function = OpenAIEmbeddingFunction(
+        api_key=os.getenv("OPENAI_API_KEY"),
+        model_name=EMBED_MODEL
+    )
+    
     chroma_client = chromadb.PersistentClient(path=MEMORY_DIR)
     
     # Delete existing collection if it exists
@@ -89,14 +96,16 @@ def build_index():
     except:
         pass
     
-    # Create new collection
-    collection = chroma_client.create_collection(name=COLLECTION_NAME)
+    # Create new collection with OpenAI embedding function
+    collection = chroma_client.create_collection(
+        name=COLLECTION_NAME,
+        embedding_function=embedding_function
+    )
 
-    # Process in batches
+    # Process in batches (ChromaDB will handle embeddings automatically)
     for i in range(0, len(chunks), 50):
         batch = chunks[i:i + 50]
         texts = [c["content"] for c in batch]
-        embeddings = embed_text(texts)
         
         # Prepare metadata (ChromaDB requires string values)
         metadatas = []
@@ -107,9 +116,8 @@ def build_index():
                     metadata[key] = str(value)
             metadatas.append(metadata)
         
-        # Add to collection
+        # Add to collection (no need to pass embeddings)
         collection.add(
-            embeddings=embeddings,
             documents=texts,
             metadatas=metadatas,
             ids=[chunk["id"] for chunk in batch]

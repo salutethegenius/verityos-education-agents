@@ -18,7 +18,8 @@ packages = [
   "libstdcxx5",
   "awscli2",
   "python311Packages.numpy",
-  "python311Packages.faiss"
+  "python311Packages.faiss",
+  "python311Packages.onnxruntime"
 ]
 
 [env]

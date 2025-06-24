@@ -24,8 +24,18 @@ class RAGRetriever:
     def load_index(self):
         """Load the ChromaDB collection if it exists"""
         try:
+            from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
+            
+            embedding_function = OpenAIEmbeddingFunction(
+                api_key=os.getenv("OPENAI_API_KEY"),
+                model_name=EMBED_MODEL
+            )
+            
             chroma_client = chromadb.PersistentClient(path=MEMORY_DIR)
-            self.collection = chroma_client.get_collection(name=COLLECTION_NAME)
+            self.collection = chroma_client.get_collection(
+                name=COLLECTION_NAME,
+                embedding_function=embedding_function
+            )
             count = self.collection.count()
             print(f"Loaded RAG index with {count} items")
         except Exception as e:
