@@ -10,33 +10,43 @@
 
   // 🧠 Reliable Interface Check
   function isAgentInterface() {
-    return document.body?.classList?.contains("agent-interface") ||
-           window.location.pathname.includes("/agents") ||
-           document.querySelector("#controls-sidebar") ||
-           window.location.pathname === "/";
+    const hasAgentClass = document.body?.classList?.contains("agent-interface");
+    const hasControlsSidebar = document.querySelector("#controls-sidebar") !== null;
+    const isRootPath = window.location.pathname === "/";
+    
+    // Only consider it an agent interface if we have specific agent elements
+    return hasAgentClass || (hasControlsSidebar && isRootPath);
   }
 
   // 🧹 Session Cleanup
   function cleanupOldSessions() {
-    if (window.__VerityOS_Global__.sessionId) return;
-
     try {
       const keys = Object.keys(localStorage);
       const now = Date.now();
       const MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+      let cleanedCount = 0;
 
       for (const key of keys) {
-        if (key.startsWith("verityos_session_") || key.startsWith("agentChatSessions")) {
+        if (key.startsWith("verityos_session_") || 
+            key.startsWith("agentChatSessions") ||
+            key.startsWith("sage_session") ||
+            key.startsWith("studentChatSessions")) {
           try {
             const data = JSON.parse(localStorage.getItem(key) || '{}');
             const sessionTime = data.created || data.timestamp || 0;
             if ((now - new Date(sessionTime).getTime()) > MAX_AGE) {
               localStorage.removeItem(key);
+              cleanedCount++;
             }
           } catch (e) {
             localStorage.removeItem(key); // Remove corrupted entries
+            cleanedCount++;
           }
         }
+      }
+      
+      if (cleanedCount > 0) {
+        console.debug(`[SessionCleanup] Cleaned ${cleanedCount} old sessions`);
       }
     } catch (e) {
       console.warn("[SessionCleanup] Failed:", e);
@@ -186,7 +196,7 @@
 
   // 📦 Main Init Function
   function initializeAgentInterface() {
-    if (window.__VerityOS_Global__.initialized) {
+    if (window.__VerityOS_Global__.initialized || document.body.hasAttribute('data-agent-initialized')) {
       console.debug("[DEBUG] Agent Interface already initialized. Skipping...");
       return;
     }
@@ -194,6 +204,7 @@
     console.debug("[DEBUG] DOM loaded, initializing...");
 
     window.__VerityOS_Global__.initialized = true;
+    document.body.setAttribute('data-agent-initialized', 'true');
 
     // 🧠 Setup session
     const sessionId = `verityos_session_${Date.now()}_${Math.random().toString(36).slice(2, 10)}`;
@@ -214,26 +225,28 @@
 
   // 🔐 Safe Global Property Exposure
   try {
-    if (!Object.getOwnPropertyDescriptor(window, 'VerityOSAgentState')) {
-      Object.defineProperty(window, 'VerityOSAgentState', {
-        value: window.__VerityOS_Global__,
-        configurable: false,
-        writable: false,
-      });
+    if (!window.hasOwnProperty('VerityOSAgentState')) {
+      window.VerityOSAgentState = window.__VerityOS_Global__;
     }
   } catch (e) {
     console.warn("[DEBUG] Failed to define global VerityOSAgentState", e);
   }
 
   // 🚀 One-Time DOM Ready Guard
-  document.addEventListener("DOMContentLoaded", () => {
-    if (isAgentInterface()) {
+  if (document.readyState === 'loading') {
+    document.addEventListener("DOMContentLoaded", handleDOMReady);
+  } else {
+    handleDOMReady();
+  }
+  
+  function handleDOMReady() {
+    if (isAgentInterface() && !window.__VerityOS_Global__.initialized) {
       cleanupOldSessions();
       initializeAgentInterface();
     } else {
-      console.debug("[DEBUG] Not an agent interface. Skipping initialization.");
+      console.debug("[DEBUG] Not an agent interface or already initialized. Skipping.");
     }
-  });
+  }
 })();
 
 console.log('[DEBUG] VerityOS Agent Interface script loaded');
