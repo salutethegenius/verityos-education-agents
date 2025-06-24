@@ -553,7 +553,7 @@ function logout() {
     sessionStorage.clear();
     localStorage.removeItem('studentChatSessions');
     localStorage.removeItem('sidebarCollapsed');
-    window.location.href = '/student-login';
+    window.location.href = '/student-goodbye';
 }
 
 function sendSampleMessage(element) {

@@ -46,6 +46,10 @@ def student_login():
 def student_interface():
     return render_template("student_interface.html")
 
+@app.route("/student-goodbye")
+def student_goodbye():
+    return render_template("student_goodbye.html")
+
 @app.route("/dashboard")
 def teacher_dashboard():
     return render_template("teacher_dashboard.html")
