@@ -184,29 +184,16 @@ class SafetyFilter:
         return False
 
     def _replace_inappropriate_topic(self, content: str, topic: str, grade_level: str) -> str:
-        """Replace inappropriate topic with grade-appropriate alternative"""
+        """Replace inappropriate topics with grade-appropriate alternatives"""
         replacements = {
-            "elementary": {
-                "advanced_politics": "community helpers and leaders",
-                "complex_social_issues": "being kind to everyone",
-                "adult_themes": "friendship and family"
-            },
-            "middle": {
-                "advanced_politics": "basic government and citizenship",
-                "complex_social_issues": "fairness and respect for others",
-                "adult_themes": "healthy relationships and communication"
-            },
-            "high": {
-                "complex_social_issues": "understanding different perspectives",
-                "adult_themes": "mature decision-making"
-            }
+            "advanced_politics": "civic education",
+            "complex_social_issues": "community studies",
+            "adult_themes": "age-appropriate topics",
+            "explicit_content": "educational content"
         }
 
-        if grade_level in replacements and topic in replacements[grade_level]:
-            # This is a simplified replacement - in practice, you'd want more sophisticated logic
-            return content + f"\n\n[Note: Let's focus on {replacements[grade_level][topic]} instead.]"
-
-        return content
+        replacement = replacements.get(topic, "educational content")
+        return f"Let's focus on {replacement} instead. What would you like to learn about?"
 
     def _enhance_educational_tone(self, content: str) -> str:
         """Enhance content with positive, educational tone"""
