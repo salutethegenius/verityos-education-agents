@@ -13,71 +13,124 @@ function generateSessionId() {
 
 // Initialize session - prevent duplicate sessions
 function initializeSession() {
-    // Only create session if none exists
-    if (!currentSessionId && chatSessions.length === 0) {
-        currentSessionId = generateSessionId();
-        console.log('[DEBUG] Initial session created:', currentSessionId);
-    } else if (chatSessions.length > 0) {
-        currentSessionId = chatSessions[0].id;
-        console.log('[DEBUG] Using existing session:', currentSessionId);
+    // Only create session if absolutely none exists
+    if (!currentSessionId) {
+        if (chatSessions.length > 0) {
+            // Use existing session
+            currentSessionId = chatSessions[0].id;
+            currentChatIndex = 0;
+            console.log('[DEBUG] Using existing session:', currentSessionId);
+        } else {
+            // Only create if no sessions exist
+            currentSessionId = generateSessionId();
+            console.log('[DEBUG] Initial session created:', currentSessionId);
+        }
+    } else {
+        console.log('[DEBUG] Session already exists:', currentSessionId);
     }
 }
 
 // SINGLE INITIALIZATION ONLY - BULLETPROOF PROTECTION
 (function() {
-    // Create a unique global flag that cannot be overridden
-    if (window.__VERITY_APP_INITIALIZED__) {
-        console.log('[DEBUG] App already initialized globally, blocking duplicate');
+    // Create multiple layers of protection
+    const INIT_KEY = '__VERITY_APP_INITIALIZED__' + Date.now();
+    if (window[INIT_KEY] || window.__VERITY_GLOBAL_INIT__ || document.documentElement.hasAttribute('data-verity-init')) {
+        console.log('[DEBUG] App already initialized, blocking duplicate');
         return;
     }
-    window.__VERITY_APP_INITIALIZED__ = true;
+    
+    // Set multiple flags
+    window[INIT_KEY] = true;
+    window.__VERITY_GLOBAL_INIT__ = true;
+    document.documentElement.setAttribute('data-verity-init', 'true');
 
-    document.addEventListener('DOMContentLoaded', function() {
-        // Triple protection against multiple calls
-        if (appInitialized || document.body.hasAttribute('data-app-initialized') || window.appAlreadyLoaded) {
-            console.log('[DEBUG] App already initialized, skipping...');
+    // Use immediate execution to prevent timing issues
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeOnce, { once: true });
+    } else {
+        initializeOnce();
+    }
+
+    function initializeOnce() {
+        // Final check before initialization
+        if (appInitialized || document.body.hasAttribute('data-app-initialized')) {
+            console.log('[DEBUG] App already initialized, final blocking');
             return;
         }
 
         console.log('[DEBUG] DOM loaded, initializing ONCE...');
         appInitialized = true;
-        window.appAlreadyLoaded = true;
         document.body.setAttribute('data-app-initialized', 'true');
 
         try {
+            // Initialize session BEFORE loading UI to prevent multiple sessions
+            initializeSession();
+            
             initializeUIComponents();
             updateDropdowns();
             initializeEventListeners();
             initializeTemperatureSlider();
             loadChatHistorySidebar();
 
-            // Only load chat session if we have sessions, otherwise start new
+            // Only load existing sessions, don't create new ones unnecessarily
             if (chatSessions.length > 0) {
                 loadChatSession(0);
             } else {
+                // Only create new chat if no sessions exist at all
                 startNewChat();
             }
         } catch (error) {
             console.error('[ERROR] Failed to initialize app:', error);
         }
-    });
+    }
 })();
 
-// COMPLETELY ELIMINATE RADIX UI
+// COMPLETELY ELIMINATE RADIX UI - BULLETPROOF VERSION
 (function() {
-    // Block all Radix UI initialization attempts
-    window.RadixUI = undefined;
-    window.Radix = undefined;
+    // Prevent any Radix UI from loading
+    if (typeof window !== 'undefined') {
+        // Block Radix UI globals
+        Object.defineProperty(window, 'RadixUI', {
+            value: undefined,
+            writable: false,
+            configurable: false
+        });
+        Object.defineProperty(window, 'Radix', {
+            value: undefined,
+            writable: false,
+            configurable: false
+        });
+        
+        // Block common Radix UI initialization
+        window.addEventListener = (function(originalAddEventListener) {
+            return function(type, listener, options) {
+                // Block Radix UI specific events
+                if (typeof listener === 'function' && listener.toString().includes('radix')) {
+                    console.log('[DEBUG] Blocked Radix UI event listener');
+                    return;
+                }
+                return originalAddEventListener.call(this, type, listener, options);
+            };
+        })(window.addEventListener);
+    }
 
-    // Override console.log to block Radix messages
-    const originalLog = console.log;
-    console.log = function(...args) {
-        const message = args.join(' ');
-        if (message.includes('[RADIX]') || message.includes('Radix UI')) {
-            return; // Block Radix messages
-        }
-        originalLog.apply(console, args);
+    // Override console methods to block ALL Radix messages
+    const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        info: console.info
     };
+
+    ['log', 'warn', 'error', 'info'].forEach(method => {
+        console[method] = function(...args) {
+            const message = args.join(' ').toLowerCase();
+            if (message.includes('radix') || message.includes('[radix]')) {
+                return; // Completely block all Radix messages
+            }
+            originalConsole[method].apply(console, args);
+        };
+    });
 })();
 
 function initializeEventListeners() {
@@ -791,12 +844,10 @@ async function loadSessionHistory(agent) {
 // Initialize UI components
 function initializeUIComponents() {
     console.log('[DEBUG] Initializing UI components...');
-
-    // Apply theme if available
-    const themeElement = document.querySelector('[data-theme]');
-    if (themeElement) {
-        console.log('[DEBUG] Theme element found, applying configurations...');
-    }
-
+    
+    // Remove any existing Radix elements that might have loaded
+    const radixElements = document.querySelectorAll('[data-radix-root], [data-radix-popper-content], .radix-ui');
+    radixElements.forEach(el => el.remove());
+    
     console.log('[DEBUG] UI components initialized successfully');
 }
