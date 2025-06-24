@@ -26,23 +26,26 @@ class MemoryManager:
 
     def get_memory_path(self, agent_name: str, session_id: str, memory_type: str = "session") -> str:
         """Generate memory file path"""
-        if memory_type == "persistent":
-            return os.path.join(self.base_path, f"{agent_name}_{session_id}_persistent.json")
-        else:
-            return os.path.join(self.base_path, f"{agent_name}_{session_id}_session.json")
+        # Sanitize filename components
+        safe_agent = "".join(c for c in agent_name if c.isalnum() or c in ('-', '_'))
+        safe_session = "".join(c for c in session_id if c.isalnum() or c in ('-', '_'))
+        safe_type = "".join(c for c in memory_type if c.isalnum() or c in ('-', '_'))
+        
+        return os.path.join(self.base_path, f"{safe_agent}_{safe_session}_{safe_type}.json")
 
     def save_memory(self, agent_name: str, session_id: str, data: Dict, memory_type: str = "session") -> bool:
         """Save memory data to file"""
         try:
+            # Input validation
+            if not agent_name or not session_id:
+                logger.error("Agent name and session ID must be non-empty")
+                return False
+            
             # Ensure memory directory exists
             os.makedirs(self.base_path, exist_ok=True)
 
-            # Sanitize filename
-            safe_agent = "".join(c for c in agent_name if c.isalnum() or c in ('-', '_'))
-            safe_session = "".join(c for c in session_id if c.isalnum() or c in ('-', '_'))
-            safe_type = "".join(c for c in memory_type if c.isalnum() or c in ('-', '_'))
-
-            memory_path = os.path.join(self.base_path, f"{safe_agent}_{safe_session}_{safe_type}.json")
+            # Use consistent path generation
+            memory_path = self.get_memory_path(agent_name, session_id, memory_type)
 
             # Validate data
             if not isinstance(data, dict):

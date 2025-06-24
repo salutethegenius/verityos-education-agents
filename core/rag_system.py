@@ -16,8 +16,16 @@ class RAGSystem:
     
     def __init__(self, knowledge_base_path: str = "data/bahamas_context.json"):
         self.knowledge_base_path = knowledge_base_path
+        self._ensure_data_directory()
         self.knowledge_base = self._load_knowledge_base()
         self.context_cache = {}
+    
+    def _ensure_data_directory(self):
+        """Ensure the data directory exists"""
+        data_dir = os.path.dirname(self.knowledge_base_path)
+        if data_dir and not os.path.exists(data_dir):
+            os.makedirs(data_dir, exist_ok=True)
+            logger.info(f"Created data directory: {data_dir}")
         
     def _load_knowledge_base(self) -> Dict:
         """Load local knowledge base"""
@@ -154,10 +162,22 @@ class RAGSystem:
     def add_to_knowledge_base(self, category: str, key: str, value: Any) -> bool:
         """Add new information to knowledge base"""
         try:
+            # Input validation
+            if not category or not key:
+                logger.error("Category and key must be non-empty strings")
+                return False
+            
+            if not isinstance(category, str) or not isinstance(key, str):
+                logger.error("Category and key must be strings")
+                return False
+            
             if category not in self.knowledge_base:
                 self.knowledge_base[category] = {}
             
             self.knowledge_base[category][key] = value
+            
+            # Ensure directory exists before saving
+            self._ensure_data_directory()
             
             # Save updated knowledge base
             with open(self.knowledge_base_path, 'w') as f:

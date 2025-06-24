@@ -4,6 +4,7 @@ Base Agent Class for VerityOS Education Agents
 
 import yaml
 import json
+import os
 from typing import Dict, List, Optional, Any
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -28,11 +29,28 @@ class BaseAgent(ABC):
     def _load_config(self, config_path: str) -> Dict:
         """Load agent configuration from YAML file"""
         try:
+            if not os.path.exists(config_path):
+                logger.warning(f"Config file not found: {config_path}")
+                return self._get_default_config()
+            
             with open(config_path, 'r') as file:
-                return yaml.safe_load(file)
+                config = yaml.safe_load(file)
+                if not config:
+                    logger.warning(f"Empty config file: {config_path}")
+                    return self._get_default_config()
+                return config
         except Exception as e:
             logger.error(f"Failed to load config from {config_path}: {e}")
-            return {}
+            return self._get_default_config()
+    
+    def _get_default_config(self) -> Dict:
+        """Return default configuration"""
+        return {
+            "name": "Unknown Agent",
+            "role": "Assistant",
+            "memory": {"enabled": False, "type": "session"},
+            "safety": {"level": "moderate"}
+        }
     
     def initialize_session(self, session_id: str, user_type: str = "student") -> None:
         """Initialize a new session for the agent"""
