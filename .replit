@@ -19,7 +19,8 @@ packages = [
   "awscli2",
   "python311Packages.numpy",
   "python311Packages.faiss",
-  "python311Packages.onnxruntime"
+  "python311Packages.onnxruntime",
+  "python311Packages.flask"
 ]
 
 [env]
