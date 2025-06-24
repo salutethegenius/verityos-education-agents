@@ -133,7 +133,7 @@ function toggleSidebar() {
     
     if (sidebar && toggleIcon) {
         sidebar.classList.toggle('collapsed');
-        toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+        toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '⟩' : '⟨';
         
         // Save toggle state
         localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
@@ -609,9 +609,11 @@ function loadChatHistorySidebar() {
     const date = new Date(chat.timestamp).toLocaleDateString();
 
     chatItem.innerHTML = `
-      <div class="chat-title">${chat.title || 'New Chat'}</div>
-      <div class="chat-preview">${chat.lastMessage || 'No messages yet'}</div>
-      <div class="chat-meta">${agentName} • ${date}</div>
+      <div class="chat-content">
+        <div class="chat-title">${chat.title || 'New Chat'}</div>
+        <div class="chat-preview">${chat.lastMessage || 'No messages yet'}</div>
+        <div class="chat-meta">${agentName} • ${date}</div>
+      </div>
     `;
 
     chatItem.addEventListener('click', () => loadChatSession(index));
