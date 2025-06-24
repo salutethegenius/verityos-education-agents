@@ -1,0 +1,39 @@
+{
+  "agent_name": "sage",
+  "session_id": "session-1750800103106-g7sfvg2tl",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T21:22:26.687744",
+  "data": {
+    "progress": {
+      "timestamp": "2025-06-24T21:22:26.687296",
+      "intent": "general_tutoring",
+      "subject": null,
+      "topic": null,
+      "interaction_count": 2
+    },
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "How far is bahamas from space",
+        "timestamp": "2025-06-24T21:22:24.594846"
+      },
+      {
+        "role": "user",
+        "content": "How far is bahamas from space",
+        "timestamp": "2025-06-24T21:22:24.595052"
+      },
+      {
+        "role": "assistant",
+        "content": "Good evening! \ud83c\udf34 The distance from The Bahamas to space can vary depending on what you mean by \"space.\" Generally, space is considered to start around 100 kilometers (62 miles) above the Earth's surface, which is known as the K\u00e1rm\u00e1n line.\n\nIf we take Nassau, the capital of The Bahamas, as a reference point, the K\u00e1rm\u00e1n line is about 1,000 kilometers (620 miles) above you. So, straight up from Nassau to the edge of space is quite a distance!\n\nRemember, space exploration is a fascinating field that includes satellites, space stations, and even missions to other planets. If you're interested in space, you might enjoy learning about the Bahamas' role in satellite communication or the astronomy programs at local universities.\n\nKeep reaching for the stars, and who knows, maybe one day a Bahamian astronaut will represent us up there! \ud83d\ude80\ud83c\udde7\ud83c\uddf8",
+        "timestamp": "2025-06-24T21:22:26.687702"
+      },
+      {
+        "role": "assistant",
+        "content": "Good evening! \ud83c\udf34 The distance from The Bahamas to space can vary depending on what you mean by \"space.\" Generally, space is considered to start around 100 kilometers (62 miles) above the Earth's surface, which is known as the K\u00e1rm\u00e1n line.\n\nIf we take Nassau, the capital of The Bahamas, as a reference point, the K\u00e1rm\u00e1n line is about 1,000 kilometers (620 miles) above you. So, straight up from Nassau to the edge of space is quite a distance!\n\nRemember, space exploration is a fascinating field that includes satellites, space stations, and even missions to other planets. If you're interested in space, you might enjoy learning about the Bahamas' role in satellite communication or the astronomy programs at local universities.\n\nKeep reaching for the stars, and who knows, maybe one day a Bahamian astronaut will represent us up there! \ud83d\ude80\ud83c\udde7\ud83c\uddf8",
+        "timestamp": "2025-06-24T21:22:26.687706"
+      }
+    ]
+  }
+}

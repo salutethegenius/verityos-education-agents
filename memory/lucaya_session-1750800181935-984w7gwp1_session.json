@@ -1,0 +1,51 @@
+{
+  "agent_name": "lucaya",
+  "session_id": "session-1750800181935-984w7gwp1",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T21:23:55.624309",
+  "data": {
+    "research_history": [
+      {
+        "timestamp": "2025-06-24T21:23:21.129339",
+        "query": "How is the govonr general of teh abhamas",
+        "intent": "fact_finding",
+        "subject": "research"
+      },
+      {
+        "timestamp": "2025-06-24T21:23:43.748521",
+        "query": "Who is the current Governor general ?",
+        "intent": "fact_finding",
+        "subject": "research"
+      },
+      {
+        "timestamp": "2025-06-24T21:23:55.623590",
+        "query": "This is incorrect",
+        "intent": "general_research",
+        "subject": "research"
+      }
+    ],
+    "level": "middle",
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "This is incorrect",
+        "timestamp": "2025-06-24T21:23:54.715003"
+      },
+      {
+        "role": "user",
+        "content": "This is incorrect",
+        "timestamp": "2025-06-24T21:23:54.715038"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83d\udd0d **Research Findings:**\n\nThat's okay! If you have a research question you need help with, feel free to ask, and I'll do my best to assist you in finding the right information. Just let me know what you're curious about or what you're studying, and I'll help guide you through the research process.\n\n\ud83d\udcda Remember to check multiple sources for accuracy! \ud83d\udcca",
+        "timestamp": "2025-06-24T21:23:55.624247"
+      },
+      {
+        "role": "assistant",
+        "content": "\ud83d\udd0d **Research Findings:**\n\nThat's okay! If you have a research question you need help with, feel free to ask, and I'll do my best to assist you in finding the right information. Just let me know what you're curious about or what you're studying, and I'll help guide you through the research process.\n\n\ud83d\udcda Remember to check multiple sources for accuracy! \ud83d\udcca",
+        "timestamp": "2025-06-24T21:23:55.624255"
+      }
+    ]
+  }
+}

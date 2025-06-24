@@ -1,0 +1,32 @@
+{
+  "agent_name": "lucaya",
+  "session_id": "session-1750800181935-984w7gwp1",
+  "memory_type": {
+    "research_history": [
+      {
+        "timestamp": "2025-06-24T21:23:21.129339",
+        "query": "How is the govonr general of teh abhamas",
+        "intent": "fact_finding",
+        "subject": "research"
+      },
+      {
+        "timestamp": "2025-06-24T21:23:43.748521",
+        "query": "Who is the current Governor general ?",
+        "intent": "fact_finding",
+        "subject": "research"
+      },
+      {
+        "timestamp": "2025-06-24T21:23:55.623590",
+        "query": "This is incorrect",
+        "intent": "general_research",
+        "subject": "research"
+      }
+    ],
+    "level": "middle",
+    "last_updated": "2025-06-24T21:23:55.623602"
+  },
+  "timestamp": "2025-06-24T21:23:55.623649",
+  "data": {
+    "data": "session"
+  }
+}
