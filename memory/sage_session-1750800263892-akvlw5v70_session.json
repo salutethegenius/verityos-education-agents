@@ -1,0 +1,39 @@
+{
+  "agent_name": "sage",
+  "session_id": "session-1750800263892-akvlw5v70",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T21:27:24.945697",
+  "data": {
+    "progress": {
+      "timestamp": "2025-06-24T21:27:24.945205",
+      "intent": "explain_concept",
+      "subject": null,
+      "topic": null,
+      "interaction_count": 1
+    },
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "What is the GPA in the bahamas for math",
+        "timestamp": "2025-06-24T21:27:22.437696"
+      },
+      {
+        "role": "user",
+        "content": "What is the GPA in the bahamas for math",
+        "timestamp": "2025-06-24T21:27:22.437866"
+      },
+      {
+        "role": "assistant",
+        "content": "Good afternoon! \ud83c\udf1e In The Bahamas, GPA (Grade Point Average) for Math is calculated by averaging the grades you receive in math-related courses. Each grade is assigned a point value, like A=4, B=3, C=2, and so on.\n\nFor example, if you get an A in math, which is 4 points, and a B in another math course, which is 3 points, your GPA for those two courses would be (4 + 3) / 2 = 3.5.\n\nThis GPA calculation is used in Bahamian schools from primary to high school and even in some college settings. It helps measure your overall performance in math courses. \ud83d\udcda\u270f\ufe0f\n\nIf you have any more questions or need further explanation, feel free to ask!",
+        "timestamp": "2025-06-24T21:27:24.945650"
+      },
+      {
+        "role": "assistant",
+        "content": "Good afternoon! \ud83c\udf1e In The Bahamas, GPA (Grade Point Average) for Math is calculated by averaging the grades you receive in math-related courses. Each grade is assigned a point value, like A=4, B=3, C=2, and so on.\n\nFor example, if you get an A in math, which is 4 points, and a B in another math course, which is 3 points, your GPA for those two courses would be (4 + 3) / 2 = 3.5.\n\nThis GPA calculation is used in Bahamian schools from primary to high school and even in some college settings. It helps measure your overall performance in math courses. \ud83d\udcda\u270f\ufe0f\n\nIf you have any more questions or need further explanation, feel free to ask!",
+        "timestamp": "2025-06-24T21:27:24.945657"
+      }
+    ]
+  }
+}
