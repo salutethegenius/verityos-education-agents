@@ -11,30 +11,29 @@ function generateSessionId() {
     return `session-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 }
 
-// Initialize session - smarter session management
+// Initialize session - prevent duplicate sessions
 function initializeSession() {
-    // Check if we have existing sessions first
-    if (chatSessions.length > 0 && chatSessions[0].id) {
+    // Only create session if none exists
+    if (!currentSessionId && chatSessions.length === 0) {
+        currentSessionId = generateSessionId();
+        console.log('[DEBUG] Initial session created:', currentSessionId);
+    } else if (chatSessions.length > 0) {
         currentSessionId = chatSessions[0].id;
         console.log('[DEBUG] Using existing session:', currentSessionId);
-    } else if (!currentSessionId) {
-        currentSessionId = generateSessionId();
-        console.log('[DEBUG] New session created:', currentSessionId);
-    } else {
-        console.log('[DEBUG] Session already exists:', currentSessionId);
     }
 }
 
-// Initialize when page loads - with better protection against multiple calls
+// Initialize when page loads - single initialization only
 document.addEventListener('DOMContentLoaded', function() {
-    // Use both memory flag and DOM attribute to prevent conflicts
-    if (appInitialized || document.body.hasAttribute('data-app-initialized')) {
+    // Strong protection against multiple calls
+    if (appInitialized || document.body.hasAttribute('data-app-initialized') || window.appAlreadyLoaded) {
         console.log('[DEBUG] App already initialized, skipping...');
         return;
     }
 
     console.log('[DEBUG] DOM loaded, initializing...');
     appInitialized = true;
+    window.appAlreadyLoaded = true;
     document.body.setAttribute('data-app-initialized', 'true');
 
     try {
