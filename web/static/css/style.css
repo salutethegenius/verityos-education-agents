@@ -244,15 +244,16 @@ textarea {
   position: absolute;
   top: var(--space-4);
   right: var(--space-4);
-  width: 24px;
-  height: 24px;
+  width: 32px;
+  height: 32px;
   background: transparent;
-  border: none;
+  border: 1px solid #2d2d2d;
+  border-radius: var(--radius-md);
   color: #8e8ea0;
   cursor: pointer;
   z-index: 10;
-  font-size: 14px;
-  transition: color 150ms ease;
+  font-size: 16px;
+  transition: all 150ms ease;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -260,11 +261,55 @@ textarea {
 
 #sidebar-toggle:hover {
   color: white;
+  background: #2d2d2d;
+  border-color: #404040;
 }
 
 #sidebar.collapsed #sidebar-toggle {
   right: 50%;
   transform: translateX(50%);
+}
+
+/* Mobile menu icon */
+@media (max-width: 768px) {
+  #sidebar-toggle {
+    position: fixed;
+    top: var(--space-4);
+    left: var(--space-4);
+    right: auto;
+    background: #1f2937;
+    border: 1px solid #374151;
+    box-shadow: var(--shadow-md);
+    z-index: 30;
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+  }
+
+  #sidebar-toggle:hover {
+    background: #374151;
+    border-color: #4b5563;
+  }
+
+  #sidebar.collapsed #sidebar-toggle {
+    right: auto;
+    left: var(--space-4);
+    transform: none;
+  }
+
+  /* Show hamburger icon on mobile */
+  #sidebar-toggle #toggle-icon {
+    display: none;
+  }
+
+  #sidebar-toggle::before {
+    content: "☰";
+    font-size: 18px;
+  }
+
+  #sidebar.collapsed #sidebar-toggle::before {
+    content: "☰";
+  }
 }
 
 #sidebar-header {
@@ -793,9 +838,15 @@ input[type="range"]::-moz-range-thumb {
 
 @media (max-width: 768px) {
   #sidebar {
-    position: absolute;
+    position: fixed;
     z-index: 20;
-    height: 100%;
+    height: 100vh;
+    transform: translateX(-100%);
+    transition: transform 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  #sidebar:not(.collapsed) {
+    transform: translateX(0);
   }
 
   #sidebar.collapsed {
@@ -805,6 +856,19 @@ input[type="range"]::-moz-range-thumb {
 
   #main-content {
     margin-left: 0 !important;
+    width: 100%;
+  }
+
+  /* Overlay for mobile when sidebar is open */
+  #sidebar:not(.collapsed)::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 320px;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: -1;
   }
 }
 

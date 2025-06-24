@@ -164,9 +164,13 @@ function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggleIcon = document.getElementById('toggle-icon');
     
-    if (sidebar && toggleIcon) {
+    if (sidebar) {
         sidebar.classList.toggle('collapsed');
-        toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '⟩' : '⟨';
+        
+        // Update icon for desktop only
+        if (toggleIcon && window.innerWidth > 768) {
+            toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '⟩' : '⟨';
+        }
         
         // Save toggle state
         localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
