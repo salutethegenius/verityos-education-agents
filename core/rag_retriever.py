@@ -1,8 +1,7 @@
 
 import os
 import json
-import numpy as np
-import faiss
+import chromadb
 from openai import OpenAI
 from typing import List, Dict, Tuple
 from dotenv import load_dotenv
@@ -11,8 +10,7 @@ load_dotenv()
 
 EMBED_MODEL = "text-embedding-3-small"
 MEMORY_DIR = "memory"
-INDEX_FILE = os.path.join(MEMORY_DIR, "curriculum_index.faiss")
-META_FILE = os.path.join(MEMORY_DIR, "curriculum_metadata.jsonl")
+COLLECTION_NAME = "curriculum"
 
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -20,24 +18,18 @@ client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 class RAGRetriever:
     def __init__(self):
-        self.index = None
-        self.metadata = []
+        self.collection = None
         self.load_index()
 
     def load_index(self):
-        """Load the FAISS index and metadata if they exist"""
+        """Load the ChromaDB collection if it exists"""
         try:
-            if os.path.exists(INDEX_FILE) and os.path.exists(META_FILE):
-                self.index = faiss.read_index(INDEX_FILE)
-                
-                with open(META_FILE, "r", encoding="utf-8") as f:
-                    self.metadata = [json.loads(line) for line in f]
-                
-                print(f"Loaded RAG index with {len(self.metadata)} items")
-            else:
-                print("No RAG index found. Run rag_embeder.py to build index.")
+            chroma_client = chromadb.PersistentClient(path=MEMORY_DIR)
+            self.collection = chroma_client.get_collection(name=COLLECTION_NAME)
+            count = self.collection.count()
+            print(f"Loaded RAG index with {count} items")
         except Exception as e:
-            print(f"Error loading RAG index: {e}")
+            print(f"No RAG index found. Run rag_embeder.py to build index. Error: {e}")
 
     def embed_query(self, query: str) -> List[float]:
         """Embed a query using OpenAI's embedding model"""
@@ -50,7 +42,7 @@ class RAGRetriever:
 
     def search(self, query: str, top_k: int = 5, filters: Dict = None) -> List[Dict]:
         """Search for relevant documents"""
-        if not self.index or not self.metadata:
+        if not self.collection:
             return []
 
         try:
@@ -59,46 +51,41 @@ class RAGRetriever:
             if not query_embedding:
                 return []
 
-            # Search the index
-            query_vector = np.array([query_embedding]).astype('float32')
-            distances, indices = self.index.search(query_vector, min(top_k * 2, len(self.metadata)))
+            # Build where clause for filtering
+            where_clause = None
+            if filters:
+                where_clause = {}
+                for key, value in filters.items():
+                    if isinstance(value, list):
+                        where_clause[key] = {"$in": [str(v) for v in value]}
+                    else:
+                        where_clause[key] = str(value)
 
-            # Filter results
-            results = []
-            for i, (distance, idx) in enumerate(zip(distances[0], indices[0])):
-                if idx >= len(self.metadata):
-                    continue
-                    
-                metadata = self.metadata[idx].copy()
-                metadata['similarity_score'] = 1 - (distance / 2)  # Convert L2 distance to similarity
-                
-                # Apply filters if provided
-                if filters:
-                    if not self._matches_filters(metadata, filters):
-                        continue
-                
-                results.append(metadata)
-                
-                if len(results) >= top_k:
-                    break
+            # Search the collection
+            results = self.collection.query(
+                query_embeddings=[query_embedding],
+                n_results=top_k,
+                where=where_clause
+            )
 
-            return results
+            # Format results
+            formatted_results = []
+            if results["documents"] and results["documents"][0]:
+                for i, (doc, metadata, distance) in enumerate(zip(
+                    results["documents"][0],
+                    results["metadatas"][0],
+                    results["distances"][0]
+                )):
+                    result = metadata.copy()
+                    result["content"] = doc
+                    result["similarity_score"] = 1 - distance  # Convert distance to similarity
+                    formatted_results.append(result)
+
+            return formatted_results
 
         except Exception as e:
             print(f"Error searching RAG index: {e}")
             return []
-
-    def _matches_filters(self, metadata: Dict, filters: Dict) -> bool:
-        """Check if metadata matches the provided filters"""
-        for key, value in filters.items():
-            if key in metadata:
-                if isinstance(value, list):
-                    if metadata[key] not in value:
-                        return False
-                else:
-                    if metadata[key] != value:
-                        return False
-        return True
 
     def get_context_for_query(self, query: str, subject: str = None, grade: str = None, max_tokens: int = 2000) -> str:
         """Get relevant context for a query, formatted for LLM consumption"""

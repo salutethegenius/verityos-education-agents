@@ -1,9 +1,9 @@
+
 import os
 import json
 import uuid
-import numpy as np
+import chromadb
 from openai import OpenAI
-import faiss
 from typing import List, Dict
 
 # Load environment vars
@@ -14,8 +14,7 @@ load_dotenv()
 EMBED_MODEL = "text-embedding-3-small"
 CURRICULUM_DIR = "data/curriculum"
 MEMORY_DIR = "memory"
-INDEX_FILE = os.path.join(MEMORY_DIR, "curriculum_index.faiss")
-META_FILE = os.path.join(MEMORY_DIR, "curriculum_metadata.jsonl")
+COLLECTION_NAME = "curriculum"
 
 # Initialize OpenAI client
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -81,26 +80,44 @@ def build_index():
     chunks = load_text_chunks()
     print(f"Loaded {len(chunks)} chunks")
 
-    embeddings = []
-    metadatas = []
+    # Initialize ChromaDB
+    chroma_client = chromadb.PersistentClient(path=MEMORY_DIR)
+    
+    # Delete existing collection if it exists
+    try:
+        chroma_client.delete_collection(name=COLLECTION_NAME)
+    except:
+        pass
+    
+    # Create new collection
+    collection = chroma_client.create_collection(name=COLLECTION_NAME)
 
+    # Process in batches
     for i in range(0, len(chunks), 50):
         batch = chunks[i:i + 50]
         texts = [c["content"] for c in batch]
-        embs = embed_text(texts)
-        embeddings.extend(embs)
-        metadatas.extend(batch)
+        embeddings = embed_text(texts)
+        
+        # Prepare metadata (ChromaDB requires string values)
+        metadatas = []
+        for chunk in batch:
+            metadata = {}
+            for key, value in chunk.items():
+                if key != "content" and value is not None:
+                    metadata[key] = str(value)
+            metadatas.append(metadata)
+        
+        # Add to collection
+        collection.add(
+            embeddings=embeddings,
+            documents=texts,
+            metadatas=metadatas,
+            ids=[chunk["id"] for chunk in batch]
+        )
+        
+        print(f"Added batch {i//50 + 1}/{(len(chunks)-1)//50 + 1}")
 
-    dim = len(embeddings[0])
-    index = faiss.IndexFlatL2(dim)
-    index.add(np.array(embeddings).astype("float32"))
-    faiss.write_index(index, INDEX_FILE)
-
-    with open(META_FILE, "w", encoding="utf-8") as f:
-        for meta in metadatas:
-            f.write(json.dumps(meta) + "\n")
-
-    print(f"Saved index with {len(embeddings)} items")
+    print(f"Saved index with {len(chunks)} items")
 
 
 if __name__ == "__main__":
