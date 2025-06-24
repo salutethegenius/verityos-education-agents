@@ -1,0 +1,39 @@
+{
+  "agent_name": "sage",
+  "session_id": "session-1750800563678-d7hg55elg",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T21:37:04.566573",
+  "data": {
+    "progress": {
+      "timestamp": "2025-06-24T21:37:04.566167",
+      "intent": "general_tutoring",
+      "subject": null,
+      "topic": null,
+      "interaction_count": 1
+    },
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "Im kenneth",
+        "timestamp": "2025-06-24T21:37:03.609362"
+      },
+      {
+        "role": "user",
+        "content": "Im kenneth",
+        "timestamp": "2025-06-24T21:37:03.609403"
+      },
+      {
+        "role": "assistant",
+        "content": "Good evening, Kenneth! How can I assist you with your math queries today? Whether you're tackling fractions, algebra, geometry, or any other math topic, I'm here to help. Let me know what you need, and we'll work through it together. Let's dive into some math, Bahamian style! \ud83c\udde7\ud83c\uddf8\ud83e\uddee",
+        "timestamp": "2025-06-24T21:37:04.566532"
+      },
+      {
+        "role": "assistant",
+        "content": "Good evening, Kenneth! How can I assist you with your math queries today? Whether you're tackling fractions, algebra, geometry, or any other math topic, I'm here to help. Let me know what you need, and we'll work through it together. Let's dive into some math, Bahamian style! \ud83c\udde7\ud83c\uddf8\ud83e\uddee",
+        "timestamp": "2025-06-24T21:37:04.566538"
+      }
+    ]
+  }
+}
