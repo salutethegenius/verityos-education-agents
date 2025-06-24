@@ -1,8 +1,11 @@
 import datetime
 import json
 import os
+import logging
 from typing import Dict, List, Optional, Any
 from core.memory_manager import MemoryManager
+
+logger = logging.getLogger(__name__)
 
 class CoralAgent:
     def __init__(self):
@@ -173,8 +176,7 @@ class CoralAgent:
                         logger.warning(f"Failed to read session file {filename}: {file_error}")
                         continue
         except Exception as dir_error:
-            logger.error(f"Failed to access memory directory: {dir_error}")
-                    continue
+            pass
 
         if not sessions:
             return f"📋 **{student['name']} ({student['student_id']})**\n\n❌ No sessions found yet"
