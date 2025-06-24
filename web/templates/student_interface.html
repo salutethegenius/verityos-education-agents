@@ -29,10 +29,10 @@
         <!-- Main chat area -->
         <div id="main-content">
             <div class="student-header">
-                <h1>🎓 VerityOS Education - Student Portal</h1>
+                <h1 class="rt-heading" data-size="6">🎓 VerityOS Education - Student Portal</h1>
                 <div class="student-info">
-                    <span id="student-welcome">Welcome, Student!</span>
-                    <button onclick="window.location.href='/login'" class="logout-btn">Logout</button>
+                    <span id="student-welcome" class="rt-text" data-size="3">Welcome, Student!</span>
+                    <button onclick="window.location.href='/login'" class="rt-button logout-btn" data-variant="soft" data-color="red">Logout</button>
                 </div>
             </div>
 
@@ -57,8 +57,8 @@
             <div id="agent-controls">
                 <h3>📚 Learning Assistants</h3>
                 <div class="control-group">
-                    <label>🤖 Assistant</label>
-                    <select id="agent-select">
+                    <label class="rt-text" data-size="2" data-weight="medium">🤖 Assistant</label>
+                    <select id="agent-select" class="rt-select-trigger" data-size="2">
                         <option value="sage">🧙‍♂️ Sage - Tutor</option>
                         <option value="echo">🗣️ Echo - Reading Coach</option>
                         <option value="lucaya">🔍 Lucaya - Research</option>
@@ -66,8 +66,8 @@
                 </div>
 
                 <div class="control-group">
-                    <label>📖 Subject</label>
-                    <select id="subject-select">
+                    <label class="rt-text" data-size="2" data-weight="medium">📖 Subject</label>
+                    <select id="subject-select" class="rt-select-trigger" data-size="2">
                         <option value="math">Mathematics</option>
                         <option value="science">Science</option>
                         <option value="english">English</option>
@@ -77,8 +77,8 @@
                 </div>
 
                 <div class="control-group">
-                    <label>📝 Activity</label>
-                    <select id="task-select">
+                    <label class="rt-text" data-size="2" data-weight="medium">📝 Activity</label>
+                    <select id="task-select" class="rt-select-trigger" data-size="2">
                         <option value="homework">Homework Help</option>
                         <option value="study">Study Session</option>
                         <option value="quiz">Practice Quiz</option>
@@ -88,13 +88,13 @@
             </div>
 
             <div id="agent-help">
-                <h3>💡 How to Use</h3>
+                <h3 class="rt-heading" data-size="4">💡 How to Use</h3>
                 <div id="help-content">
-                    <h4>🧙‍♂️ Sage - Math Homework Help</h4>
+                    <h4 class="rt-heading" data-size="3">🧙‍♂️ Sage - Math Homework Help</h4>
                     <div class="help-samples">
-                        <div class="sample-text" onclick="fillSampleText('What is 25 + 47?')">• "What is 25 + 47?"</div>
-                        <div class="sample-text" onclick="fillSampleText('Help me solve: 2x + 5 = 15')">• "Help me solve: 2x + 5 = 15"</div>
-                        <div class="sample-text" onclick="fillSampleText('Check my work: 12 × 8 = 96')">• "Check my work: 12 × 8 = 96"</div>
+                        <div class="sample-text rt-text" data-size="2" onclick="fillSampleText('What is 25 + 47?')">• "What is 25 + 47?"</div>
+                        <div class="sample-text rt-text" data-size="2" onclick="fillSampleText('Help me solve: 2x + 5 = 15')">• "Help me solve: 2x + 5 = 15"</div>
+                        <div class="sample-text rt-text" data-size="2" onclick="fillSampleText('Check my work: 12 × 8 = 96')">• "Check my work: 12 × 8 = 96"</div>
                     </div>
                 </div>
             </div>
