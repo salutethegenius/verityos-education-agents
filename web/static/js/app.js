@@ -1,3 +1,4 @@
+
 // Agent Interface Application
 let appInitialized = false;
 
@@ -18,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
     }
 
-    // Use both memory flag and DOM attribute to prevent conflicts
+    // Prevent multiple initializations
     if (appInitialized || document.body.hasAttribute('data-agent-app-initialized')) {
         console.log('[DEBUG] App already initialized, skipping...');
         return;
@@ -43,15 +44,16 @@ class ChatInterface {
     }
 
     init() {
-        console.log('[DEBUG] DOM loaded, initializing...');
+        console.log('[DEBUG] Initializing ChatInterface...');
 
-        // Initialize core functionality only
+        // Initialize core functionality
         this.initializeDropdowns();
         this.initializeTemperatureSlider();
         this.initializeEventListeners();
         this.loadSessionHistory();
+        this.restoreSidebarState();
 
-        console.log('[DEBUG] Initialization complete');
+        console.log('[DEBUG] ChatInterface initialization complete');
     }
 
     generateSessionId() {
@@ -59,24 +61,16 @@ class ChatInterface {
     }
 
     initializeDropdowns() {
+        // Set initial agent
+        const agentSelect = document.getElementById('agent-select');
+        if (agentSelect) {
+            agentSelect.value = this.currentAgent;
+        }
+
         // Initialize subject and task dropdowns based on current agent
         this.updateDropdownsForAgent(this.currentAgent);
 
-        // Add event listeners for dropdowns
-        const subjectSelect = document.getElementById('subject-select');
-        const taskSelect = document.getElementById('task-select');
-
-        if (subjectSelect) {
-            subjectSelect.addEventListener('change', () => {
-                console.log('[DEBUG] Subject changed to:', subjectSelect.value);
-            });
-        }
-
-        if (taskSelect) {
-            taskSelect.addEventListener('change', () => {
-                console.log('[DEBUG] Task changed to:', taskSelect.value);
-            });
-        }
+        console.log('[DEBUG] Dropdowns initialized');
     }
 
     updateDropdownsForAgent(agent) {
@@ -88,28 +82,77 @@ class ChatInterface {
         // Define options for each agent
         const agentConfigs = {
             sage: {
-                subjects: ['math', 'science', 'algebra', 'geometry', 'calculus'],
-                tasks: ['homework', 'practice', 'explanation', 'step-by-step']
-            },
-            quill: {
-                subjects: ['english', 'writing', 'literature', 'grammar', 'composition'],
-                tasks: ['essay', 'creative writing', 'analysis', 'editing']
-            },
-            lucaya: {
-                subjects: ['research', 'history', 'social studies', 'geography', 'civics'],
-                tasks: ['research project', 'analysis', 'presentation', 'report']
-            },
-            coral: {
-                subjects: ['administration', 'management', 'planning', 'assessment'],
-                tasks: ['manage class', 'grade work', 'plan lesson', 'track progress']
+                subjects: [
+                    { value: 'math', text: 'Mathematics' },
+                    { value: 'science', text: 'Science' },
+                    { value: 'algebra', text: 'Algebra' },
+                    { value: 'geometry', text: 'Geometry' },
+                    { value: 'calculus', text: 'Calculus' }
+                ],
+                tasks: [
+                    { value: 'homework', text: 'Homework Help' },
+                    { value: 'practice', text: 'Practice Problems' },
+                    { value: 'explanation', text: 'Concept Explanation' },
+                    { value: 'step-by-step', text: 'Step-by-Step Solutions' }
+                ]
             },
             echo: {
-                subjects: ['reading', 'comprehension', 'vocabulary', 'literature'],
-                tasks: ['reading help', 'comprehension', 'vocabulary', 'analysis']
+                subjects: [
+                    { value: 'reading', text: 'Reading' },
+                    { value: 'comprehension', text: 'Reading Comprehension' },
+                    { value: 'vocabulary', text: 'Vocabulary' },
+                    { value: 'literature', text: 'Literature' }
+                ],
+                tasks: [
+                    { value: 'reading help', text: 'Reading Help' },
+                    { value: 'comprehension', text: 'Comprehension Practice' },
+                    { value: 'vocabulary', text: 'Vocabulary Building' },
+                    { value: 'analysis', text: 'Text Analysis' }
+                ]
+            },
+            lucaya: {
+                subjects: [
+                    { value: 'research', text: 'Research' },
+                    { value: 'history', text: 'History' },
+                    { value: 'social studies', text: 'Social Studies' },
+                    { value: 'geography', text: 'Geography' },
+                    { value: 'civics', text: 'Civics' }
+                ],
+                tasks: [
+                    { value: 'research project', text: 'Research Project' },
+                    { value: 'analysis', text: 'Historical Analysis' },
+                    { value: 'presentation', text: 'Presentation Help' },
+                    { value: 'report', text: 'Report Writing' }
+                ]
+            },
+            coral: {
+                subjects: [
+                    { value: 'administration', text: 'Administration' },
+                    { value: 'management', text: 'Classroom Management' },
+                    { value: 'planning', text: 'Lesson Planning' },
+                    { value: 'assessment', text: 'Assessment' }
+                ],
+                tasks: [
+                    { value: 'manage class', text: 'Manage Class' },
+                    { value: 'grade work', text: 'Grade Work' },
+                    { value: 'plan lesson', text: 'Plan Lesson' },
+                    { value: 'track progress', text: 'Track Progress' }
+                ]
             },
             pineapple: {
-                subjects: ['creativity', 'art', 'music', 'design', 'innovation'],
-                tasks: ['creative project', 'brainstorm', 'design', 'inspiration']
+                subjects: [
+                    { value: 'creativity', text: 'Creativity' },
+                    { value: 'art', text: 'Art' },
+                    { value: 'music', text: 'Music' },
+                    { value: 'design', text: 'Design' },
+                    { value: 'innovation', text: 'Innovation' }
+                ],
+                tasks: [
+                    { value: 'creative project', text: 'Creative Project' },
+                    { value: 'brainstorm', text: 'Brainstorming' },
+                    { value: 'design', text: 'Design Work' },
+                    { value: 'inspiration', text: 'Find Inspiration' }
+                ]
             }
         };
 
@@ -119,8 +162,8 @@ class ChatInterface {
         subjectSelect.innerHTML = '';
         config.subjects.forEach(subject => {
             const option = document.createElement('option');
-            option.value = subject;
-            option.textContent = subject.charAt(0).toUpperCase() + subject.slice(1);
+            option.value = subject.value;
+            option.textContent = subject.text;
             subjectSelect.appendChild(option);
         });
 
@@ -128,12 +171,12 @@ class ChatInterface {
         taskSelect.innerHTML = '';
         config.tasks.forEach(task => {
             const option = document.createElement('option');
-            option.value = task;
-            option.textContent = task.charAt(0).toUpperCase() + task.slice(1);
+            option.value = task.value;
+            option.textContent = task.text;
             taskSelect.appendChild(option);
         });
 
-        console.log(`[DEBUG] Updated dropdowns for ${agent}: subject=${config.subjects[0]}, task=${config.tasks[0]}`);
+        console.log(`[DEBUG] Updated dropdowns for ${agent}: subjects=${config.subjects.length}, tasks=${config.tasks.length}`);
     }
 
     initializeTemperatureSlider() {
@@ -151,48 +194,85 @@ class ChatInterface {
     }
 
     initializeEventListeners() {
-        // Agent selection buttons
-        document.querySelectorAll('.agent-btn').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                this.switchAgent(e.target.dataset.agent);
-            });
-        });
+        // Prevent duplicate event listeners
+        const elements = {
+            sendBtn: document.getElementById('send-button'),
+            messageInput: document.getElementById('message-input'),
+            newConversationBtn: document.getElementById('new-chat-btn'),
+            agentSelect: document.getElementById('agent-select'),
+            sidebarToggle: document.getElementById('sidebar-toggle'),
+            subjectSelect: document.getElementById('subject-select'),
+            taskSelect: document.getElementById('task-select')
+        };
 
-        // Send message button and input
-        const sendBtn = document.getElementById('send-button');
-        const messageInput = document.getElementById('message-input');
-
-        if (sendBtn) {
-            sendBtn.addEventListener('click', () => this.sendMessage());
+        // Send message button
+        if (elements.sendBtn && !elements.sendBtn.hasAttribute('data-listener-added')) {
+            elements.sendBtn.addEventListener('click', () => this.sendMessage());
+            elements.sendBtn.setAttribute('data-listener-added', 'true');
         }
 
-        if (messageInput) {
-            messageInput.addEventListener('keypress', (e) => {
+        // Message input
+        if (elements.messageInput && !elements.messageInput.hasAttribute('data-listener-added')) {
+            elements.messageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     this.sendMessage();
                 }
             });
+            elements.messageInput.setAttribute('data-listener-added', 'true');
         }
 
         // New conversation button
-        const newConversationBtn = document.getElementById('new-chat-btn');
-        if (newConversationBtn) {
-            newConversationBtn.addEventListener('click', () => this.startNewConversation());
+        if (elements.newConversationBtn && !elements.newConversationBtn.hasAttribute('data-listener-added')) {
+            elements.newConversationBtn.addEventListener('click', () => this.startNewConversation());
+            elements.newConversationBtn.setAttribute('data-listener-added', 'true');
         }
 
         // Agent selection dropdown
-        const agentSelect = document.getElementById('agent-select');
-        if (agentSelect) {
-            agentSelect.addEventListener('change', (e) => {
+        if (elements.agentSelect && !elements.agentSelect.hasAttribute('data-listener-added')) {
+            elements.agentSelect.addEventListener('change', (e) => {
                 this.switchAgent(e.target.value);
             });
+            elements.agentSelect.setAttribute('data-listener-added', 'true');
         }
 
         // Sidebar toggle
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        if (sidebarToggle) {
-            sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+        if (elements.sidebarToggle && !elements.sidebarToggle.hasAttribute('data-listener-added')) {
+            elements.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+            elements.sidebarToggle.setAttribute('data-listener-added', 'true');
+        }
+
+        // Subject and task selects
+        if (elements.subjectSelect && !elements.subjectSelect.hasAttribute('data-listener-added')) {
+            elements.subjectSelect.addEventListener('change', () => {
+                console.log('[DEBUG] Subject changed to:', elements.subjectSelect.value);
+            });
+            elements.subjectSelect.setAttribute('data-listener-added', 'true');
+        }
+
+        if (elements.taskSelect && !elements.taskSelect.hasAttribute('data-listener-added')) {
+            elements.taskSelect.addEventListener('change', () => {
+                console.log('[DEBUG] Task changed to:', elements.taskSelect.value);
+            });
+            elements.taskSelect.setAttribute('data-listener-added', 'true');
+        }
+
+        console.log('[DEBUG] Event listeners initialized');
+    }
+
+    restoreSidebarState() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleIcon = document.getElementById('toggle-icon');
+        const isCollapsed = localStorage.getItem('agentSidebarCollapsed') === 'true';
+
+        if (sidebar && toggleIcon) {
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                toggleIcon.textContent = '⟩';
+            } else {
+                sidebar.classList.remove('collapsed');
+                toggleIcon.textContent = '⟨';
+            }
         }
     }
 
@@ -212,23 +292,38 @@ class ChatInterface {
     switchAgent(agent) {
         this.currentAgent = agent;
 
-        // Update UI to reflect current agent
-        document.querySelectorAll('.agent-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.dataset.agent === agent);
-        });
+        // Update agent select if needed
+        const agentSelect = document.getElementById('agent-select');
+        if (agentSelect && agentSelect.value !== agent) {
+            agentSelect.value = agent;
+        }
 
         // Update dropdowns for new agent
         this.updateDropdownsForAgent(agent);
 
         // Start new session for new agent
         this.startNewConversation();
+
+        console.log('[DEBUG] Switched to agent:', agent);
     }
 
     async sendMessage() {
         const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
         const message = messageInput.value.trim();
 
-        if (!message) return;
+        if (!message) {
+            console.log('[DEBUG] Empty message, not sending');
+            return;
+        }
+
+        console.log('[DEBUG] Sending message:', message.substring(0, 50) + '...');
+
+        // Disable send button
+        if (sendButton) {
+            sendButton.disabled = true;
+            sendButton.textContent = 'Sending...';
+        }
 
         // Add user message to chat
         this.addMessageToChat('user', message);
@@ -239,7 +334,12 @@ class ChatInterface {
         // Get form data
         const subject = document.getElementById('subject-select')?.value || 'general';
         const task = document.getElementById('task-select')?.value || 'help';
-        const temperature = document.getElementById('temperature-slider')?.value || '5';
+        const temperature = document.getElementById('temperature-slider')?.value || '7';
+        const responseLength = document.getElementById('response-length')?.value || 'medium';
+        const focusMode = document.getElementById('focus-mode')?.value || 'educational';
+        const explanationStyle = document.getElementById('explanation-style')?.value || 'standard';
+        const bahamianContext = document.getElementById('bahamian-context')?.checked || true;
+        const stepByStep = document.getElementById('step-by-step')?.checked || true;
 
         try {
             // Send to API
@@ -252,22 +352,38 @@ class ChatInterface {
                     message: message,
                     subject: subject,
                     task: task,
-                    temperature: parseFloat(temperature),
+                    temperature: parseFloat(temperature) / 10, // Convert to 0-1 range
+                    response_length: responseLength,
+                    focus_mode: focusMode,
+                    explanation_style: explanationStyle,
+                    bahamian_context: bahamianContext,
+                    step_by_step: stepByStep,
                     session_id: this.currentSessionId,
-                    user_type: 'student'
+                    user_type: 'teacher'
                 })
             });
 
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+
             const data = await response.json();
 
-            if (response.ok) {
-                this.addMessageToChat('agent', data.response);
-            } else {
-                this.addMessageToChat('agent', 'Sorry, I encountered an error. Please try again.');
+            if (data.error) {
+                throw new Error(data.error);
             }
+
+            this.addMessageToChat('agent', data.response);
+
         } catch (error) {
             console.error('[ERROR] Failed to send message:', error);
-            this.addMessageToChat('agent', 'Connection error. Please check your internet and try again.');
+            this.addMessageToChat('agent', `Sorry, I encountered an error: ${error.message}. Please try again.`);
+        } finally {
+            // Re-enable send button
+            if (sendButton) {
+                sendButton.disabled = false;
+                sendButton.textContent = 'Send';
+            }
         }
     }
 
@@ -289,10 +405,16 @@ class ChatInterface {
         chatWindow.scrollTop = chatWindow.scrollHeight;
 
         // Add to conversation history
-        this.conversationHistory.push({ sender, message, timestamp: new Date().toISOString() });
+        this.conversationHistory.push({ 
+            sender, 
+            message, 
+            timestamp: new Date().toISOString() 
+        });
 
         // Auto-save session
         this.saveChatSession();
+
+        console.log('[DEBUG] Added message to chat:', sender);
     }
 
     formatMessage(message) {
@@ -306,7 +428,9 @@ class ChatInterface {
 
     startNewConversation() {
         // Save current session first
-        this.saveChatSession();
+        if (currentChatIndex >= 0) {
+            this.saveChatSession();
+        }
 
         // Create new session
         this.currentSessionId = this.generateSessionId();
@@ -329,7 +453,7 @@ class ChatInterface {
         // Clear chat window
         const chatWindow = document.getElementById('chat-window');
         if (chatWindow) {
-            chatWindow.innerHTML = '';
+            chatWindow.innerHTML = '<div class="message agent-message"><strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!</div>';
         }
 
         // Update sidebar
@@ -351,16 +475,19 @@ class ChatInterface {
                 }));
 
                 chatSessions[currentChatIndex].messages = messages;
+                chatSessions[currentChatIndex].agent = this.currentAgent;
 
                 // Update last message and title
-                if (messages.length > 0) {
+                if (messages.length > 1) { // Skip welcome message
                     const lastMsg = messages[messages.length - 1];
-                    chatSessions[currentChatIndex].lastMessage = lastMsg.content.replace(/<[^>]*>/g, '').substring(0, 100);
+                    const textContent = lastMsg.content.replace(/<[^>]*>/g, '').trim();
+                    chatSessions[currentChatIndex].lastMessage = textContent.substring(0, 100);
 
                     // Set title from first user message
                     const firstUserMsg = messages.find(m => m.className.includes('user'));
                     if (firstUserMsg && chatSessions[currentChatIndex].title === 'New Chat') {
-                        chatSessions[currentChatIndex].title = firstUserMsg.content.replace(/<[^>]*>/g, '').substring(0, 50) + '...';
+                        const titleText = firstUserMsg.content.replace(/<[^>]*>/g, '').trim();
+                        chatSessions[currentChatIndex].title = titleText.substring(0, 50) + (titleText.length > 50 ? '...' : '');
                     }
                 }
 
@@ -372,31 +499,41 @@ class ChatInterface {
     }
 
     loadSessionHistory() {
-        // Load chat sessions from localStorage and backend
+        // Load from localStorage
+        const savedSessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
+        chatSessions = savedSessions;
+
+        // Load chat history in sidebar
         this.loadChatHistorySidebar();
 
         // Try to load previous session
         const savedSessionId = localStorage.getItem('agentCurrentSessionId');
-        if (savedSessionId) {
-            this.currentSessionId = savedSessionId;
-            console.log('[DEBUG] Loaded chat session:', savedSessionId);
+        if (savedSessionId && chatSessions.length > 0) {
+            const sessionIndex = chatSessions.findIndex(s => s.id === savedSessionId);
+            if (sessionIndex >= 0) {
+                this.loadChatSession(sessionIndex);
+                return;
+            }
         }
+
+        // If no previous session, start new one
+        this.startNewConversation();
+
+        // Also fetch sessions from backend
+        this.fetchBackendSessions();
     }
 
     loadChatHistorySidebar() {
         const historyList = document.getElementById('chat-history-list');
         if (!historyList) return;
 
-        // Load from localStorage first
-        const sessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
-
         historyList.innerHTML = '';
 
-        sessions.forEach((chat, index) => {
+        chatSessions.forEach((chat, index) => {
             const chatItem = document.createElement('div');
             chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
 
-            const agentName = chat.agent.charAt(0).toUpperCase() + chat.agent.slice(1);
+            const agentName = this.getAgentDisplayName(chat.agent);
             const date = new Date(chat.timestamp).toLocaleDateString();
 
             chatItem.innerHTML = `
@@ -409,8 +546,19 @@ class ChatInterface {
             historyList.appendChild(chatItem);
         });
 
-        // Also fetch sessions from backend memory
-        this.fetchBackendSessions();
+        console.log('[DEBUG] Loaded chat history sidebar with', chatSessions.length, 'sessions');
+    }
+
+    getAgentDisplayName(agent) {
+        const agentNames = {
+            sage: '🧙‍♂️ Sage',
+            echo: '🗣️ Echo',
+            lucaya: '🔍 Lucaya',
+            coral: '🪸 Coral',
+            pineapple: '🍍 Pineapple',
+            quill: '✏️ Quill'
+        };
+        return agentNames[agent] || agent.charAt(0).toUpperCase() + agent.slice(1);
     }
 
     async fetchBackendSessions() {
@@ -440,7 +588,7 @@ class ChatInterface {
             const chatItem = document.createElement('div');
             chatItem.className = 'chat-history-item backend-session';
 
-            const agentName = session.agent.charAt(0).toUpperCase() + session.agent.slice(1);
+            const agentName = this.getAgentDisplayName(session.agent);
             const date = new Date(session.timestamp).toLocaleDateString();
 
             chatItem.innerHTML = `
@@ -505,16 +653,27 @@ class ChatInterface {
     }
 
     loadChatSession(index) {
-        const sessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
-        if (index < 0 || index >= sessions.length) return;
+        if (index < 0 || index >= chatSessions.length) return;
 
-        const chat = sessions[index];
+        // Save current session first
+        if (currentChatIndex >= 0) {
+            this.saveChatSession();
+        }
+
+        const chat = chatSessions[index];
         currentChatIndex = index;
         this.currentSessionId = chat.id;
 
         // Switch agent if different
         if (chat.agent !== this.currentAgent) {
-            this.switchAgent(chat.agent);
+            this.currentAgent = chat.agent;
+            this.updateDropdownsForAgent(chat.agent);
+            
+            // Update agent select
+            const agentSelect = document.getElementById('agent-select');
+            if (agentSelect) {
+                agentSelect.value = chat.agent;
+            }
         }
 
         // Load messages
@@ -529,15 +688,20 @@ class ChatInterface {
                     messageDiv.innerHTML = msg.content;
                     chatWindow.appendChild(messageDiv);
                 });
+            } else {
+                // Show welcome message if no messages
+                chatWindow.innerHTML = '<div class="message agent-message"><strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!</div>';
             }
 
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
 
-        // Update sidebar
+        // Update sidebar to show active session
         this.loadChatHistorySidebar();
+
+        // Save current session ID
+        localStorage.setItem('agentCurrentSessionId', this.currentSessionId);
+
         console.log('[DEBUG] Loaded chat session:', chat.id);
     }
 }
-
-})(); // Close the IIFE wrapper
