@@ -450,17 +450,22 @@ class ChatInterface {
         chatSessions.unshift(newChat);
         currentChatIndex = 0;
 
-        // Clear chat window
+        // Clear chat window and add welcome message
         const chatWindow = document.getElementById('chat-window');
         if (chatWindow) {
-            chatWindow.innerHTML = '<div class="message agent-message"><strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!</div>';
+            chatWindow.innerHTML = '';
+            const welcomeDiv = document.createElement('div');
+            welcomeDiv.className = 'message agent-message';
+            welcomeDiv.innerHTML = '<strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!';
+            chatWindow.appendChild(welcomeDiv);
         }
 
         // Update sidebar
         this.loadChatHistorySidebar();
 
-        // Save session ID
+        // Save session ID and sessions
         localStorage.setItem('agentCurrentSessionId', this.currentSessionId);
+        localStorage.setItem('agentChatSessions', JSON.stringify(chatSessions));
 
         console.log('[DEBUG] New session created:', this.currentSessionId);
     }
@@ -476,6 +481,7 @@ class ChatInterface {
 
                 chatSessions[currentChatIndex].messages = messages;
                 chatSessions[currentChatIndex].agent = this.currentAgent;
+                chatSessions[currentChatIndex].timestamp = new Date().toISOString();
 
                 // Update last message and title
                 if (messages.length > 1) { // Skip welcome message
@@ -493,7 +499,7 @@ class ChatInterface {
 
                 // Save to localStorage
                 localStorage.setItem('agentChatSessions', JSON.stringify(chatSessions));
-                console.log('[DEBUG] Saved chat session:', chatSessions[currentChatIndex].id);
+                console.log('[DEBUG] Saved chat session:', chatSessions[currentChatIndex].id, 'with', messages.length, 'messages');
             }
         }
     }
@@ -690,7 +696,10 @@ class ChatInterface {
                 });
             } else {
                 // Show welcome message if no messages
-                chatWindow.innerHTML = '<div class="message agent-message"><strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!</div>';
+                const welcomeDiv = document.createElement('div');
+                welcomeDiv.className = 'message agent-message';
+                welcomeDiv.innerHTML = '<strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!';
+                chatWindow.appendChild(welcomeDiv);
             }
 
             chatWindow.scrollTop = chatWindow.scrollHeight;
@@ -702,6 +711,6 @@ class ChatInterface {
         // Save current session ID
         localStorage.setItem('agentCurrentSessionId', this.currentSessionId);
 
-        console.log('[DEBUG] Loaded chat session:', chat.id);
+        console.log('[DEBUG] Loaded chat session:', chat.id, 'with', chat.messages?.length || 0, 'messages');
     }
 }
