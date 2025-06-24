@@ -27,4 +27,4 @@ class QuillPrompts:
 
     @staticmethod
     def get_grade_comment(tier):
-        return QuillPrompts.GRADE_TIER_COMMENTS.get(tier.upper(), "Keep working hard! 📚")
+        return QuillPrompts.GRADE_TIER_COMMENTS.get(tier, "Keep working hard! 💪").get(tier.upper(), "Keep working hard! 📚")

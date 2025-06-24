@@ -205,6 +205,9 @@ Make it practical for Bahamian educational context."""
             "",
             f"🌟 {self.prompts.get_research_tip()}"
         ]
+        
+        return "\n".join(tips)"
+        ]
 
         return "\n".join(tips)
 

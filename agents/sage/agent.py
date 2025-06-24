@@ -568,6 +568,17 @@ Bahamas context: The Bahamas has 700+ islands, Nassau is the capital, currency i
                 questions = [
                     f"How does {topic} relate to Bahamian history?",
                     f"What impact did {topic} have on the development of The Bahamas?",
+                f"Name a historical figure from The Bahamas related to {topic}."
+            ]
+        else:
+            # Default questions for other subjects
+            questions = [
+                f"Tell me about {topic}",
+                f"How does {topic} relate to life in The Bahamas?",
+                f"Give me an example of {topic}"
+            ]
+
+        return questions[:num_questions]
                     f"Can you connect {topic} to modern-day Bahamas?"
                 ]
             else:

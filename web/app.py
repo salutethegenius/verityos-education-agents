@@ -23,12 +23,15 @@ logging.basicConfig(
         logging.StreamHandler(),
         logging.FileHandler('app.log', mode='a')
     ]
-)
 logger = logging.getLogger(__name__)
 
 @app.route("/")
 def index():
-    return render_template("agent_interface.html", agent="sage")
+    try:
+        return render_template("agent_interface.html", agent="sage")
+    except Exception as e:
+        print(f"Error rendering index: {e}")
+        return f"Error loading page: {str(e)}", 500
 
 @app.route("/student-login")
 def student_login():
@@ -69,12 +72,12 @@ def agent_endpoint(agent_name):
         # Handle empty or whitespace-only messages
         if not message or not message.strip():
             return jsonify({"response": "Please enter a message to get help! 📝"}), 200
-        
+
         # Clean up the message - handle encoding issues
         message = str(message).strip()
         # Remove any problematic characters that might cause issues
         message = message.replace('\x00', '').replace('\ufffd', '')
-        
+
         # Additional validation for meaningful content
         if len(message.replace(' ', '').replace('\t', '').replace('\n', '')) < 2:
             return jsonify({"response": "Please enter a meaningful message to get help! 📝"}), 200
@@ -130,14 +133,14 @@ def validate_student():
         data = request.get_json()
         student_id = data.get('student_id', '').strip()
         password = data.get('password', '').strip()
-        
+
         if not student_id or not password:
             return jsonify({"success": False, "message": "Missing credentials"}), 400
-        
+
         # Import and use Coral agent to validate credentials
         from agents.coral.agent import CoralAgent
         coral = CoralAgent()
-        
+
         # Check if student exists and password matches
         for key, student in coral.student_accounts.items():
             if (student['student_id'].upper() == student_id.upper() and 
@@ -148,9 +151,9 @@ def validate_student():
                     "student_name": student['name'],
                     "grade": student['grade']
                 })
-        
+
         return jsonify({"success": False, "message": "Invalid credentials"}), 401
-        
+
     except Exception as e:
         app.logger.error(f"Student validation error: {str(e)}")
         return jsonify({"success": False, "message": "Server error"}), 500
@@ -171,9 +174,9 @@ def session_endpoint(agent_name):
             # Load conversation history from memory
             from core.memory_manager import MemoryManager
             memory_manager = MemoryManager()
-            
+
             session_data = memory_manager.load_memory(agent_name, session_id, "session")
-            
+
             if session_data and 'conversation_history' in session_data:
                 return jsonify({
                     "conversation_history": session_data['conversation_history'],
