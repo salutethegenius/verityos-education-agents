@@ -32,4 +32,4 @@ Thumbs.db
 
 # Misc
 *.bak
-*.swp
+*.swp.env
