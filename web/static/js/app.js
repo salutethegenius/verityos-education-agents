@@ -1,3 +1,40 @@
+// Complete console override to block Radix UI
+(function() {
+    const originalConsole = {
+        log: console.log,
+        warn: console.warn,
+        error: console.error,
+        info: console.info
+    };
+
+    ['log', 'warn', 'error', 'info'].forEach(method => {
+        console[method] = function(...args) {
+            const message = args.join(' ');
+            if (message.includes('[RADIX]') || 
+                message.includes('Radix UI') || 
+                message.includes('radix')) {
+                return; // Block all Radix messages
+            }
+            originalConsole[method].apply(console, args);
+        };
+    });
+
+    // Block Radix UI globals completely
+    Object.defineProperty(window, 'RadixUI', {
+        get: () => undefined,
+        set: () => {},
+        configurable: false,
+        enumerable: false
+    });
+
+    Object.defineProperty(window, 'Radix', {
+        get: () => undefined,
+        set: () => {},
+        configurable: false,
+        enumerable: false
+    });
+})();
+
 // Chat Interface Application
 class ChatInterface {
     constructor() {
@@ -11,43 +48,13 @@ class ChatInterface {
     init() {
         console.log('[DEBUG] DOM loaded, initializing...');
 
-        // Block any external library initialization
-        this.blockExternalLibraries();
-
-        // Initialize core functionality
+        // Initialize core functionality only
         this.initializeDropdowns();
         this.initializeTemperatureSlider();
         this.initializeEventListeners();
         this.loadSessionHistory();
 
         console.log('[DEBUG] Initialization complete');
-    }
-
-    blockExternalLibraries() {
-        // Completely block Radix UI and other external libraries
-        const blockedLibraries = ['RadixUI', 'Radix', 'radix', 'RADIX'];
-
-        blockedLibraries.forEach(lib => {
-            if (window[lib]) {
-                delete window[lib];
-            }
-
-            Object.defineProperty(window, lib, {
-                value: undefined,
-                writable: false,
-                configurable: false
-            });
-        });
-
-        // Override console methods to block spam
-        const originalConsoleLog = console.log;
-        console.log = function(...args) {
-            const message = args.join(' ');
-            if (message.includes('[RADIX]') || message.includes('Radix UI')) {
-                return; // Block Radix messages completely
-            }
-            originalConsoleLog.apply(console, args);
-        };
     }
 
     generateSessionId() {
