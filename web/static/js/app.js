@@ -5,9 +5,18 @@ let conversationHistory = {};
 let chatSessions = JSON.parse(localStorage.getItem('chatSessions') || '[]');
 let currentChatIndex = -1;
 
+// Prevent multiple initializations
+let appInitialized = false;
+
 // Initialize when page loads
 document.addEventListener('DOMContentLoaded', function() {
+    if (appInitialized) {
+        console.log('[DEBUG] App already initialized, skipping...');
+        return;
+    }
+    
     console.log('[DEBUG] DOM loaded, initializing...');
+    appInitialized = true;
 
     try {
         updateDropdowns();
@@ -79,33 +88,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        // Add temperature slider functionality
-        const temperatureSlider = document.getElementById('temperature-slider');
-        const temperatureValue = document.getElementById('temperature-value');
-
-        if (temperatureSlider && temperatureValue) {
-            // Initialize value display
-            temperatureValue.textContent = temperatureSlider.value;
-            
-            // Handle input changes
-            temperatureSlider.addEventListener('input', function() {
-                temperatureValue.textContent = this.value;
-            });
-            
-            // Handle change events for better mobile support
-            temperatureSlider.addEventListener('change', function() {
-                temperatureValue.textContent = this.value;
-            });
-            
-            // Prevent slider from causing page scrolling on mobile
-            temperatureSlider.addEventListener('touchstart', function(e) {
-                e.stopPropagation();
-            });
-            
-            temperatureSlider.addEventListener('touchmove', function(e) {
-                e.stopPropagation();
-            });
-        }
+        // Initialize temperature slider with comprehensive mobile support
+        initializeTemperatureSlider();
 
         // Initialize session management
         if (!currentSessionId) {
@@ -127,6 +111,56 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('[ERROR] Failed to initialize:', error);
     }
 });
+
+function initializeTemperatureSlider() {
+    const temperatureSlider = document.getElementById('temperature-slider');
+    const temperatureValue = document.getElementById('temperature-value');
+
+    if (!temperatureSlider || !temperatureValue) {
+        console.log('[DEBUG] Temperature slider elements not found');
+        return;
+    }
+
+    try {
+        // Initialize value display
+        temperatureValue.textContent = temperatureSlider.value;
+        
+        // Update function
+        function updateTemperatureValue() {
+            temperatureValue.textContent = temperatureSlider.value;
+            console.log('[DEBUG] Temperature updated to:', temperatureSlider.value);
+        }
+        
+        // Remove any existing event listeners
+        temperatureSlider.removeEventListener('input', updateTemperatureValue);
+        temperatureSlider.removeEventListener('change', updateTemperatureValue);
+        
+        // Add new event listeners
+        temperatureSlider.addEventListener('input', updateTemperatureValue);
+        temperatureSlider.addEventListener('change', updateTemperatureValue);
+        
+        // Mobile-specific touch handling
+        temperatureSlider.addEventListener('touchstart', function(e) {
+            e.stopPropagation();
+            this.focus();
+        }, { passive: true });
+        
+        temperatureSlider.addEventListener('touchmove', function(e) {
+            e.stopPropagation();
+            updateTemperatureValue();
+        }, { passive: true });
+        
+        temperatureSlider.addEventListener('touchend', function(e) {
+            e.stopPropagation();
+            updateTemperatureValue();
+        }, { passive: true });
+        
+        console.log('[DEBUG] Temperature slider initialized successfully');
+        
+    } catch (error) {
+        console.error('[ERROR] Failed to initialize temperature slider:', error);
+    }
+}
 
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
