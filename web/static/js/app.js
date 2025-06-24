@@ -489,11 +489,13 @@ class ChatInterface {
                     const textContent = lastMsg.content.replace(/<[^>]*>/g, '').trim();
                     chatSessions[currentChatIndex].lastMessage = textContent.substring(0, 100);
 
-                    // Set title from first user message
+                    // Set title from first user message (ChatGPT style - first few words)
                     const firstUserMsg = messages.find(m => m.className.includes('user'));
                     if (firstUserMsg && chatSessions[currentChatIndex].title === 'New Chat') {
                         const titleText = firstUserMsg.content.replace(/<[^>]*>/g, '').trim();
-                        chatSessions[currentChatIndex].title = titleText.substring(0, 50) + (titleText.length > 50 ? '...' : '');
+                        const words = titleText.split(' ');
+                        const shortTitle = words.slice(0, 4).join(' '); // Take first 4 words
+                        chatSessions[currentChatIndex].title = shortTitle + (words.length > 4 ? '...' : '');
                     }
                 }
 
