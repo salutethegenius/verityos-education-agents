@@ -145,15 +145,6 @@
   </div>
 
   <!-- Scripts -->
-  <script>
-    // Block any external library loading
-    window.addEventListener('error', function(e) {
-      if (e.message && (e.message.includes('Radix') || e.message.includes('radix'))) {
-        e.preventDefault();
-        return false;
-      }
-    });
-  </script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>

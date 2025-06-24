@@ -13,7 +13,33 @@ function initializeStudentSession() {
     }
 }
 
+// Student Interface Application - Clean version without external dependencies
 document.addEventListener('DOMContentLoaded', function() {
+    // Block any external library initialization
+    const blockedLibraries = ['RadixUI', 'Radix', 'radix', 'RADIX'];
+
+    blockedLibraries.forEach(lib => {
+        if (window[lib]) {
+            delete window[lib];
+        }
+
+        Object.defineProperty(window, lib, {
+            value: undefined,
+            writable: false,
+            configurable: false
+        });
+    });
+
+    // Override console to block spam
+    const originalConsoleLog = console.log;
+    console.log = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('[RADIX]') || message.includes('Radix UI')) {
+            return;
+        }
+        originalConsoleLog.apply(console, args);
+    };
+
     // Use both memory flag and DOM attribute to prevent conflicts
     if (studentAppInitialized || document.body.hasAttribute('data-student-app-initialized')) {
         console.log('[STUDENT DEBUG] App already initialized, skipping...');
@@ -29,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeStudentEventListeners();
         updateHelpContent();
         loadStudentInfo();
-        
+
         // Load chat history and initial session
         loadChatHistorySidebar();
         if (chatSessions.length === 0) {
@@ -311,7 +337,7 @@ function startNewStudentChat() {
     }
 
     currentSessionId = generateSessionId();
-    
+
     // Create new chat session
     const newChat = {
         id: currentSessionId,
@@ -321,10 +347,10 @@ function startNewStudentChat() {
         timestamp: new Date().toISOString(),
         messages: []
     };
-    
+
     chatSessions.unshift(newChat);
     currentChatIndex = 0;
-    
+
     const chatWindow = document.getElementById('chat-window');
     if (chatWindow) {
         chatWindow.innerHTML = '';
