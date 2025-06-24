@@ -1,4 +1,36 @@
+// Agent Interface Application
+let appInitialized = false;
 
+// State management
+let currentChatIndex = -1;
+let chatSessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
+let currentAgent = 'sage';
+let conversationHistory = [];
+
+// Check if this is the agent interface page
+function isAgentInterface() {
+    return document.title.includes('VerityOS Education Agents') && !document.body.classList.contains('student-interface');
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    // Only initialize on agent interface page
+    if (!isAgentInterface()) {
+        return;
+    }
+
+    // Use both memory flag and DOM attribute to prevent conflicts
+    if (appInitialized || document.body.hasAttribute('data-agent-app-initialized')) {
+        console.log('[DEBUG] App already initialized, skipping...');
+        return;
+    }
+
+    console.log('[DEBUG] DOM loaded, initializing...');
+    appInitialized = true;
+    document.body.setAttribute('data-agent-app-initialized', 'true');
+
+    // Initialize chat interface
+    new ChatInterface();
+});
 
 // Chat Interface Application
 class ChatInterface {
@@ -272,8 +304,3 @@ class ChatInterface {
         }
     }
 }
-
-// Initialize when DOM is loaded
-document.addEventListener('DOMContentLoaded', () => {
-    new ChatInterface();
-});
