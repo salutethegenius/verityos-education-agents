@@ -197,18 +197,17 @@ function setupEventListeners() {
     }
 
         // Add sidebar toggle functionality
-        const sidebarToggle = document.getElementById('sidebar-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const toggleIcon = document.getElementById('toggle-icon');
+    const sidebarToggle = document.getElementById('sidebar-toggle');
+    const sidebar = document.getElementById('sidebar');
+    const toggleIcon = document.getElementById('toggle-icon');
 
-        if (sidebarToggle && sidebar && toggleIcon) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
-            });
-        }
+    if (sidebarToggle && sidebar && toggleIcon) {
+        // Remove any existing listeners to prevent duplicates
+        sidebarToggle.removeEventListener('click', toggleSidebar);
+        sidebarToggle.addEventListener('click', toggleSidebar);
+    }
 
-        // Load chat history and initial session
+    // Load chat history and initial session
 async function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
@@ -492,9 +491,23 @@ function loadChatHistorySidebar() {
     });
 }
 
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleIcon = document.getElementById('toggle-icon');
+    
+    if (sidebar && toggleIcon) {
+        sidebar.classList.toggle('collapsed');
+        toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+        
+        // Save toggle state
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+    }
+}
+
 function logout() {
     sessionStorage.clear();
     localStorage.removeItem('studentChatSessions');
+    localStorage.removeItem('sidebarCollapsed');
     window.location.href = '/student-login';
 }
 
@@ -513,6 +526,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update help content
     updateTaskOptions();
     updateHelpContent();
+
+    // Restore sidebar state
+    const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+    const sidebar = document.getElementById('sidebar');
+    const toggleIcon = document.getElementById('toggle-icon');
+    
+    if (sidebarCollapsed && sidebar && toggleIcon) {
+        sidebar.classList.add('collapsed');
+        toggleIcon.textContent = '▶';
+    }
 
     // Load or create initial chat
     loadChatHistorySidebar();

@@ -67,10 +67,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const toggleIcon = document.getElementById('toggle-icon');
 
         if (sidebarToggle && sidebar && toggleIcon) {
-            sidebarToggle.addEventListener('click', function() {
-                sidebar.classList.toggle('collapsed');
-                toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
-            });
+            // Remove any existing listeners to prevent duplicates
+            sidebarToggle.removeEventListener('click', toggleSidebar);
+            sidebarToggle.addEventListener('click', toggleSidebar);
+            
+            // Restore saved state
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                sidebar.classList.add('collapsed');
+                toggleIcon.textContent = '▶';
+            }
         }
 
         // Add temperature slider functionality
@@ -103,6 +109,19 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('[ERROR] Failed to initialize:', error);
     }
 });
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleIcon = document.getElementById('toggle-icon');
+    
+    if (sidebar && toggleIcon) {
+        sidebar.classList.toggle('collapsed');
+        toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
+        
+        // Save toggle state
+        localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+    }
+}
 
 function generateSessionId() {
   return 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
