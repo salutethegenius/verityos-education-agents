@@ -38,7 +38,7 @@ function initializeSession() {
         console.log('[DEBUG] App already initialized, blocking duplicate');
         return;
     }
-    
+
     // Set multiple flags
     window[INIT_KEY] = true;
     window.__VERITY_GLOBAL_INIT__ = true;
@@ -65,7 +65,7 @@ function initializeSession() {
         try {
             // Initialize session BEFORE loading UI to prevent multiple sessions
             initializeSession();
-            
+
             initializeUIComponents();
             updateDropdowns();
             initializeEventListeners();
@@ -85,52 +85,28 @@ function initializeSession() {
     }
 })();
 
-// COMPLETELY ELIMINATE RADIX UI - BULLETPROOF VERSION
+// BLOCK ALL RADIX UI COMPLETELY
 (function() {
     // Prevent any Radix UI from loading
-    if (typeof window !== 'undefined') {
-        // Block Radix UI globals
-        Object.defineProperty(window, 'RadixUI', {
-            value: undefined,
-            writable: false,
-            configurable: false
-        });
-        Object.defineProperty(window, 'Radix', {
-            value: undefined,
-            writable: false,
-            configurable: false
-        });
-        
-        // Block common Radix UI initialization
-        window.addEventListener = (function(originalAddEventListener) {
-            return function(type, listener, options) {
-                // Block Radix UI specific events
-                if (typeof listener === 'function' && listener.toString().includes('radix')) {
-                    console.log('[DEBUG] Blocked Radix UI event listener');
+    if (window.RadixUI) delete window.RadixUI;
+    if (window.Radix) delete window.Radix;
+
+    // Block all Radix-related script loading
+    const originalCreateElement = document.createElement;
+    document.createElement = function(tagName) {
+        const element = originalCreateElement.call(document, tagName);
+        if (tagName.toLowerCase() === 'script') {
+            const originalSetAttribute = element.setAttribute;
+            element.setAttribute = function(name, value) {
+                if (name === 'src' && value && value.includes('radix')) {
+                    console.log('[BLOCKED] Radix UI script blocked');
                     return;
                 }
-                return originalAddEventListener.call(this, type, listener, options);
+                return originalSetAttribute.call(this, name, value);
             };
-        })(window.addEventListener);
-    }
-
-    // Override console methods to block ALL Radix messages
-    const originalConsole = {
-        log: console.log,
-        warn: console.warn,
-        error: console.error,
-        info: console.info
+        }
+        return element;
     };
-
-    ['log', 'warn', 'error', 'info'].forEach(method => {
-        console[method] = function(...args) {
-            const message = args.join(' ').toLowerCase();
-            if (message.includes('radix') || message.includes('[radix]')) {
-                return; // Completely block all Radix messages
-            }
-            originalConsole[method].apply(console, args);
-        };
-    });
 })();
 
 function initializeEventListeners() {
@@ -841,13 +817,20 @@ async function loadSessionHistory(agent) {
   chatWindow.scrollTop = chatWindow.scrollHeight;
 }
 
-// Initialize UI components
 function initializeUIComponents() {
     console.log('[DEBUG] Initializing UI components...');
-    
-    // Remove any existing Radix elements that might have loaded
-    const radixElements = document.querySelectorAll('[data-radix-root], [data-radix-popper-content], .radix-ui');
-    radixElements.forEach(el => el.remove());
-    
+
+    // Basic UI initialization without any external libraries
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('main-content');
+
+    if (sidebar && mainContent) {
+        // Ensure proper layout
+        sidebar.style.display = 'flex';
+        sidebar.style.flexDirection = 'column';
+        mainContent.style.display = 'flex';
+        mainContent.style.flexDirection = 'column';
+    }
+
     console.log('[DEBUG] UI components initialized successfully');
 }
