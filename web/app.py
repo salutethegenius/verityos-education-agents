@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-from flask_cors import CORS
+# from flask_cors import CORS  # Temporarily disabled
 from agents.sage.agent import run_agent as run_sage
 from agents.quill.agent import run_agent as run_quill
 from agents.echo.agent import run_agent as run_echo
@@ -10,7 +10,7 @@ from utils.safety_filters import SafetyFilter
 import logging
 
 app = Flask(__name__)
-CORS(app)
+# CORS(app)  # Temporarily disabled
 
 # Initialize safety filter
 safety_filter = SafetyFilter()
