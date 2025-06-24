@@ -2,7 +2,7 @@ import os
 import json
 import uuid
 import numpy as np
-import openai
+from openai import OpenAI
 import faiss
 from typing import List, Dict
 
@@ -17,7 +17,8 @@ MEMORY_DIR = "memory"
 INDEX_FILE = os.path.join(MEMORY_DIR, "curriculum_index.faiss")
 META_FILE = os.path.join(MEMORY_DIR, "curriculum_metadata.jsonl")
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 # --- Helpers ---
@@ -70,8 +71,8 @@ def extract_tags(path: str) -> List[str]:
 
 
 def embed_text(texts: List[str]) -> List[List[float]]:
-    response = openai.embeddings.create(model=EMBED_MODEL, input=texts)
-    return [d["embedding"] for d in response.data]
+    response = client.embeddings.create(model=EMBED_MODEL, input=texts)
+    return [d.embedding for d in response.data]
 
 
 # --- Main Process ---

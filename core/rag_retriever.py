@@ -3,7 +3,7 @@ import os
 import json
 import numpy as np
 import faiss
-import openai
+from openai import OpenAI
 from typing import List, Dict, Tuple
 from dotenv import load_dotenv
 
@@ -14,7 +14,8 @@ MEMORY_DIR = "memory"
 INDEX_FILE = os.path.join(MEMORY_DIR, "curriculum_index.faiss")
 META_FILE = os.path.join(MEMORY_DIR, "curriculum_metadata.jsonl")
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+# Initialize OpenAI client
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 
 class RAGRetriever:
@@ -41,7 +42,7 @@ class RAGRetriever:
     def embed_query(self, query: str) -> List[float]:
         """Embed a query using OpenAI's embedding model"""
         try:
-            response = openai.embeddings.create(model=EMBED_MODEL, input=[query])
+            response = client.embeddings.create(model=EMBED_MODEL, input=[query])
             return response.data[0].embedding
         except Exception as e:
             print(f"Error embedding query: {e}")
