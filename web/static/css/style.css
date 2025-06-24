@@ -66,30 +66,44 @@ body {
   background: rgba(255,255,255,0.2);
 }
 
+.chat-history-item:hover .chat-preview {
+  color: #ffffff;
+}
+
 .chat-history-item.active {
-  background: #2980b9;
+  background: #3498db;
   color: white;
+}
+
+.chat-history-item.active .chat-title {
+  color: #ffffff;
+}
+
+.chat-history-item.active .chat-preview {
+  color: #ffffff;
+}
+
+.chat-history-item.active .chat-meta {
+  color: #ecf0f1;
 }
 
 .chat-title {
   font-weight: bold;
   font-size: 0.9rem;
   margin-bottom: 0.25rem;
-  color: inherit;
+  color: #ffffff;
 }
 
 .chat-preview {
   font-size: 0.8rem;
-  opacity: 0.9;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: inherit;
+  color: #ecf0f1;
 }
 
 .chat-meta {
   font-size: 0.7rem;
-  opacity: 0.8;
   margin-top: 0.25rem;
   color: #bdc3c7;
 }
