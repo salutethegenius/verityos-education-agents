@@ -1,53 +1,29 @@
 language = "python3"
-run = "PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"
 modules = ["python-3.11"]
+
+[env]
+FLASK_ENV = "development"
+FLASK_DEBUG = "0"
+PYTHONUNBUFFERED = "1"
 
 [deployment]
 run = [
   "sh",
   "-c",
-  "cd /home/runner/workspace && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000",
+  "cd /home/runner/workspace && pip install -r requirements.txt && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000",
 ]
-
-[nix]
-channel = "stable-24_05"
-packages = [
-  "glibcLocales",
-  "libyaml", 
-  "zlib.dev",
-  "libstdcxx5",
-  "awscli2",
-  "python311Packages.numpy",
-  "python311Packages.faiss",
-  "python311Packages.onnxruntime",
-  "python311Packages.flask",
-  "python311Packages.flask_cors"
-]
-
-[env]
-FLASK_DEBUG = "0"
 
 [[ports]]
 localPort = 3000
 externalPort = 80
 
 [workflows]
-runButton = "Start VerityOS Student"
+runButton = "Start VerityOS"
 
 [[workflows.workflow]]
 name = "Start VerityOS"
-author = 36910130
 mode = "sequential"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd /home/runner/workspace && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"
-
-[[workflows.workflow]]
-name = "Start VerityOS Student"
-author = 36910130
-mode = "sequential"
-
-[[workflows.workflow.tasks]]
-task = "shell.exec"
-args = "cd /home/runner/workspace && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"
+args = "cd /home/runner/workspace && pip install -r requirements.txt && PYTHONPATH=./ FLASK_APP=web/app.py flask run --host=0.0.0.0 --port=3000"

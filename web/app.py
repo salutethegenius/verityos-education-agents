@@ -1,3 +1,7 @@
+from dotenv import load_dotenv
+
+load_dotenv()
+
 from flask import Flask, render_template, request, jsonify
 # from flask_cors import CORS  # Temporarily disabled
 from agents.sage.agent import run_agent as run_sage
