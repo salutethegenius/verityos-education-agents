@@ -85,27 +85,28 @@ function initializeSession() {
     }
 })();
 
-// BLOCK ALL RADIX UI COMPLETELY
+// Comprehensive blocking of external UI libraries
 (function() {
-    // Prevent any Radix UI from loading
-    if (window.RadixUI) delete window.RadixUI;
-    if (window.Radix) delete window.Radix;
+    // Block all external UI library globals
+    Object.defineProperty(window, 'RadixUI', {
+        value: undefined,
+        writable: false,
+        configurable: false
+    });
+    
+    Object.defineProperty(window, 'Radix', {
+        value: undefined,
+        writable: false,
+        configurable: false
+    });
 
-    // Block all Radix-related script loading
-    const originalCreateElement = document.createElement;
-    document.createElement = function(tagName) {
-        const element = originalCreateElement.call(document, tagName);
-        if (tagName.toLowerCase() === 'script') {
-            const originalSetAttribute = element.setAttribute;
-            element.setAttribute = function(name, value) {
-                if (name === 'src' && value && value.includes('radix')) {
-                    console.log('[BLOCKED] Radix UI script blocked');
-                    return;
-                }
-                return originalSetAttribute.call(this, name, value);
-            };
+    // Override console.log to filter out Radix messages
+    const originalLog = console.log;
+    console.log = function(...args) {
+        const message = args.join(' ');
+        if (!message.includes('[RADIX]') && !message.includes('Radix UI')) {
+            originalLog.apply(console, args);
         }
-        return element;
     };
 })();
 

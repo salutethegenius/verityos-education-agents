@@ -98,6 +98,15 @@
     </div>
     </div>
 
+    <script>
+        // Block any external library loading
+        window.addEventListener('error', function(e) {
+          if (e.message && (e.message.includes('Radix') || e.message.includes('radix'))) {
+            e.preventDefault();
+            return false;
+          }
+        });
+    </script>
     <script src="/static/js/student_app.js"></script>
 </body>
 </html>
