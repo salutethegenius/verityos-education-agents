@@ -101,16 +101,18 @@ class CoralAgent:
         if student_key in self.student_accounts:
             return f"Student account for {name} already exists."
 
-        # Create new student account
-        self.student_accounts[student_key] = {
+        # Create student account
+        student_data = {
             "name": name,
-            "grade": grade,
+            "grade": "Grade 8",
             "student_id": student_id,
             "password": password,
             "created_date": datetime.date.today().isoformat(),
             "active": True,
             "sessions": []
         }
+
+        self.student_accounts[student_key] = student_data
 
         self._save_student_accounts()
         return f"✅ **Student Account Created**\n\n**Name:** {name}\n**Student ID:** {student_id}\n**Password:** {password}\n**Grade:** {grade}\n\n📝 *Give these credentials to the student for login access.*"

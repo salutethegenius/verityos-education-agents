@@ -67,12 +67,12 @@ class SageAgent(BaseAgent):
                 # Student-specific limitations
                 if len(message) > 300:
                     return "📝 Please keep your questions shorter so I can help you better! Try asking one specific question at a time."
-                
+
                 # Block inappropriate content for students
                 inappropriate_keywords = ['inappropriate', 'bad words', 'swear', 'curse']
                 if any(word in message.lower() for word in inappropriate_keywords):
                     return "🤔 Let's keep our conversation focused on learning! What subject would you like help with today?"
-                
+
                 # Limit complex calculations that might be overwhelming
                 if 'quantum' in message.lower() or ('×' in message and '999999' in message):
                     return "🧮 That's quite advanced! Let's focus on grade-level math problems that will help you learn step by step. What's a math topic you're working on in class?"

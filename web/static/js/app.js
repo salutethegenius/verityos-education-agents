@@ -45,12 +45,12 @@ function initializeSession() {
         document.body.setAttribute('data-app-initialized', 'true');
 
         try {
-            initializeSession();
+            initializeUIComponents();
             updateDropdowns();
             initializeEventListeners();
             initializeTemperatureSlider();
             loadChatHistorySidebar();
-            
+
             // Only load chat session if we have sessions, otherwise start new
             if (chatSessions.length > 0) {
                 loadChatSession(0);
@@ -68,7 +68,7 @@ function initializeSession() {
     // Block all Radix UI initialization attempts
     window.RadixUI = undefined;
     window.Radix = undefined;
-    
+
     // Override console.log to block Radix messages
     const originalLog = console.log;
     console.log = function(...args) {
@@ -163,15 +163,15 @@ function handleAgentChange() {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggleIcon = document.getElementById('toggle-icon');
-    
+
     if (sidebar) {
         sidebar.classList.toggle('collapsed');
-        
+
         // Update icon for desktop only
         if (toggleIcon && window.innerWidth > 768) {
             toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '⟩' : '⟨';
         }
-        
+
         // Save toggle state
         localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
     }
@@ -368,7 +368,7 @@ async function sendMessage() {
         console.log('[DEBUG] Empty message, not sending');
         return;
     }
-    
+
     if (message.replace(/[^a-zA-Z0-9\s]/g, '').trim().length === 0) {
       console.log('[DEBUG] Message contains no meaningful content');
       addMessageToChat('system', 'Please enter a meaningful question or message.', 'system');
@@ -641,12 +641,12 @@ function loadChatHistorySidebar(searchTerm = '') {
   // Filter chats based on search term
   const filteredChats = chatSessions.filter(chat => {
     if (!searchTerm) return true;
-    
+
     const searchLower = searchTerm.toLowerCase();
     const title = (chat.title || 'New Chat').toLowerCase();
     const lastMessage = (chat.lastMessage || '').toLowerCase();
     const agent = chat.agent.toLowerCase();
-    
+
     return title.includes(searchLower) || 
            lastMessage.includes(searchLower) || 
            agent.includes(searchLower);
@@ -655,7 +655,7 @@ function loadChatHistorySidebar(searchTerm = '') {
   filteredChats.forEach((chat, filteredIndex) => {
     // Find original index in chatSessions array
     const originalIndex = chatSessions.findIndex(c => c.id === chat.id);
-    
+
     const chatItem = document.createElement('div');
     chatItem.className = `chat-history-item ${originalIndex === currentChatIndex ? 'active' : ''}`;
 
@@ -786,4 +786,17 @@ async function loadSessionHistory(agent) {
 
   // Scroll to bottom
   chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+// Initialize UI components
+function initializeUIComponents() {
+    console.log('[DEBUG] Initializing UI components...');
+
+    // Apply theme if available
+    const themeElement = document.querySelector('[data-theme]');
+    if (themeElement) {
+        console.log('[DEBUG] Theme element found, applying configurations...');
+    }
+
+    console.log('[DEBUG] UI components initialized successfully');
 }

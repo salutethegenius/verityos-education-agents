@@ -35,6 +35,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (chatSessions.length === 0) {
             startNewStudentChat();
         } else {
+            currentChatIndex = 0;
             loadChatSession(0);
         }
     } catch (error) {
@@ -310,6 +311,20 @@ function startNewStudentChat() {
     }
 
     currentSessionId = generateSessionId();
+    
+    // Create new chat session
+    const newChat = {
+        id: currentSessionId,
+        agent: currentAgent,
+        title: 'New Chat',
+        lastMessage: '',
+        timestamp: new Date().toISOString(),
+        messages: []
+    };
+    
+    chatSessions.unshift(newChat);
+    currentChatIndex = 0;
+    
     const chatWindow = document.getElementById('chat-window');
     if (chatWindow) {
         chatWindow.innerHTML = '';
@@ -323,7 +338,7 @@ function startNewStudentChat() {
     }
     console.log('[STUDENT DEBUG] Started new chat with session:', currentSessionId);
 
-        // Update sidebar
+    // Update sidebar
     loadChatHistorySidebar();
 }
 
