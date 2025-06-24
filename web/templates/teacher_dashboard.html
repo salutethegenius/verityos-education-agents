@@ -198,32 +198,17 @@
                     </div>
                 </div>
 
-                <!-- Activity Feed -->
+                <!-- Chat Interface for Dashboard -->
                 <div class="dashboard-section">
-                    <h2>📈 Recent Activity</h2>
-                    <div id="activity-feed" class="activity-feed">
-                        <!-- Activity items will be populated here -->
+                    <h2>💬 Dashboard Assistant (Coral)</h2>
+                    <div id="chat-container" style="height: 300px; overflow-y: auto; border: 1px solid #dee2e6; border-radius: 8px; padding: 15px; background: white; margin-bottom: 15px;">
+                        <div style="text-align: center; padding: 20px; color: #6c757d;">Ask me about your class - attendance, reports, student progress...</div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="message-input" placeholder="Ask about class status, generate reports, check attendance..." style="flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 4px;">
+                        <button id="send-button" class="action-btn btn-primary">Send</button>
                     </div>
                 </div>
-
-                <!-- Student List -->
-                <div class="dashboard-section">
-                    <h2>👥 Student Management</h2>
-                    <div id="student-list" class="student-grid">
-                        <!-- Student cards will be populated here -->
-                    </div>
-                </div>
-
-                <!-- Class Schedule -->
-                <div class="dashboard-section">
-                    <h2>📅 Today's Schedule</h2>
-                    <div id="schedule-container" class="schedule-container">
-                        <!-- Schedule items will be populated here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
 
                         <div class="stat-number" id="total-sessions">Sessions Today</div>
                     </div>

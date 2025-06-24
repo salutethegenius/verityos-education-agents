@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     try {
         initializeDashboardEventListeners();
-        loadDashboardData();
+        refreshDashboard(); // Load initial data immediately
     } catch (error) {
         console.error('[DASHBOARD ERROR] Failed to initialize dashboard:', error);
     }
@@ -126,8 +126,11 @@ function addDashboardMessageToChat(role, content, agent = null) {
         messageDiv.innerHTML = `<div class="message-content">${escapeDashboardHtml(content)}</div>`;
     }
 
-    chatContainer.appendChild(messageDiv);
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    // Insert at beginning for latest-first order
+    chatContainer.insertBefore(messageDiv, chatContainer.firstChild);
+    
+    // Auto-scroll to show latest message (now at top)
+    chatContainer.scrollTop = 0;
 }
 
 function formatDashboardAgentResponse(content) {
@@ -351,7 +354,7 @@ function parseClassOverview(responseText) {
     // Parse overview data
     const lines = responseText.split('\n');
     let overviewHTML = '';
-    let activityHTML = '';
+    let activityItems = [];
     let sessionCount = 0;
     
     lines.forEach(line => {
@@ -360,10 +363,10 @@ function parseClassOverview(responseText) {
         }
         
         if (line.includes('Attendance:') || line.includes('✅') || line.includes('❌')) {
-            activityHTML += `<div class="activity-item">
-                <div>${line.replace(/\*\*/g, '').trim()}</div>
-                <div class="activity-time">${new Date().toLocaleTimeString()}</div>
-            </div>`;
+            activityItems.push({
+                content: line.replace(/\*\*/g, '').trim(),
+                timestamp: new Date().toLocaleTimeString()
+            });
         }
         
         // Count sessions mentioned in the response
@@ -372,14 +375,25 @@ function parseClassOverview(responseText) {
         }
     });
     
-    // Update session count
+    // Update session count and stats
     document.getElementById('total-sessions').textContent = sessionCount;
     document.getElementById('avg-questions').textContent = Math.floor(sessionCount * 2.5); // Estimate
+    document.getElementById('avg-session-time').textContent = `${Math.floor(sessionCount * 8.5)}m`; // Estimate
     
     overviewDisplay.innerHTML = overviewHTML || '<div style="text-align: center; padding: 20px; color: #6c757d;">No overview data available</div>';
     
-    if (activityHTML) {
+    // Sort activities with latest first and display
+    if (activityItems.length > 0) {
+        const sortedActivities = activityItems.reverse(); // Latest first
+        let activityHTML = '';
+        sortedActivities.forEach(item => {
+            activityHTML += `<div class="activity-item">
+                <div>${item.content}</div>
+                <div class="activity-time">${item.timestamp}</div>
+            </div>`;
+        });
         activityFeed.innerHTML = activityHTML;
+        activityFeed.scrollTop = 0; // Show latest at top
     } else {
         activityFeed.innerHTML = '<div style="text-align: center; padding: 20px; color: #6c757d;">No recent activity</div>';
     }
