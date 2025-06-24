@@ -1,6 +1,7 @@
 import os
 import json
 import uuid
+import numpy as np
 import openai
 import faiss
 from typing import List, Dict
