@@ -71,20 +71,21 @@ body {
 }
 
 .chat-history-item.active {
-  background: #3498db;
-  color: white;
+  background: #ffffff;
+  color: #2c3e50;
 }
 
 .chat-history-item.active .chat-title {
-  color: #ffffff;
+  color: #2c3e50;
+  font-weight: bold;
 }
 
 .chat-history-item.active .chat-preview {
-  color: #ffffff;
+  color: #34495e;
 }
 
 .chat-history-item.active .chat-meta {
-  color: #ecf0f1;
+  color: #7f8c8d;
 }
 
 .chat-title {
