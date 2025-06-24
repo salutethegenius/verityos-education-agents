@@ -145,39 +145,6 @@
   </div>
 
   <!-- Scripts -->
-  <script>
-    // Complete Radix UI blocking before any other scripts
-    (function() {
-      // Block all Radix globals safely
-      try {
-        if (!window.RadixUI) {
-          Object.defineProperty(window, 'RadixUI', { 
-            value: undefined, 
-            writable: false, 
-            configurable: true 
-          });
-        }
-      } catch (e) { /* Ignore if already exists */ }
-      
-      try {
-        if (!window.Radix) {
-          Object.defineProperty(window, 'Radix', { 
-            value: undefined, 
-            writable: false, 
-            configurable: true 
-          });
-        }
-      } catch (e) { /* Ignore if already exists */ }
-      
-      // Override console to block Radix messages
-      const originalConsole = console.log;
-      console.log = function(...args) {
-        const message = args.join(' ');
-        if (message.includes('[RADIX]') || message.includes('Radix UI')) return;
-        originalConsole.apply(console, args);
-      };
-    })();
-  </script>
   <script src="/static/js/app.js"></script>
 </body>
 </html>
