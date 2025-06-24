@@ -1,3 +1,150 @@
+let dashboardInitialized = false;
+let dashboardSessionId = 'dashboard-session';
+
+document.addEventListener('DOMContentLoaded', function() {
+    if (dashboardInitialized) {
+        console.log('[DASHBOARD] Already initialized, skipping...');
+        return;
+    }
+
+    console.log('[DASHBOARD] DOM loaded, initializing dashboard...');
+    dashboardInitialized = true;
+
+    try {
+        initializeDashboardEventListeners();
+        loadDashboardData();
+    } catch (error) {
+        console.error('[DASHBOARD ERROR] Failed to initialize dashboard:', error);
+    }
+});
+
+function initializeDashboardEventListeners() {
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+
+    if (messageInput) {
+        messageInput.removeEventListener('keydown', handleDashboardKeydown);
+        messageInput.addEventListener('keydown', handleDashboardKeydown);
+    }
+
+    if (sendButton) {
+        sendButton.removeEventListener('click', sendDashboardMessage);
+        sendButton.addEventListener('click', sendDashboardMessage);
+    }
+}
+
+function handleDashboardKeydown(event) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        sendDashboardMessage();
+    }
+}
+
+async function sendDashboardMessage() {
+    const messageInput = document.getElementById('message-input');
+    const sendButton = document.getElementById('send-button');
+
+    if (!messageInput || !sendButton) {
+        console.error('[DASHBOARD ERROR] Missing required elements');
+        return;
+    }
+
+    const message = messageInput.value.trim();
+    if (!message) return;
+
+    sendButton.disabled = true;
+    sendButton.textContent = 'Sending...';
+
+    try {
+        addDashboardMessageToChat('user', message);
+        messageInput.value = '';
+
+        const response = await fetch('/api/coral', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                message: message,
+                subject: 'administration',
+                task: 'manage class',
+                session_id: dashboardSessionId,
+                user_type: 'teacher'
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+
+        const data = await response.json();
+
+        if (data.error) {
+            throw new Error(data.error);
+        }
+
+        addDashboardMessageToChat('agent', data.response, 'coral');
+
+    } catch (error) {
+        console.error('[DASHBOARD ERROR] Failed to send message:', error);
+        addDashboardMessageToChat('system', `Error: ${error.message}`, 'system');
+    } finally {
+        sendButton.disabled = false;
+        sendButton.textContent = 'Send';
+    }
+}
+
+function addDashboardMessageToChat(role, content, agent = null) {
+    const chatContainer = document.getElementById('chat-container');
+    if (!chatContainer) return;
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${role}-message`;
+
+    const timestamp = new Date().toLocaleTimeString();
+    const agentName = agent ? agent.charAt(0).toUpperCase() + agent.slice(1) : '';
+
+    if (role === 'user') {
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <strong>You</strong>
+                <span class="timestamp">${timestamp}</span>
+            </div>
+            <div class="message-content">${escapeDashboardHtml(content)}</div>
+        `;
+    } else if (role === 'agent') {
+        messageDiv.innerHTML = `
+            <div class="message-header">
+                <strong>${agentName}</strong>
+                <span class="timestamp">${timestamp}</span>
+            </div>
+            <div class="message-content">${formatDashboardAgentResponse(content)}</div>
+        `;
+    } else {
+        messageDiv.innerHTML = `<div class="message-content">${escapeDashboardHtml(content)}</div>`;
+    }
+
+    chatContainer.appendChild(messageDiv);
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+}
+
+function formatDashboardAgentResponse(content) {
+    return escapeDashboardHtml(content)
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/\n/g, '<br>');
+}
+
+function escapeDashboardHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+}
+
+function loadDashboardData() {
+    console.log('[DASHBOARD] Loading dashboard data...');
+    // Load initial dashboard data here
+}
 
 // Teacher Dashboard JavaScript
 let dashboardData = {
@@ -6,15 +153,6 @@ let dashboardData = {
     schedule: {},
     lastUpdated: null
 };
-
-// Initialize dashboard when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('[DASHBOARD] Initializing teacher dashboard...');
-    refreshDashboard();
-    
-    // Auto-refresh every 30 seconds
-    setInterval(refreshDashboard, 30000);
-});
 
 async function refreshDashboard() {
     console.log('[DASHBOARD] Refreshing dashboard data...');
