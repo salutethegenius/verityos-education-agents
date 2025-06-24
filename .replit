@@ -21,7 +21,7 @@ packages = [
   "python311Packages.faiss",
   "python311Packages.onnxruntime",
   "python311Packages.flask",
-  "python311Packages.flask-cors"
+  "python311Packages.flask_cors"
 ]
 
 [env]
