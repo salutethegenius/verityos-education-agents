@@ -1,0 +1,39 @@
+{
+  "agent_name": "sage",
+  "session_id": "session-1750761247554-j1td8zqpw",
+  "memory_type": "session",
+  "timestamp": "2025-06-24T10:39:34.638666",
+  "data": {
+    "progress": {
+      "timestamp": "2025-06-24T10:39:34.638148",
+      "intent": "general_tutoring",
+      "subject": null,
+      "topic": null,
+      "interaction_count": 7
+    },
+    "level": "middle",
+    "current_subject": null,
+    "conversation_history": [
+      {
+        "role": "user",
+        "content": "who is the govener general of the bhamas",
+        "timestamp": "2025-06-24T10:39:33.835392"
+      },
+      {
+        "role": "user",
+        "content": "who is the govener general of the bhamas",
+        "timestamp": "2025-06-24T10:39:33.835446"
+      },
+      {
+        "role": "assistant",
+        "content": "Hey there! The Governor-General of The Bahamas is Sir Cornelius A. Smith. He represents the Queen of The Bahamas and performs various ceremonial duties. If you have any more questions or need help with anything else, feel free to ask! How you doin'?",
+        "timestamp": "2025-06-24T10:39:34.638627"
+      },
+      {
+        "role": "assistant",
+        "content": "Hey there! The Governor-General of The Bahamas is Sir Cornelius A. Smith. He represents the Queen of The Bahamas and performs various ceremonial duties. If you have any more questions or need help with anything else, feel free to ask! How you doin'?",
+        "timestamp": "2025-06-24T10:39:34.638633"
+      }
+    ]
+  }
+}
