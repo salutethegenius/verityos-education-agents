@@ -814,7 +814,8 @@ async function sendMessage() {
 
     } catch (error) {
         console.error('[UI ERROR]', error);
-        addMessage('Sorry, something went wrong. Please refresh the page.', 'error');
+        addMessage('Sorry, something went wrong. Please refresh the page.', 'error-message');
+    }r');
     }
 }
 

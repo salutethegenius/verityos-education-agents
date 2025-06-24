@@ -32,14 +32,48 @@
                 <h1>🎓 VerityOS Education - Student Portal</h1>
                 <div class="student-info">
                     <span id="student-welcome">Welcome, Student!</span>
-                    <button onclick="logout()" class="logout-btn">Logout</button>
+                    <button onclick="window.location.href='/login'" class="logout-btn">Logout</button>
                 </div>
             </div>
 
             <div id="chat-container">
                 <div id="chat-window">
-                    <!-- Messages will be populated here -->
+                    <div class="message bot">Welcome to VerityOS Education! I'm here to help you learn. What would you like to study today?</div>
                 </div>
+
+                <div id="input-area">
+                    <textarea id="message-input" placeholder="Ask me anything about your studies..."></textarea>
+                    <button id="send-button" class="rt-button" data-variant="solid" data-color="green">Send</button>
+                </div>
+            </div>
+
+            <div class="student-notice">
+                <small>🌟 Remember to ask questions if you need help understanding anything!</small>
+            </div>
+        </div>
+
+        <!-- Right sidebar for help and samples -->
+        <div id="controls-sidebar" style="width: 300px;">
+            <div id="agent-help">
+                <h3>📚 Study Help</h3>
+                <h4>Try asking:</h4>
+                <div class="help-samples">
+                    <div class="sample-text" onclick="sendSampleMessage(this)">Help me with math homework</div>
+                    <div class="sample-text" onclick="sendSampleMessage(this)">Explain photosynthesis</div>
+                    <div class="sample-text" onclick="sendSampleMessage(this)">What happened in 1492?</div>
+                    <div class="sample-text" onclick="sendSampleMessage(this)">Help me write an essay</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/radix-init.js"></script>
+    <script src="/static/js/student_app.js"></script>
+    </div>
+    <!-- Radix UI Themes JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/@radix-ui/themes@3.0.0/dist/index.js"></script>
+</body>
+</html>/div>
 
                 <div id="input-area">
                     <textarea id="message-input" placeholder="Ask me anything about your studies... (Max 300 characters)" maxlength="300"></textarea>

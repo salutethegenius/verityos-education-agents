@@ -494,11 +494,11 @@ function loadChatHistorySidebar() {
 function toggleSidebar() {
     const sidebar = document.getElementById('sidebar');
     const toggleIcon = document.getElementById('toggle-icon');
-    
+
     if (sidebar && toggleIcon) {
         sidebar.classList.toggle('collapsed');
         toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '▶' : '◀';
-        
+
         // Save toggle state
         localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
     }
@@ -531,7 +531,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
     const sidebar = document.getElementById('sidebar');
     const toggleIcon = document.getElementById('toggle-icon');
-    
+
     if (sidebarCollapsed && sidebar && toggleIcon) {
         sidebar.classList.add('collapsed');
         toggleIcon.textContent = '▶';
@@ -547,3 +547,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     console.log('[STUDENT DEBUG] Student portal setup complete');
 });
+
+// Student-specific functionality
+
+function sendSampleMessage(element) {
+    const messageInput = document.getElementById('message-input');
+    if (messageInput) {
+        messageInput.value = element.textContent;
+        messageInput.focus();
+    }
+}

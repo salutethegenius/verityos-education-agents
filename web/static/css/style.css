@@ -1103,3 +1103,72 @@ body {
     margin-top: 0.5rem;
     text-align: center;
 }
+
+/* Dashboard Styles */
+.dashboard-header {
+    margin-bottom: var(--space-6);
+    padding-bottom: var(--space-4);
+    border-bottom: 1px solid var(--gray-6);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+}
+
+.stat-card {
+    background: var(--color-panel-solid);
+    padding: var(--space-5);
+    border-radius: var(--radius-4);
+    box-shadow: var(--shadow-3);
+    border: 1px solid var(--gray-6);
+    text-align: center;
+}
+
+.stat-number {
+    font-size: var(--font-size-7);
+    font-weight: var(--font-weight-bold);
+    color: var(--accent-11);
+    margin-bottom: var(--space-2);
+}
+
+.stat-label {
+    font-size: var(--font-size-2);
+    color: var(--gray-11);
+    text-transform: uppercase;
+    letter-spacing: var(--letter-spacing-1);
+}
+
+.dashboard-section {
+    background: var(--color-panel-solid);
+    border-radius: var(--radius-4);
+    padding: var(--space-5);
+    margin-bottom: var(--space-5);
+    box-shadow: var(--shadow-2);
+    border: 1px solid var(--gray-6);
+}
+
+.dashboard-section h2 {
+    margin: 0 0 var(--space-4) 0;
+    color: var(--gray-12);
+    font-size: var(--font-size-5);
+}
+
+.activity-feed {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.student-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-3);
+}
+
+.schedule-container {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
