@@ -31,10 +31,8 @@ body {
 
 #sidebar.collapsed {
   width: 0;
-  transform: translateX(-100%);
-  opacity: 0;
+  transform: translateX(-280px);
   overflow: hidden;
-  pointer-events: none;
 }
 
 #sidebar-toggle {
@@ -64,11 +62,11 @@ body {
 }
 
 #sidebar.collapsed #sidebar-toggle {
-  right: -40px;
-  border-radius: 8px;
-  left: 10px;
-  transform: translateY(-50%);
+  right: auto;
+  left: 280px;
+  border-radius: 8px 0 0 8px;
   background: #3498db;
+  transform: translateY(-50%);
 }
 
 #sidebar.collapsed #sidebar-toggle:hover {
