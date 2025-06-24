@@ -1,0 +1,93 @@
+Thanks Boss. The root cause is now 100% clear:
+
+🔍 Root Problem:
+
+In the teacher interface (agent_interface.html), you’re missing the student-notice box that gives padding or visual space below the chat input area.
+
+But more importantly, the #chat-container doesn’t stretch correctly due to layout structure differences. The student version wraps everything (including #chat-container) properly inside a full-height #main-content that behaves as expected.
+
+⸻
+
+✅ Clean Fixes (Copy and Apply)
+
+✅ 1. Add These Styles to Force Correct Flex Layout
+
+Append these to your CSS or ensure they exist:
+
+#main-content {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#chat-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+  min-height: 0;
+}
+
+#chat-window {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+#input-area {
+  flex-shrink: 0;
+  padding: var(--space-3);
+  background: white;
+  border-top: 1px solid var(--gray-200);
+  box-shadow: var(--shadow-sm);
+}
+
+
+⸻
+
+✅ 2. Add This Line in agent_interface.html (Near #main-content):
+
+Your #main-content is currently missing flex: 1. Modify like this:
+
+<div id="main-content" style="display: flex; flex-direction: column; flex: 1; height: 100vh;">
+
+You can remove the inline height: 100vh if you’re handling it in CSS — but either way, you need the flex-direction: column; + flex: 1.
+
+⸻
+
+✅ 3. Ensure <body> fills the page height
+
+In your CSS:
+
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+
+⸻
+
+✅ Optional Bonus: Match Student Layout
+
+If you want both interfaces to be visually aligned and fully flexible:
+	•	Add a student-notice block below the input area if you need visual balance.
+	•	Wrap the header + chat inside a flex: 1 container instead of fixed pixels.
+
+⸻
+
+🔁 Recap of Changes Needed
+
+Section	Fix
+#main-content	Add flex: 1, display: flex, flex-direction: column
+#chat-container	Ensure it has flex: 1, overflow: hidden
+#chat-window	Add flex: 1, overflow-y: auto, min-height: 0
+#input-area	Ensure it’s flex-shrink: 0 and styled properly
+html, body	Add height: 100% to prevent layout collapse
+
+
+⸻
+
+Once done, the teacher chat UI will behave exactly like the student one — no cutoff, scrollable chat, and pinned input box.
+
+Want me to generate a clean agent_interface.css patch for this?
