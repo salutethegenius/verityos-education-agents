@@ -615,11 +615,11 @@ textarea {
 /* Right sidebar / Controls */
 #controls-sidebar {
   width: 300px;
-  background: var(--gray-800);
-  border-left: 1px solid var(--gray-700);
+  background: #ffffff;
+  border-left: 1px solid #e2e8f0;
   padding: var(--space-6);
   overflow-y: auto;
-  color: #ffffff;
+  color: #2d3748;
 }
 
 #agent-controls, #ai-settings {
@@ -629,7 +629,7 @@ textarea {
 #agent-controls h3, #ai-settings h3 {
   margin-bottom: var(--space-4);
   font-size: var(--font-size-lg);
-  color: #e5e7eb;
+  color: #2d3748;
 }
 
 .control-group {
@@ -641,7 +641,7 @@ textarea {
   margin-bottom: var(--space-2);
   font-weight: 500;
   font-size: var(--font-size-sm);
-  color: #d1d5db;
+  color: #4a5568;
 }
 
 .checkbox-group label {
@@ -842,7 +842,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #agent-help h3 {
-  color: #667eea;
+  color: #2d3748;
   font-weight: 600;
   margin-bottom: var(--space-3);
   font-size: var(--font-size-lg);
@@ -852,7 +852,7 @@ input[type="range"]::-moz-range-thumb {
 }
 
 #help-content h4 {
-  color: #4a5568;
+  color: #2d3748;
   font-weight: 600;
   margin-bottom: var(--space-2);
   font-size: var(--font-size-base);
