@@ -54,6 +54,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
+// Stop any remaining Radix UI initialization
+if (window.RadixUI) {
+    delete window.RadixUI;
+}
+if (window.Radix) {
+    delete window.Radix;
+}
+
 function initializeEventListeners() {
     // Check if already initialized to prevent duplicate listeners
     if (document.body.hasAttribute('data-events-initialized')) {

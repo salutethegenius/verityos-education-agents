@@ -56,10 +56,10 @@
 body {
   font-family: var(--font-family);
   margin: 0;
-  background: var(--gray-50);
+  background: #171717;
   height: 100vh;
   overflow: hidden;
-  color: var(--gray-900);
+  color: #e5e7eb;
   line-height: 1.5;
   font-size: var(--font-size-base);
 }
@@ -75,7 +75,7 @@ body {
 #main-content {
   display: flex;
   flex-direction: column;
-  background: white;
+  background: #1f2937;
   transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   overflow: hidden;
   min-height: 0; /* Allow flex shrinking */
@@ -170,10 +170,10 @@ input, textarea, select {
   padding: var(--space-3);
   font-family: inherit;
   font-size: var(--font-size-sm);
-  border: 1px solid var(--gray-300);
+  border: 1px solid #4b5563;
   border-radius: var(--radius-md);
-  background: white;
-  color: var(--gray-900);
+  background: #374151;
+  color: #e5e7eb;
   transition: border-color 150ms ease, box-shadow 150ms ease;
 }
 
@@ -395,10 +395,10 @@ textarea {
 #chat-window {
   flex: 1;
   overflow-y: auto;
-  border: 1px solid var(--gray-200);
+  border: 1px solid #374151;
   border-radius: var(--radius-lg);
   padding: var(--space-4);
-  background: var(--gray-50);
+  background: #111827;
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -422,9 +422,9 @@ textarea {
 
 .agent-message {
   align-self: flex-start;
-  background: white;
-  color: var(--gray-900);
-  border: 1px solid var(--gray-200);
+  background: #374151;
+  color: #e5e7eb;
+  border: 1px solid #4b5563;
   border-bottom-left-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
 }
@@ -451,9 +451,9 @@ textarea {
   flex-shrink: 0;
   position: sticky;
   bottom: 0;
-  background: white;
+  background: #1f2937;
   padding-top: var(--space-2);
-  border-top: 1px solid var(--gray-200);
+  border-top: 1px solid #374151;
 }
 
 #message-input {
@@ -477,10 +477,11 @@ textarea {
 /* Right sidebar / Controls */
 #controls-sidebar {
   width: 300px;
-  background: white;
-  border-left: 1px solid var(--gray-200);
+  background: #1f2937;
+  border-left: 1px solid #374151;
   padding: var(--space-6);
   overflow-y: auto;
+  color: #e5e7eb;
 }
 
 #agent-controls, #ai-settings {
@@ -490,7 +491,7 @@ textarea {
 #agent-controls h3, #ai-settings h3 {
   margin-bottom: var(--space-4);
   font-size: var(--font-size-lg);
-  color: var(--gray-900);
+  color: #e5e7eb;
 }
 
 .control-group {
@@ -502,7 +503,7 @@ textarea {
   margin-bottom: var(--space-2);
   font-weight: 500;
   font-size: var(--font-size-sm);
-  color: var(--gray-700);
+  color: #d1d5db;
 }
 
 .checkbox-group label {
