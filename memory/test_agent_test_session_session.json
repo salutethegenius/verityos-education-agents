@@ -1,9 +1,0 @@
-{
-  "agent_name": "test_agent",
-  "session_id": "test_session",
-  "memory_type": "session",
-  "timestamp": "2025-06-24T19:40:49.291357",
-  "data": {
-    "test": "data"
-  }
-}
