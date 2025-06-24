@@ -244,5 +244,56 @@ def session_endpoint(agent_name):
         return jsonify({"error": "Internal server error"}), 500
 
 
+@app.route('/api/sessions/list', methods=['GET'])
+def list_sessions():
+    """List all available chat sessions from memory"""
+    try:
+        import os
+        from core.memory_manager import MemoryManager
+        
+        memory_manager = MemoryManager()
+        sessions = []
+        
+        # Scan memory directory for session files
+        if os.path.exists(memory_manager.base_path):
+            for filename in os.listdir(memory_manager.base_path):
+                if filename.endswith('_session.json'):
+                    try:
+                        filepath = os.path.join(memory_manager.base_path, filename)
+                        with open(filepath, 'r') as f:
+                            session_data = json.load(f)
+                            
+                        # Extract session info
+                        agent_name = session_data.get('agent_name', 'unknown')
+                        session_id = session_data.get('session_id', 'unknown')
+                        timestamp = session_data.get('timestamp', '')
+                        
+                        # Count messages
+                        conversation_history = session_data.get('data', {}).get('conversation_history', [])
+                        message_count = len(conversation_history)
+                        
+                        sessions.append({
+                            'agent': agent_name,
+                            'session_id': session_id,
+                            'timestamp': timestamp,
+                            'messages': message_count
+                        })
+                    except Exception as e:
+                        app.logger.warning(f"Failed to read session file {filename}: {e}")
+                        continue
+        
+        # Sort by timestamp (newest first)
+        sessions.sort(key=lambda x: x['timestamp'], reverse=True)
+        
+        return jsonify({
+            'sessions': sessions,
+            'count': len(sessions)
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error listing sessions: {str(e)}")
+        return jsonify({"error": "Failed to list sessions"}), 500
+
+
 if __name__ == "__main__":
     app.run(debug=False, host="0.0.0.0", port=3000)

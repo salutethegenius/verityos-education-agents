@@ -188,6 +188,25 @@ class ChatInterface {
                 this.switchAgent(e.target.value);
             });
         }
+
+        // Sidebar toggle
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+        }
+    }
+
+    toggleSidebar() {
+        const sidebar = document.getElementById('sidebar');
+        const toggleIcon = document.getElementById('toggle-icon');
+        
+        if (sidebar && toggleIcon) {
+            sidebar.classList.toggle('collapsed');
+            toggleIcon.textContent = sidebar.classList.contains('collapsed') ? '⟩' : '⟨';
+            
+            // Save state
+            localStorage.setItem('agentSidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
     }
 
     switchAgent(agent) {
@@ -271,6 +290,9 @@ class ChatInterface {
 
         // Add to conversation history
         this.conversationHistory.push({ sender, message, timestamp: new Date().toISOString() });
+
+        // Auto-save session
+        this.saveChatSession();
     }
 
     formatMessage(message) {
@@ -283,8 +305,26 @@ class ChatInterface {
     }
 
     startNewConversation() {
+        // Save current session first
+        this.saveChatSession();
+
+        // Create new session
         this.currentSessionId = this.generateSessionId();
         this.conversationHistory = [];
+
+        // Create new chat session object
+        const newChat = {
+            id: this.currentSessionId,
+            agent: this.currentAgent,
+            title: 'New Chat',
+            lastMessage: '',
+            timestamp: new Date().toISOString(),
+            messages: []
+        };
+
+        // Add to sessions
+        chatSessions.unshift(newChat);
+        currentChatIndex = 0;
 
         // Clear chat window
         const chatWindow = document.getElementById('chat-window');
@@ -292,15 +332,210 @@ class ChatInterface {
             chatWindow.innerHTML = '';
         }
 
+        // Update sidebar
+        this.loadChatHistorySidebar();
+
+        // Save session ID
+        localStorage.setItem('agentCurrentSessionId', this.currentSessionId);
+
         console.log('[DEBUG] New session created:', this.currentSessionId);
     }
 
+    saveChatSession() {
+        if (currentChatIndex >= 0 && currentChatIndex < chatSessions.length) {
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow) {
+                const messages = Array.from(chatWindow.children).map(msg => ({
+                    className: msg.className,
+                    content: msg.innerHTML
+                }));
+
+                chatSessions[currentChatIndex].messages = messages;
+                
+                // Update last message and title
+                if (messages.length > 0) {
+                    const lastMsg = messages[messages.length - 1];
+                    chatSessions[currentChatIndex].lastMessage = lastMsg.content.replace(/<[^>]*>/g, '').substring(0, 100);
+                    
+                    // Set title from first user message
+                    const firstUserMsg = messages.find(m => m.className.includes('user'));
+                    if (firstUserMsg && chatSessions[currentChatIndex].title === 'New Chat') {
+                        chatSessions[currentChatIndex].title = firstUserMsg.content.replace(/<[^>]*>/g, '').substring(0, 50) + '...';
+                    }
+                }
+
+                // Save to localStorage
+                localStorage.setItem('agentChatSessions', JSON.stringify(chatSessions));
+                console.log('[DEBUG] Saved chat session:', chatSessions[currentChatIndex].id);
+            }
+        }
+    }
+
     loadSessionHistory() {
+        // Load chat sessions from localStorage and backend
+        this.loadChatHistorySidebar();
+        
         // Try to load previous session
-        const savedSessionId = localStorage.getItem('current_session_id');
+        const savedSessionId = localStorage.getItem('agentCurrentSessionId');
         if (savedSessionId) {
             this.currentSessionId = savedSessionId;
             console.log('[DEBUG] Loaded chat session:', savedSessionId);
         }
+    }
+
+    loadChatHistorySidebar() {
+        const historyList = document.getElementById('chat-history-list');
+        if (!historyList) return;
+
+        // Load from localStorage first
+        const sessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
+        
+        historyList.innerHTML = '';
+
+        sessions.forEach((chat, index) => {
+            const chatItem = document.createElement('div');
+            chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
+
+            const agentName = chat.agent.charAt(0).toUpperCase() + chat.agent.slice(1);
+            const date = new Date(chat.timestamp).toLocaleDateString();
+
+            chatItem.innerHTML = `
+                <div class="chat-title">${chat.title || 'New Chat'}</div>
+                <div class="chat-preview">${chat.lastMessage || 'No messages yet'}</div>
+                <div class="chat-meta">${agentName} • ${date}</div>
+            `;
+
+            chatItem.addEventListener('click', () => this.loadChatSession(index));
+            historyList.appendChild(chatItem);
+        });
+
+        // Also fetch sessions from backend memory
+        this.fetchBackendSessions();
+    }
+
+    async fetchBackendSessions() {
+        try {
+            const response = await fetch('/api/sessions/list', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            if (response.ok) {
+                const backendSessions = await response.json();
+                console.log('[DEBUG] Found backend sessions:', backendSessions);
+                this.mergeBackendSessions(backendSessions);
+            }
+        } catch (error) {
+            console.log('[DEBUG] Could not fetch backend sessions:', error);
+        }
+    }
+
+    mergeBackendSessions(backendSessions) {
+        const historyList = document.getElementById('chat-history-list');
+        if (!historyList || !backendSessions.sessions) return;
+
+        backendSessions.sessions.forEach(session => {
+            const chatItem = document.createElement('div');
+            chatItem.className = 'chat-history-item backend-session';
+
+            const agentName = session.agent.charAt(0).toUpperCase() + session.agent.slice(1);
+            const date = new Date(session.timestamp).toLocaleDateString();
+
+            chatItem.innerHTML = `
+                <div class="chat-title">Session ${session.session_id.slice(-8)}</div>
+                <div class="chat-preview">${session.messages} messages</div>
+                <div class="chat-meta">${agentName} • ${date}</div>
+            `;
+
+            chatItem.addEventListener('click', () => this.loadBackendSession(session.session_id, session.agent));
+            historyList.appendChild(chatItem);
+        });
+    }
+
+    async loadBackendSession(sessionId, agent) {
+        try {
+            const response = await fetch(`/api/${agent}/session`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    action: 'load_session',
+                    session_id: sessionId
+                })
+            });
+
+            if (response.ok) {
+                const sessionData = await response.json();
+                this.loadSessionFromData(sessionData, agent);
+            }
+        } catch (error) {
+            console.error('[ERROR] Failed to load backend session:', error);
+        }
+    }
+
+    loadSessionFromData(sessionData, agent) {
+        // Switch agent if different
+        if (agent !== this.currentAgent) {
+            this.switchAgent(agent);
+        }
+
+        // Set session ID
+        this.currentSessionId = sessionData.session_id;
+        this.conversationHistory = sessionData.conversation_history || [];
+
+        // Clear and populate chat window
+        const chatWindow = document.getElementById('chat-window');
+        if (chatWindow) {
+            chatWindow.innerHTML = '';
+
+            this.conversationHistory.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender === 'user' ? 'user' : 'agent'}-message`;
+                messageDiv.innerHTML = this.formatMessage(msg.message);
+                chatWindow.appendChild(messageDiv);
+            });
+
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        console.log('[DEBUG] Loaded session from backend:', sessionData.session_id);
+    }
+
+    loadChatSession(index) {
+        const sessions = JSON.parse(localStorage.getItem('agentChatSessions') || '[]');
+        if (index < 0 || index >= sessions.length) return;
+
+        const chat = sessions[index];
+        currentChatIndex = index;
+        this.currentSessionId = chat.id;
+
+        // Switch agent if different
+        if (chat.agent !== this.currentAgent) {
+            this.switchAgent(chat.agent);
+        }
+
+        // Load messages
+        const chatWindow = document.getElementById('chat-window');
+        if (chatWindow) {
+            chatWindow.innerHTML = '';
+
+            if (chat.messages && chat.messages.length > 0) {
+                chat.messages.forEach(msg => {
+                    const messageDiv = document.createElement('div');
+                    messageDiv.className = msg.className;
+                    messageDiv.innerHTML = msg.content;
+                    chatWindow.appendChild(messageDiv);
+                });
+            }
+
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // Update sidebar
+        this.loadChatHistorySidebar();
+        console.log('[DEBUG] Loaded chat session:', chat.id);
     }
 }
