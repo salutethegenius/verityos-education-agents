@@ -208,6 +208,8 @@ function setupEventListeners() {
     }
 
     // Load chat history and initial session
+}
+
 async function sendMessage() {
     const messageInput = document.getElementById('message-input');
     const sendButton = document.getElementById('send-button');
