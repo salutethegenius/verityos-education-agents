@@ -11,7 +11,7 @@ run = [
 
 [nix]
 channel = "stable-24_05"
-packages = ["glibcLocales", "libyaml", "awscli2"]
+packages = ["glibcLocales", "libyaml", "zlib", "awscli2"]
 
 [env]
 FLASK_DEBUG = "0"
