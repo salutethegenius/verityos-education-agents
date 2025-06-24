@@ -17,25 +17,30 @@ function isAgentInterface() {
     return isAgentTitle && isNotStudent && hasAgentElements;
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Only initialize on agent interface page
-    if (!isAgentInterface()) {
-        return;
-    }
+// Prevent multiple event listeners
+if (!window.agentAppDOMListenerAdded) {
+    window.agentAppDOMListenerAdded = true;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+        // Only initialize on agent interface page
+        if (!isAgentInterface()) {
+            return;
+        }
 
-    // Prevent multiple initializations more robustly
-    if (window.chatInterfaceInstance || appInitialized || document.body.hasAttribute('data-agent-app-initialized')) {
-        console.log('[DEBUG] App already initialized, skipping...');
-        return;
-    }
+        // Prevent multiple initializations more robustly
+        if (window.chatInterfaceInstance || appInitialized || document.body.hasAttribute('data-agent-app-initialized')) {
+            console.log('[DEBUG] App already initialized, skipping...');
+            return;
+        }
 
-    console.log('[DEBUG] DOM loaded, initializing...');
-    appInitialized = true;
-    document.body.setAttribute('data-agent-app-initialized', 'true');
+        console.log('[DEBUG] DOM loaded, initializing...');
+        appInitialized = true;
+        document.body.setAttribute('data-agent-app-initialized', 'true');
 
-    // Initialize chat interface and store reference
-    window.chatInterfaceInstance = new ChatInterface();
-});
+        // Initialize chat interface and store reference
+        window.chatInterfaceInstance = new ChatInterface();
+    });
+}
 
 // Chat Interface Application
 class ChatInterface {
@@ -206,7 +211,11 @@ class ChatInterface {
     }
 
     initializeEventListeners() {
-        // Prevent duplicate event listeners
+        // Store bound functions to prevent memory leaks
+        this.boundSendMessage = this.boundSendMessage || (() => this.sendMessage());
+        this.boundStartNewConversation = this.boundStartNewConversation || (() => this.startNewConversation());
+        this.boundToggleSidebar = this.boundToggleSidebar || (() => this.toggleSidebar());
+        
         const elements = {
             sendBtn: document.getElementById('send-button'),
             messageInput: document.getElementById('message-input'),
@@ -217,56 +226,74 @@ class ChatInterface {
             taskSelect: document.getElementById('task-select')
         };
 
+        // Clean up existing listeners first
+        Object.values(elements).forEach(el => {
+            if (el && el.hasAttribute('data-listener-added')) {
+                el.replaceWith(el.cloneNode(true));
+            }
+        });
+
+        // Re-get elements after cloning
+        const cleanElements = {
+            sendBtn: document.getElementById('send-button'),
+            messageInput: document.getElementById('message-input'),
+            newConversationBtn: document.getElementById('new-chat-btn'),
+            agentSelect: document.getElementById('agent-select'),
+            sidebarToggle: document.getElementById('sidebar-toggle'),
+            subjectSelect: document.getElementById('subject-select'),
+            taskSelect: document.getElementById('task-select')
+        };
+
         // Send message button
-        if (elements.sendBtn && !elements.sendBtn.hasAttribute('data-listener-added')) {
-            elements.sendBtn.addEventListener('click', () => this.sendMessage());
-            elements.sendBtn.setAttribute('data-listener-added', 'true');
+        if (cleanElements.sendBtn) {
+            cleanElements.sendBtn.addEventListener('click', this.boundSendMessage);
+            cleanElements.sendBtn.setAttribute('data-listener-added', 'true');
         }
 
         // Message input
-        if (elements.messageInput && !elements.messageInput.hasAttribute('data-listener-added')) {
-            elements.messageInput.addEventListener('keypress', (e) => {
+        if (cleanElements.messageInput) {
+            cleanElements.messageInput.addEventListener('keypress', (e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                     e.preventDefault();
                     this.sendMessage();
                 }
             });
-            elements.messageInput.setAttribute('data-listener-added', 'true');
+            cleanElements.messageInput.setAttribute('data-listener-added', 'true');
         }
 
         // New conversation button
-        if (elements.newConversationBtn && !elements.newConversationBtn.hasAttribute('data-listener-added')) {
-            elements.newConversationBtn.addEventListener('click', () => this.startNewConversation());
-            elements.newConversationBtn.setAttribute('data-listener-added', 'true');
+        if (cleanElements.newConversationBtn) {
+            cleanElements.newConversationBtn.addEventListener('click', this.boundStartNewConversation);
+            cleanElements.newConversationBtn.setAttribute('data-listener-added', 'true');
         }
 
         // Agent selection dropdown
-        if (elements.agentSelect && !elements.agentSelect.hasAttribute('data-listener-added')) {
-            elements.agentSelect.addEventListener('change', (e) => {
+        if (cleanElements.agentSelect) {
+            cleanElements.agentSelect.addEventListener('change', (e) => {
                 this.switchAgent(e.target.value);
             });
-            elements.agentSelect.setAttribute('data-listener-added', 'true');
+            cleanElements.agentSelect.setAttribute('data-listener-added', 'true');
         }
 
         // Sidebar toggle
-        if (elements.sidebarToggle && !elements.sidebarToggle.hasAttribute('data-listener-added')) {
-            elements.sidebarToggle.addEventListener('click', () => this.toggleSidebar());
-            elements.sidebarToggle.setAttribute('data-listener-added', 'true');
+        if (cleanElements.sidebarToggle) {
+            cleanElements.sidebarToggle.addEventListener('click', this.boundToggleSidebar);
+            cleanElements.sidebarToggle.setAttribute('data-listener-added', 'true');
         }
 
         // Subject and task selects
-        if (elements.subjectSelect && !elements.subjectSelect.hasAttribute('data-listener-added')) {
-            elements.subjectSelect.addEventListener('change', () => {
-                console.log('[DEBUG] Subject changed to:', elements.subjectSelect.value);
+        if (cleanElements.subjectSelect) {
+            cleanElements.subjectSelect.addEventListener('change', () => {
+                console.log('[DEBUG] Subject changed to:', cleanElements.subjectSelect.value);
             });
-            elements.subjectSelect.setAttribute('data-listener-added', 'true');
+            cleanElements.subjectSelect.setAttribute('data-listener-added', 'true');
         }
 
-        if (elements.taskSelect && !elements.taskSelect.hasAttribute('data-listener-added')) {
-            elements.taskSelect.addEventListener('change', () => {
-                console.log('[DEBUG] Task changed to:', elements.taskSelect.value);
+        if (cleanElements.taskSelect) {
+            cleanElements.taskSelect.addEventListener('change', () => {
+                console.log('[DEBUG] Task changed to:', cleanElements.taskSelect.value);
             });
-            elements.taskSelect.setAttribute('data-listener-added', 'true');
+            cleanElements.taskSelect.setAttribute('data-listener-added', 'true');
         }
 
         console.log('[DEBUG] Event listeners initialized');
@@ -552,6 +579,10 @@ class ChatInterface {
         chatSessions.forEach((chat, index) => {
             const chatItem = document.createElement('div');
             chatItem.className = `chat-history-item ${index === currentChatIndex ? 'active' : ''}`;
+            
+            // Add data attribute for debugging
+            chatItem.setAttribute('data-chat-index', index);
+            chatItem.setAttribute('data-session-id', chat.id);
 
             const agentName = this.getAgentDisplayName(chat.agent);
             const date = new Date(chat.timestamp).toLocaleDateString();
@@ -562,7 +593,18 @@ class ChatInterface {
                 <div class="chat-meta">${agentName} • ${date}</div>
             `;
 
-            chatItem.addEventListener('click', () => this.loadChatSession(index));
+            // Use arrow function to preserve 'this' context and add error handling
+            chatItem.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('[DEBUG] Chat item clicked:', index, chat.id);
+                try {
+                    this.loadChatSession(index);
+                } catch (error) {
+                    console.error('[ERROR] Failed to load chat session:', error);
+                }
+            });
+            
             historyList.appendChild(chatItem);
         });
 
@@ -679,58 +721,88 @@ class ChatInterface {
     }
 
     loadChatSession(index) {
-        if (index < 0 || index >= chatSessions.length) return;
-
-        // Save current session first
-        if (currentChatIndex >= 0) {
-            this.saveChatSession();
+        console.log('[DEBUG] Loading chat session, index:', index, 'total sessions:', chatSessions.length);
+        
+        if (index < 0 || index >= chatSessions.length) {
+            console.error('[ERROR] Invalid chat session index:', index);
+            return;
         }
 
-        const chat = chatSessions[index];
-        currentChatIndex = index;
-        this.currentSessionId = chat.id;
+        try {
+            // Save current session first
+            if (currentChatIndex >= 0 && currentChatIndex !== index) {
+                this.saveChatSession();
+            }
 
-        // Switch agent if different
-        if (chat.agent !== this.currentAgent) {
-            this.currentAgent = chat.agent;
-            this.updateDropdownsForAgent(chat.agent);
+            const chat = chatSessions[index];
+            if (!chat) {
+                console.error('[ERROR] Chat session not found at index:', index);
+                return;
+            }
             
-            // Update agent select
-            const agentSelect = document.getElementById('agent-select');
-            if (agentSelect) {
-                agentSelect.value = chat.agent;
-            }
-        }
+            console.log('[DEBUG] Loading chat:', chat.id, 'agent:', chat.agent);
+            
+            currentChatIndex = index;
+            this.currentSessionId = chat.id;
 
-        // Load messages
-        const chatWindow = document.getElementById('chat-window');
-        if (chatWindow) {
-            chatWindow.innerHTML = '';
-
-            if (chat.messages && chat.messages.length > 0) {
-                chat.messages.forEach(msg => {
-                    const messageDiv = document.createElement('div');
-                    messageDiv.className = msg.className;
-                    messageDiv.innerHTML = msg.content;
-                    chatWindow.appendChild(messageDiv);
-                });
-            } else {
-                // Show welcome message if no messages
-                const welcomeDiv = document.createElement('div');
-                welcomeDiv.className = 'message agent-message';
-                welcomeDiv.innerHTML = '<strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!';
-                chatWindow.appendChild(welcomeDiv);
+            // Switch agent if different
+            if (chat.agent !== this.currentAgent) {
+                console.log('[DEBUG] Switching agent from', this.currentAgent, 'to', chat.agent);
+                this.currentAgent = chat.agent;
+                this.updateDropdownsForAgent(chat.agent);
+                
+                // Update agent select
+                const agentSelect = document.getElementById('agent-select');
+                if (agentSelect) {
+                    agentSelect.value = chat.agent;
+                }
             }
 
-            chatWindow.scrollTop = chatWindow.scrollHeight;
+            // Load messages
+            const chatWindow = document.getElementById('chat-window');
+            if (chatWindow) {
+                chatWindow.innerHTML = '';
+
+                if (chat.messages && chat.messages.length > 0) {
+                    console.log('[DEBUG] Loading', chat.messages.length, 'messages');
+                    chat.messages.forEach((msg, msgIndex) => {
+                        try {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = msg.className || 'message';
+                            messageDiv.innerHTML = msg.content || '';
+                            chatWindow.appendChild(messageDiv);
+                        } catch (msgError) {
+                            console.error('[ERROR] Failed to load message', msgIndex, ':', msgError);
+                        }
+                    });
+                } else {
+                    // Show welcome message if no messages
+                    const welcomeDiv = document.createElement('div');
+                    welcomeDiv.className = 'message agent-message';
+                    welcomeDiv.innerHTML = '<strong>Welcome to VerityOS Education Agents!</strong> I\'m here to help you with educational tasks. Select an agent and start chatting!';
+                    chatWindow.appendChild(welcomeDiv);
+                }
+
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+
+            // Update sidebar to show active session (without reloading all items)
+            const allItems = document.querySelectorAll('.chat-history-item');
+            allItems.forEach((item, i) => {
+                if (i === index) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+
+            // Save current session ID
+            localStorage.setItem('agentCurrentSessionId', this.currentSessionId);
+
+            console.log('[DEBUG] Successfully loaded chat session:', chat.id, 'with', chat.messages?.length || 0, 'messages');
+            
+        } catch (error) {
+            console.error('[ERROR] Failed to load chat session:', error);
         }
-
-        // Update sidebar to show active session
-        this.loadChatHistorySidebar();
-
-        // Save current session ID
-        localStorage.setItem('agentCurrentSessionId', this.currentSessionId);
-
-        console.log('[DEBUG] Loaded chat session:', chat.id, 'with', chat.messages?.length || 0, 'messages');
     }
 }
