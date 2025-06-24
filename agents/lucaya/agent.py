@@ -12,7 +12,7 @@ from openai import OpenAI
 
 from core.agent_base import BaseAgent
 from core.memory_manager import MemoryManager
-from core.rag_system import RAGSystem
+fromcore.rag_system import RAGSystem
 from utils.bahamas_context import BahamasContext
 from utils.safety_filters import SafetyFilter
 from .prompts import LucayaPrompts
@@ -203,9 +203,9 @@ Make it practical for Bahamian educational context."""
             "• Academic journals and encyclopedias",
             "• Established news organizations",
             "",
-            f"🌟 {self.prompts.get_research_tip()}"
+            "🌟 Remember to always verify information from multiple reliable sources!"
         ]
-        
+
         return "\n".join(tips)
 
     def _handle_citation_help(self, query: str) -> str:

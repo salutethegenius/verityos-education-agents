@@ -152,23 +152,28 @@ class CoralAgent:
 
         # Load session data from memory system
         sessions = []
-        memory_files = os.listdir("memory") if os.path.exists("memory") else []
+        try:
+            memory_files = os.listdir("memory") if os.path.exists("memory") else []
 
-        for filename in memory_files:
-            if filename.endswith("_session.json"):
-                try:
-                    with open(f"memory/{filename}", 'r') as f:
-                        session_data = json.load(f)
-                        # Check if this session belongs to our student
-                        if ('student_name' in session_data and 
-                            student['name'].lower() in session_data.get('student_name', '').lower()):
-                            sessions.append({
-                                "session_id": session_data.get('session_id', 'Unknown'),
-                                "agent": session_data.get('agent_name', 'Unknown'),
-                                "timestamp": session_data.get('timestamp', 'Unknown'),
-                                "messages": len(session_data.get('data', {}).get('conversation_history', []))
-                            })
-                except:
+            for filename in memory_files:
+                if filename.endswith("_session.json"):
+                    try:
+                        with open(f"memory/{filename}", 'r') as f:
+                            session_data = json.load(f)
+                            # Check if this session belongs to our student
+                            if ('student_name' in session_data and 
+                                student['name'].lower() in session_data.get('student_name', '').lower()):
+                                sessions.append({
+                                    "session_id": session_data.get('session_id', 'Unknown'),
+                                    "agent": session_data.get('agent_name', 'Unknown'),
+                                    "timestamp": session_data.get('timestamp', 'Unknown'),
+                                    "messages": len(session_data.get('data', {}).get('conversation_history', []))
+                                })
+                    except Exception as file_error:
+                        logger.warning(f"Failed to read session file {filename}: {file_error}")
+                        continue
+        except Exception as dir_error:
+            logger.error(f"Failed to access memory directory: {dir_error}")
                     continue
 
         if not sessions:

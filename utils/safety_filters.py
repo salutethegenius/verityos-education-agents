@@ -114,7 +114,16 @@ class SafetyFilter:
     def _contains_inappropriate_content(self, message: str) -> bool:
         """Check for inappropriate content"""
         message_lower = message.lower()
-        return any(word in message_lower for word in self.inappropriate_words)
+        # Check basic inappropriate words
+        if any(word in message_lower for word in self.inappropriate_words):
+            return True
+        
+        # Check comprehensive inappropriate content categories
+        for category, words in self.inappropriate_content.items():
+            if any(word in message_lower for word in words):
+                return True
+        
+        return False
 
     def filter_content(self, content: str, safety_level: str = "moderate", 
                       grade_level: str = "middle") -> Tuple[str, List[str]]:

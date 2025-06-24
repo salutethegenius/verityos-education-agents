@@ -177,23 +177,32 @@ def session_endpoint(agent_name):
 
         if action == 'load_session':
             # Load conversation history from memory
-            from core.memory_manager import MemoryManager
-            memory_manager = MemoryManager()
+            try:
+                from core.memory_manager import MemoryManager
+                memory_manager = MemoryManager()
 
-            session_data = memory_manager.load_memory(agent_name, session_id, "session")
+                session_data = memory_manager.load_memory(agent_name, session_id, "session")
 
-            if session_data and 'conversation_history' in session_data:
-                return jsonify({
-                    "conversation_history": session_data['conversation_history'],
-                    "session_id": session_id,
-                    "agent": agent_name
-                })
-            else:
+                if session_data and 'conversation_history' in session_data:
+                    return jsonify({
+                        "conversation_history": session_data['conversation_history'],
+                        "session_id": session_id,
+                        "agent": agent_name
+                    })
+                else:
+                    return jsonify({
+                        "conversation_history": [],
+                        "session_id": session_id,
+                        "agent": agent_name,
+                        "message": "No previous session found"
+                    })
+            except Exception as memory_error:
+                app.logger.error(f"Memory loading error: {str(memory_error)}")
                 return jsonify({
                     "conversation_history": [],
                     "session_id": session_id,
                     "agent": agent_name,
-                    "message": "No previous session found"
+                    "error": "Failed to load session history"
                 })
 
         return jsonify({"error": "Unknown action"}), 400
