@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,124 +11,55 @@
         <div class="login-card">
             <h1>🎓 VerityOS Education</h1>
             <h2>Student Portal</h2>
-            
+
             <form id="student-login-form">
                 <div class="form-group">
                     <label for="student-id">Student ID:</label>
-                    <input type="text" id="student-id" name="student-id" placeholder="Enter your Student ID (e.g., JS001)" required>
+                    <input type="text" id="student-id" name="student_id" placeholder="Enter your Student ID (e.g., JS001)" required>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="student-password">Password:</label>
-                    <input type="password" id="student-password" name="student-password" placeholder="Enter your password" required>
+                    <input type="password" id="student-password" name="password" placeholder="Enter your password" required>
                 </div>
-                
+
                 <button type="submit" class="login-btn">Login to Learning Portal</button>
             </form>
-            
+
+            <div id="error-message" class="error-message" style="display: none;"></div>
+            <div id="success-message" class="success-message" style="display: none;"></div>
+
             <div class="login-footer">
                 <p>Need help? Ask your teacher for your Student ID and password</p>
-                <p><small>Example: Student ID = JS001, Password = jrolle</small></p>
-                <a href="/">Teacher Portal</a>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.getElementById('student-login-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const studentId = document.getElementById('student-id').value;
-            const password = document.getElementById('student-password').value;
-            
-            // Validate credentials with server
-            fetch('/api/validate-student', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    student_id: studentId,
-                    password: password
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Store student info in session
-                    sessionStorage.setItem('student_id', studentId);
-                    sessionStorage.setItem('student_name', data.student_name);
-                    
-                    // Redirect to student interface
-                    window.location.href = `/student?id=${studentId}&name=${encodeURIComponent(data.student_name)}`;
-                } else {
-                    alert('Invalid credentials. Please check your Student ID and password.');
-                }
-            })
-            .catch(error => {
-                console.error('Login error:', error);
-                alert('Login failed. Please try again.');
-            });
-        });
-    </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VerityOS Education - Student Login</title>
-    <link rel="stylesheet" href="/static/css/style.css">
-</head>
-<body>
-    <div class="login-container">
-        <div class="login-card">
-            <h1>🎓 VerityOS Education</h1>
-            <h2>Student Portal</h2>
-            
-            <form id="login-form">
-                <div class="form-group">
-                    <label for="student-id">Student ID</label>
-                    <input type="text" id="student-id" name="student_id" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required>
-                </div>
-                
-                <button type="submit" class="login-btn">Login</button>
-            </form>
-            
-            <div id="error-message" style="color: red; margin-top: 10px; display: none;"></div>
-            
-            <div class="login-footer">
-                <p>Need help? Contact your teacher.</p>
+                <p><small>Example: Student ID = RS009, Password = rsimms</small></p>
                 <a href="/">← Back to Teacher Portal</a>
             </div>
         </div>
     </div>
 
     <script>
-        document.getElementById('login-form').addEventListener('submit', async function(e) {
+        document.getElementById('student-login-form').addEventListener('submit', async function(e) {
             e.preventDefault();
-            
+
             const studentId = document.getElementById('student-id').value.trim();
-            const password = document.getElementById('password').value.trim();
+            const password = document.getElementById('student-password').value.trim();
             const errorDiv = document.getElementById('error-message');
+            const successDiv = document.getElementById('success-message');
             const submitBtn = document.querySelector('.login-btn');
-            
+
+            // Hide previous messages
+            errorDiv.style.display = 'none';
+            successDiv.style.display = 'none';
+
             if (!studentId || !password) {
-                errorDiv.textContent = 'Please enter both Student ID and Password';
-                errorDiv.style.display = 'block';
+                showError('Please enter both Student ID and Password');
                 return;
             }
-            
+
+            // Show loading state
             submitBtn.disabled = true;
             submitBtn.textContent = 'Logging in...';
-            errorDiv.style.display = 'none';
-            
+
             try {
                 const response = await fetch('/api/validate-student', {
                     method: 'POST',
@@ -141,29 +71,49 @@
                         password: password
                     })
                 });
-                
+
                 const data = await response.json();
-                
+
                 if (data.success) {
-                    // Store student info and redirect
+                    // Store student info
                     sessionStorage.setItem('student_id', studentId);
                     sessionStorage.setItem('student_name', data.student_name);
                     sessionStorage.setItem('student_grade', data.grade);
-                    
-                    window.location.href = `/student?id=${encodeURIComponent(studentId)}&name=${encodeURIComponent(data.student_name)}`;
+
+                    showSuccess(`Welcome ${data.student_name}! Redirecting...`);
+
+                    // Redirect after short delay
+                    setTimeout(() => {
+                        window.location.href = `/student?id=${encodeURIComponent(studentId)}&name=${encodeURIComponent(data.student_name)}`;
+                    }, 1000);
                 } else {
-                    errorDiv.textContent = data.message || 'Login failed';
-                    errorDiv.style.display = 'block';
+                    showError(data.message || 'Invalid credentials. Please check your Student ID and password.');
                 }
-                
+
             } catch (error) {
                 console.error('Login error:', error);
-                errorDiv.textContent = 'Connection error. Please try again.';
-                errorDiv.style.display = 'block';
+                showError('Connection error. Please try again.');
             } finally {
                 submitBtn.disabled = false;
-                submitBtn.textContent = 'Login';
+                submitBtn.textContent = 'Login to Learning Portal';
             }
+        });
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error-message');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('success-message');
+            successDiv.textContent = message;
+            successDiv.style.display = 'block';
+        }
+
+        // Auto-focus on student ID field
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('student-id').focus();
         });
     </script>
 </body>

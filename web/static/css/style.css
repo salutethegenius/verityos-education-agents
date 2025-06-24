@@ -754,6 +754,40 @@ input[type="range"]::-moz-range-thumb {
   font-size: var(--font-size-sm);
 }
 
+/* Login message styles */
+.error-message {
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  color: #dc2626;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.success-message {
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  color: #16a34a;
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+  font-size: var(--font-size-sm);
+  text-align: center;
+}
+
+.login-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
 /* Dashboard specific */
 .dashboard-header {
   background: linear-gradient(135deg, var(--primary-purple), #7c3aed);
