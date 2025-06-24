@@ -19,20 +19,32 @@
         };
     });
 
-    // Block Radix UI globals completely
-    Object.defineProperty(window, 'RadixUI', {
-        get: () => undefined,
-        set: () => {},
-        configurable: false,
-        enumerable: false
-    });
+    // Block Radix UI globals safely
+    try {
+        if (!window.RadixUI) {
+            Object.defineProperty(window, 'RadixUI', {
+                get: () => undefined,
+                set: () => {},
+                configurable: true,
+                enumerable: false
+            });
+        }
+    } catch (e) {
+        // Ignore if property already exists and is non-configurable
+    }
 
-    Object.defineProperty(window, 'Radix', {
-        get: () => undefined,
-        set: () => {},
-        configurable: false,
-        enumerable: false
-    });
+    try {
+        if (!window.Radix) {
+            Object.defineProperty(window, 'Radix', {
+                get: () => undefined,
+                set: () => {},
+                configurable: true,
+                enumerable: false
+            });
+        }
+    } catch (e) {
+        // Ignore if property already exists and is non-configurable
+    }
 })();
 
 // Chat Interface Application

@@ -3,7 +3,6 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from flask import Flask, render_template, request, jsonify
-# from flask_cors import CORS  # Temporarily disabled
 from agents.sage.agent import run_agent as run_sage
 from agents.quill.agent import run_agent as run_quill
 from agents.echo.agent import run_agent as run_echo
@@ -14,7 +13,6 @@ from utils.safety_filters import SafetyFilter
 import logging
 
 app = Flask(__name__)
-# CORS(app)  # Temporarily disabled
 
 # Initialize safety filter
 safety_filter = SafetyFilter()
@@ -69,12 +67,13 @@ def agent_endpoint(agent_name):
         # Get JSON data with better error handling
         try:
             data = request.get_json(force=True)
+            if data is None:
+                return jsonify({"error": "No JSON data provided"}), 400
         except Exception as json_error:
             app.logger.error(f"JSON parsing error: {json_error}")
             return jsonify({"error": "Invalid JSON format"}), 400
 
-        if not data:
-            return jsonify({"error": "No JSON data provided"}), 400
+        
 
         # Validate and sanitize input
         message = data.get('message', '')

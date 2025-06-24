@@ -27,11 +27,15 @@ function initializeDashboardEventListeners() {
     if (messageInput) {
         messageInput.removeEventListener('keydown', handleDashboardKeydown);
         messageInput.addEventListener('keydown', handleDashboardKeydown);
+    } else {
+        console.warn('[DASHBOARD] Message input element not found');
     }
 
     if (sendButton) {
         sendButton.removeEventListener('click', sendDashboardMessage);
         sendButton.addEventListener('click', sendDashboardMessage);
+    } else {
+        console.warn('[DASHBOARD] Send button element not found');
     }
 }
 

@@ -101,9 +101,26 @@
     <script>
         // Complete Radix UI blocking before any other scripts
         (function() {
-          // Block all Radix globals
-          Object.defineProperty(window, 'RadixUI', { value: undefined, writable: false });
-          Object.defineProperty(window, 'Radix', { value: undefined, writable: false });
+          // Block all Radix globals safely
+          try {
+            if (!window.RadixUI) {
+              Object.defineProperty(window, 'RadixUI', { 
+                value: undefined, 
+                writable: false, 
+                configurable: true 
+              });
+            }
+          } catch (e) { /* Ignore if already exists */ }
+          
+          try {
+            if (!window.Radix) {
+              Object.defineProperty(window, 'Radix', { 
+                value: undefined, 
+                writable: false, 
+                configurable: true 
+              });
+            }
+          } catch (e) { /* Ignore if already exists */ }
           
           // Override console to block Radix messages
           const originalConsole = console.log;
